@@ -1,0 +1,191 @@
+{
+    "students":[
+
+        {
+            "id":1,
+            "first_name":"Julietta",
+            "last_name":"Knight",
+            "house":"Fire",
+            "DOB":"27/01/2010",
+            "games":[
+                {
+                "gid":1,
+                "position":2
+                },
+                {
+                    "gid":5,
+                    "position":3
+                }
+        ]},
+        {
+            "id":2,
+            "first_name":"Valentin",
+            "last_name":"Shewsmith",
+            "house":"Earth",
+            "DOB":"29/10/2017",
+            "games":[
+                {
+                    "gid":1,
+                    "position":3
+                },
+                {
+                    "gid":5,
+                    "position":2
+                },
+                {
+                    "gid":4,
+                    "position":4
+                }
+        ]},
+        {
+            "id":3,
+            "first_name":"Brynna",
+            "last_name":"Grassot",
+            "house":"Wind",
+            "DOB":"14/03/2012",
+            "games":[
+                {
+                    "gid":1,
+                    "position":4
+                },
+                {
+                    "gid":5,
+                    "position":1
+                },
+                {
+                    "gid":4,
+                    "position":1
+                },
+                {
+                    "gid":3,
+                    "position":1
+                }
+        ]},
+        {
+            "id":4,
+            "first_name":"Ania",
+            "last_name":"Windless",
+            "house":"Earth",
+            "DOB":"05/07/2007",
+            "games":[    
+                {
+                "gid":2,
+                "position":2
+            },
+            {
+                "gid":4,
+                "position":2
+            },
+            {
+                "gid":3,
+                "position":2
+            }
+        ]},
+        {
+            "id":5,
+            "first_name":"Marjory",
+            "last_name":"Allewell",
+            "house":"Wind",
+            "DOB":"04/08/2010",
+            "games":[
+                {
+                    "gid":5,
+                    "position":1
+                },
+                {
+                    "gid":4,
+                    "position":3
+                }
+        ]},
+        {
+            "id":6,
+            "first_name":"Waylan",
+            "last_name":"Sparrowhawk",
+            "house":"Water",
+            "DOB":"25/12/2010",
+            "games":[
+                {
+                    "gid":3,
+                    "position":4
+                },
+                {
+                    "gid":2,
+                    "position":4
+                }
+        ]}
+    ],
+    "games":[
+        {
+            "id":1,
+            "name":"100m Sprint",
+            "category":"15-A",
+            "relay":false,
+            "players":[1,2,3],
+            "date_played":"28/01/2024"
+        },
+        {
+            "id":2,
+            "name":"Shotput",
+            "category":"15-A",
+            "relay":false,
+            "players":[6,4],
+                "date_played":"10/10/2023"
+        },
+        {
+            "id":3,
+            "name":"Javelin",
+            "category":"15-A",
+            "relay":false,
+            "players":[4,6,3],
+                "date_played":"02/05/2024"
+        },
+        {
+            "id":4,
+            "name":"Bean bag",
+            "category":"15-A",
+            "relay":true,
+            "players":[5,4,2,3],
+                "date_played":"07/03/2024"
+        },
+        {
+            "id":5,
+            "name":"400m Sprint",
+            "category":"U-14",
+            "relay":true,
+            "players":[1,2,3,5],
+            "date_played":"18/04/2024"
+        }
+
+],
+"users": [
+    {
+      "id": "69b6",
+      "first_name": "Joan",
+      "last_name": "Mukiibi",
+      "password": "jklksjd",
+      "email": "joan@kl.lk"
+    },
+    {
+      "id": "4069",
+      "first_name": "jacob",
+      "last_name": "kiki",
+      "password": "kiojkl",
+      "email": "kio@jk.io"
+    },
+    {
+      "id": "a8f9",
+      "first_name": "berna",
+      "last_name": "boy",
+      "password": "kdlfjer",
+      "email": "boer@kjkd.kl"
+    },
+    {
+      "id": "0d50",
+      "first_name": "Timo",
+      "last_name": "Ssemwo",
+      "password": "oi8wej",
+      "email": "tio@hio.kl"
+    }
+  ]
+
+}
