@@ -7,6 +7,8 @@ import Team from './components/Team/Team'
 import Details from './components/Team/Details'
 import MemberForm from './components/Team/MemberForm'
 import Transactions from './components/Transactions/Transactions'
+import TransactionTypeForm from './components/Transactions/TransactionTypeForm'
+import TransactionDetails from './components/Transactions/TransactionDetails'
 
 const App = () => {
 
@@ -21,7 +23,10 @@ const App = () => {
               <Route path=':id' element={<Details />} />
               <Route path='add/' element={<MemberForm />} />
             </Route>
-            <Route path='transactions/' element={<Transactions />} />
+            <Route path='transactions/' element={<Transactions />}>
+              <Route path='add-type/' element={<TransactionTypeForm />} />
+              <Route path=':id/' element={<TransactionDetails />} />
+            </Route> 
         </Route>
         <Route path='/login' element={<Login />} />
       </Routes>
