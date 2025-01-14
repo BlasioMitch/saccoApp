@@ -4,35 +4,27 @@ import { NavLink } from 'react-router-dom'
 function StatCards() {
     return (
         <>
-        <Card titleText='Transactions' 
+        <Card titleText='Loans in Cash' 
             cardText={
                 <div className='flex justify-between -mt-2'>
                     <div className='flex-1 border-r border-r-dblack-50'>
-                        <p className='text-center text-sm text-dcyan-700'>Successful</p>
-                        <p className='text-center text-dcyan-300'>250</p>
+                        <p className='text-center text-sm text-dcyan-700'>Amount (UGX)</p>
+                        <p className='text-center text-dcyan'>250</p>
                     </div>
                     <div className='flex-1 border-l'>
-                        <p className='text-center text-sm text-red-400'>failed</p>
-                        <p className='text-center text-white'>2</p>
+                        <p className='text-center text-sm text-green-300'>Interest (UGX)</p>
+                        <p className='text-center text-white'>20</p>
                     </div>
                 </div>}/>
-        <Card titleText='Transaction types' cardText={
+        <Card titleText='Loans' cardText={
             <div className='flex justify-between -mt-2'>
-                    <div className='flex-1 border-r border-r-dblack-50'>
-                        <p className='text-center text-sm text-dcyan-400'>Dep</p>
-                        <p className='text-center text-dcyan-300'>250</p>
+                    <div className='flex-1 border-r'>
+                        <p className='text-center text-sm text-dcyan-400'>Awarded</p>
+                        <p className='text-center text-white'>60</p>
                     </div>
-                    <div className='flex-1 border-l'>
-                        <p className='text-center text-sm text-dcyan-400'>Loan</p>
-                        <p className='text-center text-white'>6</p>
-                    </div>
-                    <div className='flex-1 border-l'>
-                        <p className='text-center text-sm text-dcyan-400'>Mem</p>
-                        <p className='text-center text-white'>100</p>
-                    </div>
-                    <div className='flex-1 border-l'>
-                        <p className='text-center text-sm text-dcyan-400'>With</p>
-                        <p className='text-center text-white'>56</p>
+                    <div className='flex-1 border-l border-r-dblack-50'>
+                        <p className='text-center text-sm text-dcyan-400'>Applications</p>
+                        <p className='text-center text-dcyan-300'>70</p>
                     </div>
 
             </div>

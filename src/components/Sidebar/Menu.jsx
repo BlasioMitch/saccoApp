@@ -25,18 +25,18 @@ const Menu = ({expa, route}) => {
                     />
                 <MenuItem 
                     icon={<FiPaperclip className={`${expa?'':'flex-r1 size-5 delay-10 duration-100'}`}/>}
-                    title="Invoices"
+                    title="transactions"
                     selected={false}
                     expa={expa}
-                    route="transactions"
+                    route="/transactions"
 
                     />
                 <MenuItem 
                     icon={<FiLink className={`${expa?'':'flex-r1 size-5 delay-10 duration-100'}`}/>}
-                    title="Integrations"
+                    title="loans"
                     selected={false}
                     expa={expa}
-                    route="integrations"
+                    route="loans"
 
                     />
                 <MenuItem 

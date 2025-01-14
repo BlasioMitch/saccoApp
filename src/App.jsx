@@ -9,6 +9,8 @@ import MemberForm from './components/Team/MemberForm'
 import Transactions from './components/Transactions/Transactions'
 import TransactionTypeForm from './components/Transactions/TransactionTypeForm'
 import TransactionDetails from './components/Transactions/TransactionDetails'
+import Loans from './components/Loans/Loans'
+import LoanDetails from './components/Loans/LoanDetails'
 
 const App = () => {
 
@@ -27,6 +29,9 @@ const App = () => {
               <Route path='add-type/' element={<TransactionTypeForm />} />
               <Route path=':id/' element={<TransactionDetails />} />
             </Route> 
+            <Route path='loans/' element={<Loans /> }>
+                <Route path=':id' element={<LoanDetails />} />
+            </Route>
         </Route>
         <Route path='/login' element={<Login />} />
       </Routes>
