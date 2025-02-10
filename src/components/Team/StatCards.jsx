@@ -1,11 +1,13 @@
 import React from 'react'
 import { FiChevronDown } from 'react-icons/fi'
+import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 
 function StatCards() {
+    const {users} = useSelector(state => state.users)
     return (
         <>
-        <Card titleText='Members' cardText='26'/>
+        <Card titleText='Members' cardText={users.length}/>
         <Card titleText='Online members' cardText='6'/>
         {/* <Card titleText='Transactions' cardText='100'/> */}
         <div className='bg-dblack-900 rounded col-span-4 flex flex-col '>

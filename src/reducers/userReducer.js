@@ -4,7 +4,8 @@ import userService from '../services/user'
 const initialState = {
     user: null,
     error: null,
-    users: []
+    users: [],
+    status:'idle'
 }
 // register user in backend
 export const createUser = createAsyncThunk(
@@ -137,6 +138,6 @@ const usersSlice = createSlice({
 })
 
 
-export const {clearError} = usersSlice.actions
+export const {clearRegError} = usersSlice.actions
 
 export default usersSlice.reducer

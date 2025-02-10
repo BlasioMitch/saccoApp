@@ -2,8 +2,8 @@ import React from 'react'
 import moment from 'moment'
 import { useOutletContext } from 'react-router-dom'
 
-function TransactionDetails() {
-    const transaction = useOutletContext()
+const TTypeDetails = () => {
+    const transactiontype = useOutletContext()
 
     return (
         <>
@@ -11,13 +11,12 @@ function TransactionDetails() {
                 <div className='flex flex-col px-1 pb-2 
                 border-b-dblack-300 gap-3 rounded-b-lg'>
                     <h2 className='text-xl text-dcyan-600 font-bold py-2 mb-2 sticky top-0 bg-dblack-900'>Details</h2>
-                    <Detail title='trn id' value={transaction.id}/>
-                    <Detail title='account' value={transaction.account}/>
-                    <Detail title='type' value={transaction.type}/>
-                    <Detail title='amount' value={transaction.amount}/>
-                    <Detail title='status' value={transaction.status} />
-                    <Detail title='trn date' value={moment(transaction.created_on).format('DD-MMM-YYYY')} />
-                    <Detail title='by' value={transaction.created_by} />
+                    <Detail title='type id' value={transactiontype.id}/>
+                    <Detail title='name' value={transactiontype.name}/>
+                    <Detail title='description' value={transactiontype.description}/>
+                    <Detail title='created by' value={transactiontype.created_by}/>
+                    <Detail title='created on' value={moment(transactiontype.created_on).format('DD-MMM-YYYY')}/>
+
 
                 </div>
             </div>
@@ -25,7 +24,7 @@ function TransactionDetails() {
     )
 }
 
-export default TransactionDetails
+export default TTypeDetails
 
 const Detail = ({title, value}) => {
 

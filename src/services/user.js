@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseUrl = 'http://localhost:3001'
+// const baseUrl = 'http://localhost:3001'
+const baseUrl = 'http://localhost:8000/api'
 
 const createUser = (userData) =>{
     const request = axios.post(`${baseUrl}/users/`, userData)

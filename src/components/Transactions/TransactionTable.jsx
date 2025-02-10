@@ -1,13 +1,9 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import moment from 'moment'
 
 function TransactionTable({transactions}) {
-    // const transactions = [
-    //     {by:'mitchell nsimbi',id:1,account:234,type:'Loan Disb',amount:2000000,trndate:'12/9/2004',status:'success'},
-    //     {by:'mitchell nsimbi',id:2,account:234,type:'Loan Payt',amount:160000,trndate:'23/8/2014',status:'failed'},
-    //     {by:'mitchell nsimbi',id:3,account:234,type:'Membership Fee',amount:20000,trndate:'12/4/2024',status:'pending'}
-
-    // ]
     return (
         <>
         <table className='min-w-full mt-2  table-auto border-separate border-spacing-y-2' >
@@ -26,9 +22,10 @@ function TransactionTable({transactions}) {
             <tbody>
                 {
                     transactions.map(transaction => <TransactionRow 
-                        id={transaction.id} account={transaction.account}
-                        amount={transaction.amount} trn_date={transaction.trndate}
-                        status={transaction.status} type={transaction.type} by={transaction.by}
+                        id={transaction.id} account={transaction.account_no}
+                        amount={transaction.amount} trn_date={transaction.created_on}
+                        status={transaction.status} type={transaction.type} by={transaction.created_by}
+                        key={transaction.id}
                     />)
                 }
             </tbody>
@@ -53,8 +50,8 @@ const TransactionRow = ({id, account,type,amount,status, trn_date,by}) => {
                 <td className='pl-1.5 whitespace-nowrap'>{type}</td>
                 <td className='pl-1.5 whitespace-nowrap'>{amount}</td>
                 <td className='pl-1.5 whitespace-nowrap'>{status}</td>
-                <td className='pl-1.5 whitespace-nowrap'>{trn_date}</td>
-                <td className='pl-1.5 whitespace-nowrap'>{by}</td>
+                <td className='pl-1.5 whitespace-nowrap'>{moment(trn_date).format('DD-MMM-YYYY')}</td>
+                <td className='pl-1.5 whitespace-nowrap text-center'>{by}</td>
             </tr>
         </>
     )

@@ -11,6 +11,7 @@ import TransactionTypeForm from './components/Transactions/TransactionTypeForm'
 import TransactionDetails from './components/Transactions/TransactionDetails'
 import Loans from './components/Loans/Loans'
 import LoanDetails from './components/Loans/LoanDetails'
+import TTypeDetails from './components/Transactions/TTypeDetails'
 
 const App = () => {
 
@@ -28,6 +29,8 @@ const App = () => {
             <Route path='transactions/' element={<Transactions />}>
               <Route path='add-type/' element={<TransactionTypeForm />} />
               <Route path=':id/' element={<TransactionDetails />} />
+              <Route path='types/:id/' element={<TTypeDetails />}/>
+              {/* <Route path='types/edit/:id' /> */}
             </Route> 
             <Route path='loans/' element={<Loans /> }>
                 <Route path=':id' element={<LoanDetails />} />
