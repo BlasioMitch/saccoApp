@@ -7,6 +7,10 @@ import Team from './components/Team/Team'
 import Details from './components/Team/Details'
 import MemberForm from './components/Team/MemberForm'
 import Transactions from './components/Transactions/Transactions'
+import TransactionDetails from './components/Transactions/TransactionDetails'
+import Loans from './components/Loans/Loans'
+import LoanDetails from './components/Loans/LoanDetails'
+import TTypeDetails from './components/Transactions/TTypeDetails'
 
 const App = () => {
 
@@ -21,7 +25,13 @@ const App = () => {
               <Route path=':id' element={<Details />} />
               <Route path='add/' element={<MemberForm />} />
             </Route>
-            <Route path='transactions/' element={<Transactions />} />
+            <Route path='transactions/' element={<Transactions />}>
+              <Route path=':id/' element={<TransactionDetails />} />
+              <Route path='types/:id/' element={<TTypeDetails />}/>
+            </Route> 
+            <Route path='loans/' element={<Loans /> }>
+                <Route path=':id' element={<LoanDetails />} />
+            </Route>
         </Route>
         <Route path='/login' element={<Login />} />
       </Routes>

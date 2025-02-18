@@ -1,36 +1,34 @@
-import React from 'react'
+import React ,{ useEffect, useState} from 'react'
 import MemberTable from './MemberTable'
 import { FiFilter, FiUserPlus } from 'react-icons/fi'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchUsers } from '../../reducers/userReducer'
+
 
 function Member() {
-    const members = [
-        {
-            id:1,
-            name:'mitchell blasio',
-            amount:300000,
-            duration:'2 years',
-            paid:true
-            
-        },
-        {
-            id:2,
-            name:'Joan Nsimbi',
-            amount:4000000,
-            duration:'4 years',
-            paid:false
+    const dispatch = useDispatch()
+
+    const {status, error, users} = useSelector(state => state.users)
+
+    useEffect(() =>{
+        if (status === 'idle'){
+            dispatch(fetchUsers())
         }
-    ]
+    },[status, dispatch])
+
+    const members = users
+        
     const navigate = useNavigate()
     const openForm = () => {
         navigate('add/')
     }
     const {id} = useParams()
-    console.log(id,' is Id')
+
     const selectedMember = id
         ? members.find(member => member.id == id)
         : null
-    console.log(selectedMember, ' smmmm')
+
     return (
         <>
         <div className='col-span-8 row-span-2 p-4 rounded bg-dblack-900'>

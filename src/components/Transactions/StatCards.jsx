@@ -1,7 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState} from 'react'
 import { NavLink } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchTransactions } from '../../reducers/transactionReducer'
+import { fetchtransactiontypes } from '../../reducers/transactiontypesReducer'
 
 function StatCards() {
+    const dispatch = useDispatch()
+
+    const { status, error, transactions } = useSelector(state => state.transactions)
+    const {transactiontypes } = useSelector(state => state.transactiontypes)
+    useEffect(() => {
+        dispatch(fetchTransactions())
+        dispatch(fetchtransactiontypes())
+    },[ dispatch])
+    
+    // create filtered data on transactions
+    const success = transactions.filter(transaction => transaction.status === 'S')
+    const pending = transactions.filter(transaction => transaction.status === 'P')
+    const rejected = transactions.filter(transaction => transaction.status === 'R')
+
+
     return (
         <>
         <Card titleText='Transactions' 
@@ -9,14 +27,39 @@ function StatCards() {
                 <div className='flex justify-between -mt-2'>
                     <div className='flex-1 border-r border-r-dblack-50'>
                         <p className='text-center text-sm text-dcyan-700'>Successful</p>
+                        <p className='text-center text-dcyan-300'>{success.length}</p>
+                    </div>
+                    <div className='flex-1 border-l border-r-dblack-50'>
+                        <p className='text-center text-sm text-slate-300'>pending</p>
+                        <p className='text-center text-white'>{pending.length}</p>
+                    </div>
+
+                    <div className='flex-1 border-l'>
+                        <p className='text-center text-sm text-red-400'>failed</p>
+                        <p className='text-center text-white'>{rejected.length}</p>
+                    </div>
+                </div>}/>
+        <Card titleText='Transaction types' cardText={
+            <div className='flex justify-between -mt-2'>
+                    <div className='flex-1 border-r border-r-dblack-50'>
+                        <p className='text-center text-sm text-dcyan-400'>Dep</p>
                         <p className='text-center text-dcyan-300'>250</p>
                     </div>
                     <div className='flex-1 border-l'>
-                        <p className='text-center text-sm text-red-400'>failed</p>
-                        <p className='text-center text-white'>2</p>
+                        <p className='text-center text-sm text-dcyan-400'>Loan</p>
+                        <p className='text-center text-white'>6</p>
                     </div>
-                </div>}/>
-        <Card titleText='Transaction types' cardText='6'/>
+                    <div className='flex-1 border-l'>
+                        <p className='text-center text-sm text-dcyan-400'>Mem</p>
+                        <p className='text-center text-white'>100</p>
+                    </div>
+                    <div className='flex-1 border-l'>
+                        <p className='text-center text-sm text-dcyan-400'>With</p>
+                        <p className='text-center text-white'>56</p>
+                    </div>
+
+            </div>
+        }/>
         {/* <Card titleText='Transactions' cardText='100'/> */}
         <div className='bg-dblack-900 rounded col-span-4 flex flex-col '>
             <p className='text-xl px-2 my-2'>Quick links...</p>

@@ -1,10 +1,23 @@
 import React from 'react'
-import { FiChevronDown } from 'react-icons/fi'
+import { useState,  useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {fetchUsers} from '../../reducers/userReducer'
 
 function StatCards() {
+
+    const dispatch = useDispatch()
+    const {users, error,user, status} = useSelector( state => state.users)
+
+    useEffect(() => {
+        if (status === 'idle'){
+            dispatch(fetchUsers())
+        }
+    },[status,dispatch])
+
+
     return (
         <>
-        <Card value={'5 Active members'} title={'Members'} />
+        <Card value={`${users.length} active members`} title={'Members'} />
         <Card value={'100,000,000'} title={'Balance'}/>
         <Card title={'Active Loans'} value={'45'}/>
         </>
