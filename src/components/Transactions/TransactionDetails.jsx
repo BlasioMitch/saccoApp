@@ -12,7 +12,7 @@ function TransactionDetails() {
                 border-b-dblack-300 gap-3 rounded-b-lg'>
                     <h2 className='text-xl text-dcyan-600 font-bold py-2 mb-2 sticky top-0 bg-dblack-900'>Details</h2>
                     <Detail title='trn id' value={transaction.id}/>
-                    <Detail title='account' value={transaction.account}/>
+                    <Detail title='account' value={transaction.account_no}/>
                     <Detail title='type' value={transaction.type}/>
                     <Detail title='amount' value={transaction.amount}/>
                     <Detail title='status' value={transaction.status} />

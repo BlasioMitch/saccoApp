@@ -2,7 +2,6 @@ import React from 'react'
 import { useState,  useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {fetchUsers} from '../../reducers/userReducer'
-import { FiChevronDown } from 'react-icons/fi'
 
 function StatCards() {
 
@@ -15,7 +14,6 @@ function StatCards() {
         }
     },[status,dispatch])
 
-    console.log(users,' all users')
 
     return (
         <>

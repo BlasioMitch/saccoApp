@@ -36,6 +36,7 @@ export const createTransactiontype = createAsyncThunk(
     async ( objData, { rejectWithValue }) => {
         try{   
             const response = await transactiontypesService.createTransactiontype(objData)
+            console.log(response,' red response')
             return response
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Something went wrong on our end')
@@ -47,6 +48,10 @@ export const updateTransactiontype = createAsyncThunk(
     'transactiontypes/updateTransactiontype',
     async ({ id,objData }, { rejectWithValue }) =>{
         try{
+            if(!id || !objData){
+                throw new Error('Invalid Input: ID and data object are required')
+            }
+            console.log(objData,' in reducer')
             const response = await transactiontypesService.updateTransactiontype(id, objData)
             return response
         } catch (error) {
@@ -84,21 +89,21 @@ const transactiontypeslice = createSlice({
                 state.error = null
             })
             .addCase(fetchtransactiontypes.fulfilled, (state,action) => {
-                state.status = 'succeeded'
                 state.transactiontypes = action.payload
+                state.status = 'succeeded'
             })
             .addCase(fetchtransactiontypes.rejected, (state, action) => {
-                state.status = 'failed'
                 state.error = action.payload
+                state.status = 'failed'
             })
             // update cases
             .addCase(updateTransactiontype.pending, state => {
                 state.status = 'loading'
             })
             .addCase(updateTransactiontype.fulfilled, (state,action) =>{
-                state.status = 'succeeded'
-                const tranID = action.payload
+                const tranID = action.payload.id
                 state.transactiontypes = state.transactiontypes.map(tran => tran.id !== tranID ? tran : action.payload )
+                state.status = 'succeeded'
             })
             .addCase(updateTransactiontype.rejected, (state,action) => {
                 state.status = 'failed'
@@ -111,7 +116,7 @@ const transactiontypeslice = createSlice({
             })
             .addCase(deleteTransactiontype.fulfilled,(state,action) => {
                 state.status = 'succeeded'
-                const tranID = action.payload
+                const tranID = action.payload.id
                 state.transactiontypes = state.transactiontypes.filter(tran => tran.id !== tranID)
             })
             .addCase(deleteTransactiontype.rejected, (state, action) =>{
@@ -124,8 +129,8 @@ const transactiontypeslice = createSlice({
                 state.error = null
             })
             .addCase(createTransactiontype.fulfilled, (state,action) => {
-                state.status = 'succeeded'
                 state.transactiontypes.push(action.payload)
+                state.status = 'succeeded'
             })
             .addCase(createTransactiontype.rejected, (state,action) => {
                 state.status = 'failed'

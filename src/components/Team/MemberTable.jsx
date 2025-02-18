@@ -25,7 +25,7 @@ function MemberTable({members}) {
                         other_names={member.other_names}
                         gender={member.sex}
                         id={member.id}
-                        // key={member.id}
+                        key={member.id}
                             />)
                 }
             </tbody>
@@ -72,7 +72,7 @@ const MemberRow = ({since,first_name, last_name, other_names,gender,dob,id}) => 
    
     return (
         <>
-            <tr key={id} className='text-dcyan-300 text-sm 
+            <tr className='text-dcyan-300 text-sm 
             even:bg-dblack-800 hover:cursor-pointer even:hover:bg-transparent odd:hover:bg-dblack-700
             capitalize' onClick={() => handleSelect(id)}>
                 <td className='pl-1.5 py-2'>{first_name} {last_name} {other_names? other_names : ''}</td>

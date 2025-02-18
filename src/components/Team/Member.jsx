@@ -17,8 +17,6 @@ function Member() {
         }
     },[status, dispatch])
 
-    console.log(users, ' all users members')
-
     const members = users
         
     const navigate = useNavigate()
@@ -26,11 +24,11 @@ function Member() {
         navigate('add/')
     }
     const {id} = useParams()
-    console.log(id,' is Id')
+
     const selectedMember = id
         ? members.find(member => member.id == id)
         : null
-    console.log(selectedMember, ' smmmm')
+
     return (
         <>
         <div className='col-span-8 row-span-2 p-4 rounded bg-dblack-900'>

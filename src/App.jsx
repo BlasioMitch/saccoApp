@@ -7,7 +7,6 @@ import Team from './components/Team/Team'
 import Details from './components/Team/Details'
 import MemberForm from './components/Team/MemberForm'
 import Transactions from './components/Transactions/Transactions'
-import TransactionTypeForm from './components/Transactions/TransactionTypeForm'
 import TransactionDetails from './components/Transactions/TransactionDetails'
 import Loans from './components/Loans/Loans'
 import LoanDetails from './components/Loans/LoanDetails'
@@ -27,10 +26,8 @@ const App = () => {
               <Route path='add/' element={<MemberForm />} />
             </Route>
             <Route path='transactions/' element={<Transactions />}>
-              <Route path='add-type/' element={<TransactionTypeForm />} />
               <Route path=':id/' element={<TransactionDetails />} />
               <Route path='types/:id/' element={<TTypeDetails />}/>
-              {/* <Route path='types/edit/:id' /> */}
             </Route> 
             <Route path='loans/' element={<Loans /> }>
                 <Route path=':id' element={<LoanDetails />} />

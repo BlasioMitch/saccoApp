@@ -42,7 +42,7 @@ const TransactionRow = ({id, account,type,amount,status, trn_date,by}) => {
 
     return(
         <>
-            <tr key={id} className='text-dcyan-300 text-sm 
+            <tr className='text-dcyan-300 text-sm 
                 even:bg-dblack-800 hover:cursor-pointer even:hover:bg-transparent odd:hover:bg-dblack-700
                 capitalize' onClick={() => handleSelect(id)}>
                 <td className='pl-1.5 py-2 sticky left-0 whitespace-nowrap'>{id}</td>

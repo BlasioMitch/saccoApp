@@ -30,7 +30,8 @@ export default {
         }
       },
       boxShadow:{
-        '4xl':' 0 5px 30px 6px rgba(152,229,221,1))'
+        '4xl':' 0 5px 30px 6px rgba(152,229,221,1))',
+        'left':'-5px 0 10px rgba(152,229,221, 0.3)'
       },
       flex:{
         'r1':'1 1 0',

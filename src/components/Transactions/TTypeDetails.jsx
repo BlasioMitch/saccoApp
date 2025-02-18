@@ -4,7 +4,6 @@ import { useOutletContext } from 'react-router-dom'
 
 const TTypeDetails = () => {
     const transactiontype = useOutletContext()
-
     return (
         <>
             <div className='bg-dblack-900 col-span-4 row-span-2 rounded p-4'>

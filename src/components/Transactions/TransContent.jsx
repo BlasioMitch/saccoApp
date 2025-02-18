@@ -1,7 +1,7 @@
 import React from 'react'
 import TransactionTable from './TransactionTable'
 import TransTypes from './TransTypes'
-import { Outlet, useNavigate, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 function TransContent() {
@@ -13,15 +13,20 @@ function TransContent() {
     // ]
     const {transactions} = useSelector(state => state.transactions)
     const {transactiontypes} = useSelector(state => state.transactiontypes)
+    const location = useLocation()
 
     const {id} = useParams()
-    const selectedTransaction = id 
-        ? transactions.find(tran => tran.id == id)
-        : <p className='bg-dblack-900'>No Transaction selected</p>
+       
+    let selectedItem = null
+    
+    if(id){
+        if(location.pathname.startsWith('/transactions/types')){
+        selectedItem = transactiontypes.find(type => type.id == id)
+        } else if (location.pathname.startsWith('/transactions')){    
+         selectedItem = transactions.find(tran => tran.id == id)
+        }
+    }
 
-    const selectedType = id
-        ? transactiontypes.find(type => type.id == id)
-        : ''
     return (
         <>
         <div className='col-span-8 row-span-4 bg-dblack-900 overflow-x-auto px-3'>
@@ -29,11 +34,9 @@ function TransContent() {
         </div>
         <div className='overflow-y-auto col-span-4 row-span-2'>
             { 
-            selectedTransaction 
-            ?  <Outlet context={selectedTransaction}/>
-            : selectedType
-                ? <Outlet context={selectedType} />
-                :''
+            selectedItem 
+            ?  <Outlet context={selectedItem}/>
+            :''
         }
 
         </div>
