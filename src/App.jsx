@@ -5,7 +5,6 @@ import Dashboard from './components/Dashboard/Dashboard'
 import Grid from './components/Dashboard/Grid'
 import Team from './components/Team/Team'
 import Details from './components/Team/Details'
-import MemberForm from './components/Team/MemberForm'
 import Transactions from './components/Transactions/Transactions'
 import TransactionDetails from './components/Transactions/TransactionDetails'
 import Loans from './components/Loans/Loans'
@@ -23,7 +22,6 @@ const App = () => {
             <Route path='team/' element={<Team />}>
               {/* Child routes for Team */}
               <Route path=':id' element={<Details />} />
-              <Route path='add/' element={<MemberForm />} />
             </Route>
             <Route path='transactions/' element={<Transactions />}>
               <Route path=':id/' element={<TransactionDetails />} />

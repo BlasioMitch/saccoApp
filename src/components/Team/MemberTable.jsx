@@ -1,18 +1,29 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import moment from 'moment'
+import { FaEllipsisVertical } from 'react-icons/fa6'
+import { HiPencil, HiTrash } from 'react-icons/hi2'
+import { useDispatch } from 'react-redux'
+import { deleteUser } from '../../reducers/userReducer'
 
-function MemberTable({members}) {
-
+function MemberTable({members, dataToEdit}) {
+  
+  const dispatch = useDispatch()
+  const handleDelete = (id) => {
+    dispatch(deleteUser(id))
+  }
+  const handleEdit = (member) => {
+    dataToEdit(member)
+  }
     return (
         <>
-        <table className='w-full mt-2 table-auto border-separate border-spacing-y-2 '>
+        <table className='w-full mt-2 table-auto border-separate border-spacing-y-2 overflow-auto '>
             <thead className='uppercase text-sm text-left font-normal bg-dblack-600  text-slate-400'>
                 <tr >
-                    <th className='py-2 pl-1'>Name</th>
-                    <th className='py-2 pl-1'>DOB</th>
-                    <th className='py-2 pl-1'>Gender</th>
-                    <th className='py-2 pl-1'>Membership</th>
+                    <th className='py-2 pl-1 whitespace-nowrap sticky left-0'>Name</th>
+                    <th className='py-2 pl-1 whitespace-nowrap'>DOB</th>
+                    <th className='py-2 pl-1 whitespace-nowrap'>Gender</th>
+                    <th className='py-2 pl-1 whitespace-nowrap' colSpan={2}>Membership</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,6 +37,8 @@ function MemberTable({members}) {
                         gender={member.sex}
                         id={member.id}
                         key={member.id}
+                        handleOpen={() => handleEdit(member)}
+                        handleDel={() =>handleDelete(member.id)}
                             />)
                 }
             </tbody>
@@ -40,7 +53,7 @@ export default MemberTable
 
 
 
-const MemberRow = ({since,first_name, last_name, other_names,gender,dob,id}) => {
+const MemberRow = ({since,first_name, last_name, other_names,gender,dob,id, handleOpen, handleDel}) => {
     const navigate = useNavigate()
     const handleSelect = (id) => navigate(`/team/${id}`)
 
@@ -74,11 +87,22 @@ const MemberRow = ({since,first_name, last_name, other_names,gender,dob,id}) => 
         <>
             <tr className='text-dcyan-300 text-sm 
             even:bg-dblack-800 hover:cursor-pointer even:hover:bg-transparent odd:hover:bg-dblack-700
-            capitalize' onClick={() => handleSelect(id)}>
-                <td className='pl-1.5 py-2'>{first_name} {last_name} {other_names? other_names : ''}</td>
-                <td className='pl-1.5'>{moment(dob).format('Do-MMM-YYYY')}</td>
-                <td className='pl-1.5'>{gender}</td>
-                <td className='pl-1.5'>{compareDates(since)}</td>
+            capitalize' >
+                <td className='pl-1.5 py-2 whitespace-nowrap sticky left-0'>
+                 <NavLink  to={`/team/${id}`} className='hover:underline'>
+                    {first_name} {last_name} {other_names? other_names : ''}
+                  </NavLink> 
+                </td>
+                <td className='pl-1.5 whitespace-nowrap'>{moment(dob).format('Do-MMM-YYYY')}</td>
+                <td className='pl-1.5 whitespace-nowrap'>{gender}</td>
+                <td className='pl-1.5 whitespace-nowrap'>{compareDates(since)}</td>
+                <td className='px-3'>
+                  {/* <FaEllipsisVertical className='size-4'/> */}
+                  <div className='flex gap-1 items-center'>
+                  <HiPencil className='size-4' onClick={handleOpen}/> |
+                  <HiTrash className='size-5 fill-red-500' onClick={handleDel}/>
+                  </div>
+                  </td>
             </tr>
         </>
     )

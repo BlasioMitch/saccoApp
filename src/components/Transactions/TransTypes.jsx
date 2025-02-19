@@ -33,7 +33,7 @@ const TransTypes = ({types}) => {
         const {id, ...dataWithoutId} = formData
         try{
             if(!formData.id){
-                await dispatch(createTransactiontype({...formData,created_by:2}))
+                await dispatch(createTransactiontype({...dataWithoutId,created_by:2}))
                 setFormdata({name:'',description:''})
                 setIsOpen(false)
             }else {

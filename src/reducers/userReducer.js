@@ -49,9 +49,12 @@ export const fetchUserById = createAsyncThunk(
 // patch one user
 export const patchUser = createAsyncThunk(
     'users/patchUser',
-    async ({id, updatedData},{ rejectWithValue }) => {
+    async ({ id, objData } , { rejectWithValue }) => {
         try {
-            const response = await userService.patchUser(id,updatedData)
+            if(!id || !objData){
+                throw new Error('Invalid Input: ID and data are required')
+            }
+            const response = await userService.patchUser(id,objData)
             return response
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Something went wrong on our side')
@@ -82,25 +85,25 @@ const usersSlice = createSlice({
         builder
             // fetch users cases
             .addCase(fetchUsers.pending, (state) => {
-                state.status = 'loading'
                 state.error = null
+                state.status = 'loading'
             })
             .addCase(fetchUsers.fulfilled, (state,action) =>{
-                state.status = 'succeeded'
                 state.users = action.payload
+                state.status = 'succeeded'
             })
             .addCase(fetchUsers.rejected, (state,action) => {
-                state.status = 'failed'
                 state.error = action.payload
+                state.status = 'failed'
             })
             //  create user cases
             .addCase(createUser.pending, (state) => {
-                state.status = 'loading'
                 state.error = null
+                state.status = 'loading'
             })
             .addCase(createUser.fulfilled, (state,action) =>{
-                state.status = 'succeeded'
                 state.users.push(action.payload)
+                state.status = 'succeeded'
             })
             .addCase(createUser.rejected, (state,action) => {
                 state.status = 'failed'
@@ -108,13 +111,13 @@ const usersSlice = createSlice({
             })
             // delete cases
             .addCase(deleteUser.pending, (state) => {
-                state.status = 'loading'
                 state.error = null
+                state.status = 'loading'
             })
             .addCase(deleteUser.fulfilled, (state,action) =>{
-                state.status = 'succeeded'
                 const userId = action.payload
                 state.users = state.users.filter(user => user.id !== userId); // Remove user
+                state.status = 'succeeded'
             })
             .addCase(deleteUser.rejected, (state,action) => {
                 state.status = 'failed'
@@ -126,13 +129,13 @@ const usersSlice = createSlice({
                 state.error = null
             })
             .addCase(patchUser.fulfilled, (state,action) =>{
-                state.status = 'succeeded'
-                const userId = action.payload
+                const userId = action.payload.id
                 state.users = state.users.map(user => user.id !== userId ? user : action.payload); // Remove user
+                state.status = 'succeeded'
             })
             .addCase(patchUser.rejected, (state,action) => {
-                state.status = 'failed'
                 state.error = action.payload
+                state.status = 'failed'
             })
     }
 })

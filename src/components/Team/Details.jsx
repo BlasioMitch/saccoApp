@@ -35,7 +35,7 @@ function Details() {
         <>
             <div className='bg-dblack-800 col-span-4 row-span-2 rounded p-4'>
                 <div className='flex flex-col border-b-2 px-1 pb-2 
-                border-b-dblack-300 gap-3 rounded-b-lg'>
+                border-b-dblack-300 gap-3 '>
                     <h2 className='text-xl text-dcyan-600 font-bold py-2 mb-2'>Details</h2>
                     {/* <Detail title='account no' value={member.id}/> */}
                     <Detail title='name' value={`${member.first_name} ${member.last_name} ${member.other_names ? member.other_names : ''}`}/>
@@ -43,6 +43,7 @@ function Details() {
                     <Detail title='contact' value={member.contact}/>
                     <Detail title='email' value={member.email} />
                     <Detail title='membership' value={compareDates(member.created_on)} />
+                    <Detail title='joined on' value={moment(member.created_on).format('DD-MMM-YYYY')}/>
 
 
                 </div>
