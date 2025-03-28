@@ -97,7 +97,7 @@ const transactionSlice = createSlice({
             })
             .addCase(updateTransaction.fulfilled, (state,action) =>{
                 state.status = 'succeeded'
-                const tranID = action.payload
+                const tranID = action.payload.id
                 state.transactions = state.transactions.map(tran => tran.id !== tranID ? tran : action.payload )
             })
             .addCase(updateTransaction.rejected, (state,action) => {
@@ -134,6 +134,6 @@ const transactionSlice = createSlice({
     }
 })
 
-export const { clearRegError, succesful, rejected,  pending } = transactionSlice.actions
+export const { clearRegError } = transactionSlice.actions
 
 export default transactionSlice.reducer

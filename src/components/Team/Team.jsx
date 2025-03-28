@@ -1,7 +1,6 @@
 import React from 'react'
 import StatCards from './StatCards'
 import Member from './Member'
-import MemberForm from './MemberForm'
 
 function Team() {
     return (
