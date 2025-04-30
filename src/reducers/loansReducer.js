@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import loansService from '../services/loans'
+import accountsService from '../services/accounts'
 
 const initialState = {
     error : null,
@@ -35,6 +36,7 @@ export const createLoan = createAsyncThunk(
     'loans/createLoan',
     async (loanData, { rejectWithValue }) =>{
         try{
+            // First create the loan
             const response = await loansService.createLoan(loanData)
             return response
         } catch (error){
@@ -48,7 +50,7 @@ export const deleteLoan = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try{
             const response = await loansService.deleteLoan(id)
-            return response
+            return { id }; // Return the deleted loan's ID
         } catch(error){
             return rejectWithValue(error.response?.data || 'Something went wrong!')
         }
@@ -59,7 +61,7 @@ export const patchLoan = createAsyncThunk(
     'loans/patchLoan',
     async ({id, loanData}, { rejectWithValue}) => {
         try{
-            const response = await loansService.patchLoan(id, loanData)
+            const response = await loansService.patchLoan(id, loanData)        
             return response
         } catch (error){
             return rejectWithValue(error.response?.data || 'Something went wrong!')
@@ -101,14 +103,13 @@ const loanSlice = createSlice({
             })
             // create
             .addCase(createLoan.pending, state => {
-                state.status = 'pending'
-                state.error = null
+                state.status = 'loading'
             })
-            .addCase(createLoan.fulfilled, (state,action) =>{
+            .addCase(createLoan.fulfilled, (state, action) => {
                 state.status = 'succeeded'
-                state.loans.push(action.payload)
+                state.loans = [...state.loans, action.payload]
             })
-            .addCase(createLoan.rejected,(state,action) =>{
+            .addCase(createLoan.rejected, (state, action) => {
                 state.status = 'failed'
                 state.error = action.payload
             })
@@ -117,7 +118,7 @@ const loanSlice = createSlice({
                 state.status = 'pending',
                 state.error = null
             })
-            .addCase(deleteLoan.fulfilled, (state,action) => {
+            .addCase(deleteLoan.fulfilled, (state, action) => {
                 state.status = 'succeeded'
                 const loanId = action.payload.id
                 state.loans = state.loans.filter(loan => loan.id !== loanId)

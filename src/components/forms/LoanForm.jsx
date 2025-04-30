@@ -2,13 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createLoan, patchLoan } from '../../reducers/loansReducer';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { FiX } from 'react-icons/fi';
 
 const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
   const dispatch = useDispatch();
@@ -30,6 +24,12 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
     totalPayment: 0
   });
   const [errors, setErrors] = useState({});
+
+  // Get accounts that don't have loans
+  const accountsWithoutLoans = React.useMemo(() => {
+    if (!accounts) return [];
+    return accounts.filter(account => !account.hasLoan);
+  }, [accounts]);
 
   useEffect(() => {
     if (loanToEdit) {
@@ -131,86 +131,96 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-900 text-slate-100 sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle>{loanToEdit ? 'Edit Loan' : 'Create New Loan'}</DialogTitle>
-        </DialogHeader>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+      <div className="bg-black-900/60 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-gray-50">
+            {loanToEdit ? 'Edit Loan' : 'Create New Loan'}
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-300">
+            <FiX className="w-6 h-6" />
+          </button>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Account</label>
+            <label className="block text-sm font-medium text-gray-200 mb-1">Account</label>
             <select
               name="accountId"
               value={formData.accountId}
               onChange={handleChange}
-              className="w-full p-2 bg-slate-800 rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+              className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
               disabled={loanToEdit}
             >
               <option value="">Select Account</option>
-              {accounts?.map(account => (
+              {accountsWithoutLoans.map(account => (
                 <option key={account.id} value={account.id}>
                   {account.accountNumber} - {account.owner?.first_name} {account.owner?.last_name}
                 </option>
               ))}
             </select>
             {errors.accountId && (
-              <p className="mt-1 text-sm text-red-500">{errors.accountId}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.accountId}</p>
+            )}
+            {accountsWithoutLoans.length === 0 && !loanToEdit && (
+              <p className="text-yellow-300 text-sm mt-1">No accounts available for new loans</p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Amount</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Amount</label>
               <input
                 type="number"
                 name="amount"
                 value={formData.amount}
                 onChange={handleChange}
-                className="w-full p-2 bg-slate-800 rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
               />
               {errors.amount && (
-                <p className="mt-1 text-sm text-red-500">{errors.amount}</p>
+                <p className="text-red-300 text-sm mt-1">{errors.amount}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Interest Rate (%)</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Interest Rate (%)</label>
               <input
                 type="number"
                 name="interestRate"
                 value={formData.interestRate}
                 onChange={handleChange}
-                className="w-full p-2 bg-slate-800 rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
               />
               {errors.interestRate && (
-                <p className="mt-1 text-sm text-red-500">{errors.interestRate}</p>
+                <p className="text-red-300 text-sm mt-1">{errors.interestRate}</p>
               )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Term (months)</label>
+            <label className="block text-sm font-medium text-gray-200 mb-1">Term (months)</label>
             <input
               type="number"
               name="term"
               value={formData.term}
               onChange={handleChange}
-              className="w-full p-2 bg-slate-800 rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+              className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
             />
             {errors.term && (
-              <p className="mt-1 text-sm text-red-500">{errors.term}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.term}</p>
             )}
           </div>
 
           {/* Loan Summary Section */}
           {(formData.amount && formData.interestRate && formData.term) && (
-            <div className="bg-slate-800 p-4 rounded-md space-y-2">
+            <div className="bg-black-800/90 p-4 rounded-md space-y-2 border border-black-700">
               <h3 className="text-sm font-semibold text-dcyan-400">Loan Summary</h3>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="text-slate-400">Monthly Payment</p>
+                  <p className="text-gray-400">Monthly Payment</p>
                   <p className="text-dcyan-300 font-medium">
                     {new Intl.NumberFormat('en-US', {
                       style: 'currency',
@@ -219,7 +229,7 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-400">Total Interest</p>
+                  <p className="text-gray-400">Total Interest</p>
                   <p className="text-dcyan-300 font-medium">
                     {new Intl.NumberFormat('en-US', {
                       style: 'currency',
@@ -228,7 +238,7 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-400">Total Payment</p>
+                  <p className="text-gray-400">Total Payment</p>
                   <p className="text-dcyan-300 font-medium">
                     {new Intl.NumberFormat('en-US', {
                       style: 'currency',
@@ -242,41 +252,41 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Start Date</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Start Date</label>
               <input
                 type="date"
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full p-2 bg-slate-800 rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
               />
               {errors.startDate && (
-                <p className="mt-1 text-sm text-red-500">{errors.startDate}</p>
+                <p className="text-red-300 text-sm mt-1">{errors.startDate}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Proposed End Date</label>
+              <label className="block text-sm font-medium text-gray-200 mb-1">Proposed End Date</label>
               <input
                 type="date"
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="w-full p-2 bg-slate-800 rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
               />
               {errors.endDate && (
-                <p className="mt-1 text-sm text-red-500">{errors.endDate}</p>
+                <p className="text-red-300 text-sm mt-1">{errors.endDate}</p>
               )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-200 mb-1">Status</label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full p-2 bg-slate-800 rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+              className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
             >
               <option value="ACTIVE">Active</option>
               <option value="COMPLETED">Completed</option>
@@ -284,25 +294,16 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
             </select>
           </div>
 
-          <DialogFooter className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-700"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-dcyan-500 text-white rounded-md hover:bg-dcyan-600"
-              disabled={status === 'loading'}
-            >
-              {status === 'loading' ? 'Saving...' : (loanToEdit ? 'Update' : 'Create')}
-            </button>
-          </DialogFooter>
+          <button
+            type="submit"
+            disabled={status === 'loading'}
+            className="w-full bg-green-500 text-gray-900 py-2 px-4 rounded-md hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {status === 'loading' ? 'Saving...' : (loanToEdit ? 'Update' : 'Create')}
+          </button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 

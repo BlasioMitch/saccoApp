@@ -196,9 +196,9 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
   }
 
   const handleDeleteClick = (account) => {
-    setActiveMenu(null)
     setSelectedAccount(account)
     setIsDeleteOpen(true)
+    setActiveMenu(null)
   }
 
   const handleViewClick = (account) => {

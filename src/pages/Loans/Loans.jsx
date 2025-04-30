@@ -6,13 +6,21 @@ import { fetchLoans } from '../../reducers/loansReducer';
 
 const Loans = () => {
   const dispatch = useDispatch();
-  const { loans, status } = useSelector((state) => state.loans);
+  const { loans, status, error } = useSelector((state) => state.loans);
 
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchLoans());
     }
-  }, [dispatch, status]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      console.log('Error in Loan component:', error)
+      toast.error(error)
+    }
+  }, [error])
+  
 
   const stats = useMemo(() => {
     if (!loans || loans.length === 0) return [];

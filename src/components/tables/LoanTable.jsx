@@ -71,7 +71,7 @@ const LoanTable = () => {
   // Modal states
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
@@ -84,6 +84,8 @@ const LoanTable = () => {
       await dispatch(deleteLoan(id));
       toast.success('Loan deleted successfully');
       setActiveMenu(null);
+      setIsDeleteModalOpen(false);
+      setSelectedLoan(null);
     } catch (error) {
       toast.error('Error deleting loan');
     }
@@ -255,7 +257,7 @@ const LoanTable = () => {
             onClose={() => setActiveMenu(null)}
             onEdit={() => {
               setSelectedLoan(row.original);
-              setIsEditModalOpen(true);
+              setIsFormModalOpen(true);
               setActiveMenu(null);
             }}
             onDelete={() => {
@@ -299,31 +301,34 @@ const LoanTable = () => {
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className={`${loans.length > 0 ? 'px-4 py-3 flex justify-between items-center border-b border-dblack-700' : 'hidden'}`}>
-          <input
-            type="text"
-            value={filtering}
-            onChange={(e) => setFiltering(e.target.value)}
-          placeholder="Search..."
-          className="w-1/2 p-2 bg-dblack-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-dcyan-500"
-          />
-          <button
-            onClick={() => {
-              setSelectedLoan(null);
-              setIsEditModalOpen(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-dcyan-700 text-white rounded-md hover:bg-dcyan-800 transition-colors"
-          >
-            <HiPlus className="h-5 w-5" />
-            Add Loan
-          </button>
+        <div className="flex justify-between items-center px-2 border-b border-custom-bg-tertiary pb-4">
+          <h1 className="text-2xl font-semibold text-custom-text-primary">Loan List</h1>
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              value={filtering}
+              onChange={(e) => setFiltering(e.target.value)}
+              placeholder="Search loans..."
+              className="w-64 p-2 bg-custom-bg-secondary text-custom-text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-custom-accent"
+            />
+            <button
+              onClick={() => {
+                setSelectedLoan(null);
+                setIsFormModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-custom-brand-primary text-custom-interactive-active-text rounded-md hover:bg-custom-brand-dark transition-colors"
+              >
+              <HiPlus className="h-5 w-5" />
+              Add Loan
+            </button>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-auto min-h-0">
+        <div className="flex-1 bg-custom-bg-secondary rounded-lg overflow-hidden min-h-0">
           <div className="h-full overflow-x-auto">
             {loans && loans.length > 0 ? (
               <table className="min-w-full table-auto">
-                <thead className="bg-dblack-600 text-slate-400 sticky top-0 z-10">
+                <thead className="bg-custom-bg-tertiary text-custom-text-secondary sticky top-0 z-10">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
@@ -342,15 +347,15 @@ const LoanTable = () => {
                     </tr>
                   ))}
                 </thead>
-                <tbody>
+                <tbody className="bg-custom-bg-primary divide-y divide-custom-bg-tertiary">
                   {table.getRowModel().rows.map((row) => (
                     <tr
                       key={row.id}
-                      className="even:bg-dblack-800 hover:bg-dblack-700"
-                    >
+                      className="hover:bg-custom-bg-secondary transition-colors"
+                      >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-4 py-2">
-                          <div className="whitespace-nowrap p-1">
+                        <td key={cell.id} className="px-4 py-3">
+                          <div className="text-custom-text-primary">
                             {flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext()
@@ -364,13 +369,13 @@ const LoanTable = () => {
               </table>
             ) : (
               <div className="flex flex-col items-center justify-center h-full py-8">
-                <p className="text-gray-400 mb-4">No loans found</p>
+                <p className="text-custom-text-secondary mb-4">No loans found</p>
                 <button
                   onClick={() => {
                     setSelectedLoan(null);
-                    setIsEditModalOpen(true);
+                    setIsFormModalOpen(true);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-dcyan-700 text-white rounded-md hover:bg-dcyan-800 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-custom-accent text-white rounded-md hover:bg-custom-accent-hover transition-colors"
                 >
                   <HiPlus className="h-5 w-5" />
                   Create New Loan
@@ -381,16 +386,16 @@ const LoanTable = () => {
         </div>
 
         {loans && loans.length > 0 && (
-          <div className="flex justify-between items-center p-4 border-t border-dblack-700">
+          <div className="flex justify-between items-center p-4 border-t border-custom-bg-tertiary">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-dblack-50">
+              <span className="text-sm text-custom-text-secondary">
                 Page {table.getState().pagination.pageIndex + 1} of{' '}
                 {table.getPageCount()}
               </span>
               <select
                 value={table.getState().pagination.pageSize}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
-                className="p-1 bg-dblack-600 text-dblack-50 rounded-md"
+                className="p-1 bg-custom-bg-secondary text-custom-text-primary rounded-md"
               >
                 {[5, 10, 20, 30, 40, 50].map((pageSize) => (
                   <option key={pageSize} value={pageSize}>
@@ -403,14 +408,14 @@ const LoanTable = () => {
               <button
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                className="px-3 py-1 bg-dblack-600 text-dblack-50 rounded-md disabled:opacity-50"
+                className="px-3 py-1 bg-custom-bg-secondary text-custom-text-primary rounded-md disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                className="px-3 py-1 bg-dblack-600 text-dblack-50 rounded-md disabled:opacity-50"
+                className="px-3 py-1 bg-custom-bg-secondary text-custom-text-primary rounded-md disabled:opacity-50"
               >
                 Next
               </button>
@@ -427,9 +432,9 @@ const LoanTable = () => {
       />
 
       <LoanForm
-        isOpen={isEditModalOpen}
+        isOpen={isFormModalOpen}
         onClose={() => {
-          setIsEditModalOpen(false);
+          setIsFormModalOpen(false);
           setSelectedLoan(null);
         }}
         loanToEdit={selectedLoan}
