@@ -65,6 +65,7 @@ const Team = () => {
         dob: member.dob,
         email: member.email,
         role: member.role || 'Member',
+        hasAccount: member.hasAccount,
         status: member.status || 'Active',
         lastLogin: member.last_login ? new Date(member.last_login).toLocaleString() : 'Never',
         joinDate: member.created_on ? new Date(member.created_on).toLocaleString() : new Date().toISOString()
@@ -123,60 +124,59 @@ const Team = () => {
 
       {/* User Details Modal */}
       <Dialog open={isDetailsModalOpen} onOpenChange={handleCloseDetailsModal}>
-        <DialogContent className="bg-dblack-700 p-6 rounded-lg w-full max-w-md">
+        <DialogContent className="bg-black-900/90 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-dcyan-300">Member Details</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-gray-50">Member Details</DialogTitle>
             <DialogDescription className="text-gray-400">
               Details for {selectedUser?.first_name} {selectedUser?.last_name}
             </DialogDescription>
           </DialogHeader>
-          {selectedUser && ( // Only render if selectedUser is not null
+          {selectedUser && (
             <div className="space-y-4">
               <div>
-                <span className="font-medium text-gray-300">First Name:</span>
-                <span className="text-white ml-2">{selectedUser.first_name}</span>
+                <span className="font-medium text-gray-200">First Name:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.first_name}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-300">Last Name:</span>
-                <span className="text-white ml-2">{selectedUser.last_name}</span>
+                <span className="font-medium text-gray-200">Last Name:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.last_name}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-300">Email:</span>
-                <span className="text-white ml-2">{selectedUser.email}</span>
+                <span className="font-medium text-gray-200">Email:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.email}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-300">Contact:</span>
-                <span className="text-white ml-2">{selectedUser.contact}</span>
-              </div>
-               <div>
-                <span className="font-medium text-gray-300">Gender:</span>
-                <span className="text-white ml-2">{selectedUser.gender}</span>
+                <span className="font-medium text-gray-200">Contact:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.contact}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-300">Date of Birth:</span>
-                <span className="text-white ml-2">{selectedUser.dob}</span>
+                <span className="font-medium text-gray-200">Gender:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.gender}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-300">Role:</span>
-                <span className="text-white ml-2">{selectedUser.role}</span>
+                <span className="font-medium text-gray-200">Date of Birth:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.dob}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-300">Status:</span>
-                <span className="text-white ml-2">{selectedUser.status}</span>
-              </div>
-               <div>
-                <span className="font-medium text-gray-300">Last Login:</span>
-                <span className="text-white ml-2">{selectedUser.lastLogin}</span>
+                <span className="font-medium text-gray-200">Role:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.role}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-300">Join Date:</span>
-                <span className="text-white ml-2">{selectedUser.joinDate}</span>
+                <span className="font-medium text-gray-200">Status:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.status}</span>
               </div>
-              {/* Add more details as needed */}
+              <div>
+                <span className="font-medium text-gray-200">Last Login:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.lastLogin}</span>
+              </div>
+              <div>
+                <span className="font-medium text-gray-200">Join Date:</span>
+                <span className="text-gray-50 ml-2">{selectedUser.joinDate}</span>
+              </div>
               <div className="flex justify-end">
                 <button
                   onClick={handleCloseDetailsModal}
-                  className="bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2 bg-black-800/90 text-gray-50 rounded-md hover:bg-black-700 border border-black-700"
                 >
                   Close
                 </button>

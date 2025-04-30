@@ -42,7 +42,7 @@ const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm, account }) => {
               value={deleteText}
               onChange={(e) => setDeleteText(e.target.value)}
               placeholder="Type 'delete' to confirm"
-              className="w-full p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 placeholder-gray-500"
+              className="w-full p-2 bg-black-800/90 text-red-700 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 placeholder-gray-500"
             />
             <div className="flex justify-end gap-4">
               <button

@@ -14,35 +14,50 @@ import { useDispatch } from 'react-redux'
 import { deleteUser } from '../../reducers/userReducer'
 import { toast } from 'sonner'
 
-const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm }) => {
+const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm, user }) => {
   const [deleteText, setDeleteText] = useState('')
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-custom-bg-secondary p-6 rounded-lg">
-        <h2 className="text-xl font-semibold text-custom-text-primary mb-4">Delete Member</h2>
-        <p className="text-custom-text-secondary mb-4">This action cannot be undone. Type "delete" to confirm.</p>
-        <input
-          type="text"
-          value={deleteText}
-          onChange={(e) => setDeleteText(e.target.value)}
-          placeholder="Type 'delete' to confirm"
-          className="w-full px-4 py-2 mb-4 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary"
-        />
-        <div className="flex justify-end gap-4">
+      <DialogContent className="bg-black-900/90 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold text-gray-50">Delete Member</DialogTitle>
+          <DialogDescription className="text-gray-400">
+            {user?.hasAccount ? (
+              <div className="space-y-2">
+                <p>This member has an active account. Deleting this member will also delete their account.</p>
+                <p className="text-yellow-400">This action cannot be allowed.</p>
+              </div>
+            ) : (
+              <p>This action cannot be undone. Type "delete" to confirm.</p>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+        {!user?.hasAccount && (
+          <input
+            type="text"
+            value={deleteText}
+            onChange={(e) => setDeleteText(e.target.value)}
+            placeholder="Type 'delete' to confirm"
+            className="w-full px-4 py-2 mt-4 bg-black-800/90 text-gray-50 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+          />
+        )}
+        <div className="flex justify-end gap-4 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary"
+            className="px-4 py-2 bg-black-800/90 text-gray-50 rounded-md hover:bg-black-700 border border-black-700"
           >
             Cancel
           </button>
-          <button
-            onClick={onConfirm}
-            disabled={deleteText !== 'delete'}
-            className="px-4 py-2 bg-red-500 text-white rounded-md disabled:opacity-50"
-          >
-            Delete
-          </button>
+          {!user?.hasAccount && (
+            <button
+              onClick={onConfirm}
+              disabled={deleteText !== 'delete'}
+              className="px-4 py-2 bg-red-500 text-gray-50 rounded-md hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Delete
+            </button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -140,6 +155,7 @@ function UsersTable({ users, onEdit, onView }) {
         const other = row.original.other_name || ''
         return `${first} ${last} ${other}`.trim()
       },
+      filterFn: 'nameFilter',
     },
     {
       accessorKey: 'email',
@@ -253,6 +269,27 @@ function UsersTable({ users, onEdit, onView }) {
         </span>
       ),
     },
+    {
+      accessorKey: 'hasAccount',
+      header: ({ column }) => (
+        <button
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="flex items-center gap-1"
+        >
+          Account Status
+          {column.getIsSorted() === 'asc' ? '↑' : column.getIsSorted() === 'desc' ? '↓' : ''}
+        </button>
+      ),
+      cell: ({ row }) => (
+        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+          row.original.hasAccount
+            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-500'
+            : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-500'
+        }`}>
+          {row.original.hasAccount ? 'Has Account' : 'No Account'}
+        </span>
+      ),
+    },
   ]
 
   const actionColumn = {
@@ -306,6 +343,15 @@ function UsersTable({ users, onEdit, onView }) {
     onSortingChange: setSorting,
     onGlobalFilterChange: setFiltering,
     onColumnFiltersChange: setColumnFilters,
+    filterFns: {
+      nameFilter: (row, id, filterValue) => {
+        const first = row.original.first_name || ''
+        const last = row.original.last_name || ''
+        const other = row.original.other_name || ''
+        const fullName = `${first} ${last} ${other}`.trim().toLowerCase()
+        return fullName.includes(filterValue.toLowerCase())
+      }
+    },
     initialState: {
       pagination: {
         pageSize: 10,
@@ -314,7 +360,7 @@ function UsersTable({ users, onEdit, onView }) {
   })
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-[1200px]">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-custom-text-primary">Members List</h2>
         <div className="flex items-center gap-4">
@@ -461,6 +507,7 @@ function UsersTable({ users, onEdit, onView }) {
           setUserToDelete(null)
         }}
         onConfirm={handleDeleteConfirm}
+        user={userToDelete}
       />
        
     </div>
