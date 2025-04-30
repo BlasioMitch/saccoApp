@@ -415,81 +415,83 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-custom-bg-tertiary">
-        <table className="w-full">
-          <thead className="bg-custom-bg-secondary">
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th
-                    key={header.id}
-                    className="px-6 py-3 text-left text-xs font-medium text-custom-text-secondary uppercase tracking-wider"
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className="bg-custom-bg-primary divide-y divide-custom-bg-tertiary">
-            {table.getRowModel().rows.map(row => (
-              <tr
-                key={row.id}
-                onClick={() => onRowClick(row.original)}
-                className="hover:bg-custom-bg-secondary transition-colors"
-              >
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-custom-text-primary">
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex items-center justify-between px-4 py-3 bg-custom-bg-secondary border-t border-custom-bg-tertiary mt-4 rounded-lg sticky bottom-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-custom-text-secondary">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
-          </span>
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={e => {
-              table.setPageSize(Number(e.target.value))
-            }}
-            className="px-2 py-1 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary"
-          >
-            {[5, 10, 20, 30, 40, 50].map(pageSize => (
-              <option key={pageSize} value={pageSize}>
-                Show {pageSize}
-              </option>
-            ))}
-          </select>
+      <div className="flex flex-col h-[calc(100vh-200px)]">
+        <div className="flex-1 overflow-x-auto rounded-lg border border-custom-bg-tertiary">
+          <table className="w-full">
+            <thead className="bg-custom-bg-secondary">
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <th
+                      key={header.id}
+                      className="px-6 py-3 text-left text-xs font-medium text-custom-text-secondary uppercase tracking-wider"
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody className="bg-custom-bg-primary divide-y divide-custom-bg-tertiary">
+              {table.getRowModel().rows.map(row => (
+                <tr
+                  key={row.id}
+                  onClick={() => onRowClick(row.original)}
+                  className="hover:bg-custom-bg-secondary transition-colors"
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-custom-text-primary">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div className="flex gap-2">
-          <button
-            className="px-3 py-1 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary disabled:opacity-50"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </button>
-          <button
-            className="px-3 py-1 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary disabled:opacity-50"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </button>
+
+        <div className="flex items-center justify-between px-4 py-3 bg-custom-bg-secondary border-t border-custom-bg-tertiary mt-4 rounded-lg sticky bottom-0">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-custom-text-secondary">
+              Page {table.getState().pagination.pageIndex + 1} of{' '}
+              {table.getPageCount()}
+            </span>
+            <select
+              value={table.getState().pagination.pageSize}
+              onChange={e => {
+                table.setPageSize(Number(e.target.value))
+              }}
+              className="px-2 py-1 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary"
+            >
+              {[5, 10, 20, 30, 40, 50].map(pageSize => (
+                <option key={pageSize} value={pageSize}>
+                  Show {pageSize}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <button
+              className="px-3 py-1 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary disabled:opacity-50"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </button>
+            <button
+              className="px-3 py-1 bg-custom-bg-primary text-custom-text-primary rounded-md border border-custom-bg-tertiary disabled:opacity-50"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 

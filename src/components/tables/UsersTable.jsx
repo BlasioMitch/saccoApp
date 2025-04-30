@@ -427,8 +427,8 @@ function UsersTable({ users, onEdit, onView }) {
         </div>
       </div>
       
-      <div className="flex flex-col">
-        <div className="w-full overflow-x-auto rounded-lg border border-custom-bg-tertiary">
+      <div className="flex flex-col h-[calc(100vh-200px)]">
+        <div className="flex-1 overflow-x-auto rounded-lg border border-custom-bg-tertiary">
           <table className="w-full">
             <thead className="bg-custom-bg-secondary">
               {table.getHeaderGroups().map(headerGroup => (
