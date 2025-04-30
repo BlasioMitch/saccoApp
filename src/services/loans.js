@@ -1,29 +1,27 @@
-import axios from "axios"
-
-const baseUrl = "http://localhost:8000/api"
+import api from './api'
 
 const createLoan = (loanData) => {
-    const request = axios.post(`${baseUrl}/loans/`, loanData)
+    const request = api.post(`/loans`, loanData)
     return request.then(response => response.data)
 }
 
 const getAllLoans = () => {
-    const request = axios.get(`${baseUrl}/loans/`)
+    const request = api.get(`/loans`)
     return request.then(response => response.data)
 }
 
 const getOneLoan = (id) => {
-    const request = axios.get(`${baseUrl}/loans/${id}`)
+    const request = api.get(`/loans/${id}`)
     return request.then(response => response.data)
 }
 
 const patchLoan = (id, loanData) => {
-    const request = axios.patch(`${baseUrl}/loans/${id}`, loanData)
+    const request = api.patch(`/loans/${id}`, loanData)
     return request.then(response => response.data)
 }
 
 const deleteLoan = (id) => {
-    const request = axios.delete(`${baseUrl}/loans/${id}`)
+    const request = api.delete(`/loans/${id}`)
     return request.then(response => response.data)
 }
 

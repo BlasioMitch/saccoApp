@@ -1,28 +1,29 @@
-import axios from "axios";
 
-const baseUrl = 'http://localhost:8000/api'
+import api from './api'
 
-const createUser = (userData) =>{
-    const request = axios.post(`${baseUrl}/users/`, userData)
-    return request.then(response => response.data)
+const createUser = (userData) => {
+  const request = api.post('/users', userData)
+  return request.then(response => response.data)
 }
 
 const getAllUsers = () => {
-    const request = axios.get(`${baseUrl}/users/`)
-    return request.then(response => response.data)
+  const request = api.get('/users')
+  return request.then(response => response.data)
 }
 
-const getOneUser = (id) =>{
-    const request =  axios.get(`${baseUrl}/users/${id}/`)
-    return request.then(response => response.data)
-}
-const patchUser =  (id,userData) => {
-    const request = axios.patch(`${baseUrl}/users/${id}/`,userData)
-    return request.then(response => response.data)
-}
-const deleteUser =  (id) => {
-    const request = axios.delete(`${baseUrl}/users/${id}/`)
-    return request.then(response => response.data)
+const getOneUser = (id) => {
+  const request = api.get(`/users/${id}`)
+  return request.then(response => response.data)
 }
 
-export default { createUser, getAllUsers, getOneUser, patchUser,deleteUser}
+const patchUser = (id, userData) => {
+  const request = api.patch(`/users/${id}`, userData)
+  return request.then(response => response.data)
+}
+
+const deleteUser = (id) => {
+  const request = api.delete(`/users/${id}`)
+  return request.then(response => response.data)
+}
+
+export default { createUser, getAllUsers, getOneUser, patchUser, deleteUser }
