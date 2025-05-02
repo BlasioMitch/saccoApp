@@ -395,7 +395,7 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-custom-text-primary">Account List</h2>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 py-2">
           <div className="flex gap-2">
             <input
               type="text"

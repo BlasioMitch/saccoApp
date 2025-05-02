@@ -25,7 +25,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, loanId }) => {
             value={deleteText}
             onChange={(e) => setDeleteText(e.target.value)}
             placeholder="Type 'delete' to confirm"
-            className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+            className="w-full p-2 bg-black-800/90 text-red-500 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
           />
           <div className="flex justify-end gap-4">
             <button

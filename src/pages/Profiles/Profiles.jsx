@@ -5,8 +5,8 @@ import { FetchProfile } from '../../reducers/profileReducer';
 import UserSearch from '../../components/Profiles/UserSearch';
 import UserBioData from '../../components/Profiles/UserBioData';
 import SavingsHistory from '../../components/Profiles/SavingsHistory';
-import LoanHistory from '../../components/Profiles/LoanHistory';
-import { Loader2 } from 'lucide-react';
+import LoanAccordion from '../../components/Profiles/LoanAccordion';
+import { Loader2, X } from 'lucide-react';
 
 const Profiles = () => {
   const dispatch = useDispatch();
@@ -25,6 +25,10 @@ const Profiles = () => {
     if (user?.id) {
       dispatch(FetchProfile(user.id));
     }
+  };
+
+  const handleClearProfile = () => {
+    setSelectedUser(null);
   };
 
   // Calculate user statistics from the profile data
@@ -63,29 +67,62 @@ const Profiles = () => {
   const isLoading = usersStatus === 'loading';
 
   return (
-    <div className="flex flex-col h-full p-4 space-y-6">
-      <div className="flex flex-col space-y-4">
-        <h1 className="text-2xl font-semibold text-slate-100">Member Profile</h1>
-        <UserSearch users={users} onSelect={handleUserSelect} />
+    <div className="flex flex-col h-full p-6 space-y-6 bg-gray-50 dark:bg-gray-900">
+      {/* Header Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div className="flex flex-col space-y-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Member Profile</h1>
+            {selectedUser && (
+              <button
+                onClick={handleClearProfile}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+                Clear Profile
+              </button>
+            )}
+          </div>
+          <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+            <UserSearch users={users} onSelect={handleUserSelect} />
+          </div>
+        </div>
       </div>
 
+      {/* Main Content Section */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-[400px]">
+        <div className="flex items-center justify-center h-[400px] bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <Loader2 className="h-8 w-8 animate-spin text-dcyan-500" />
         </div>
       ) : selectedUser ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column */}
           <div className="space-y-6">
-            <UserBioData user={selectedUser} statistics={userStatistics} />
-            <SavingsHistory />
+            {/* User Bio Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <UserBioData user={selectedUser} statistics={userStatistics} />
+            </div>
+
+            {/* Savings History Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <SavingsHistory />
+            </div>
           </div>
-          <div>
-            <LoanHistory />
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            {/* Loans Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <LoanAccordion 
+                loans={profile?.loans || []} 
+                loanPayments={profile?.transactions?.LOAN_PAYMENT || []} 
+              />
+            </div>
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-[400px]">
-          <p className="text-slate-400">Search for a member to view their profile</p>
+        <div className="flex items-center justify-center h-[400px] bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <p className="text-gray-500 dark:text-gray-400">Search for a member to view their profile</p>
         </div>
       )}
     </div>

@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
 } from '@tanstack/react-table';
-import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaSort, FaSortUp, FaSortDown, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { HiPencil, HiTrash, HiPlus, HiEllipsisVertical, HiEye, HiCurrencyDollar } from 'react-icons/hi2';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteLoan } from '../../reducers/loansReducer';
@@ -61,6 +61,47 @@ const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView, onMakePayment }
   );
 };
 
+const ColumnVisibilityMenu = ({ columns, onToggleColumn }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2 bg-black-800/90 text-gray-100 rounded-md hover:bg-black-700 border border-black-700"
+      >
+        <FaEye className="w-4 h-4" />
+        Columns
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-black-800 border border-black-700 z-50">
+          <div className="py-1" role="menu">
+            {columns.map(column => (
+              <button
+                key={column.id}
+                onClick={() => {
+                  onToggleColumn(column.id);
+                  setIsOpen(false);
+                }}
+
+                className="flex items-center border border-custom-bg-tertiary bg-custom-bg-secondary w-full px-4 py-2 text-sm text-gray-100 hover:bg-black-700"
+                role="menuitem"
+              >
+                {column.getIsVisible() ? (
+                  <FaEye className="mr-3 h-4 w-4" />
+                ) : (
+                  <FaEyeSlash className="mr-3 h-4 w-4" />
+                )}
+                {column.columnDef.header}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LoanTable = () => {
   const dispatch = useDispatch();
   const loans = useSelector((state) => state.loans.loans);
@@ -74,6 +115,7 @@ const LoanTable = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [columnVisibility, setColumnVisibility] = useState({});
 
   useEffect(() => {
     dispatch(fetchAccounts());
@@ -293,9 +335,12 @@ const LoanTable = () => {
     state: {
       sorting,
       globalFilter: filtering,
+      columnVisibility,
     },
     onSortingChange: setSorting,
     onGlobalFilterChange: setFiltering,
+    onColumnVisibilityChange: setColumnVisibility,
+
   });
 
   return (
@@ -303,14 +348,22 @@ const LoanTable = () => {
       <div className="flex flex-col h-full">
         <div className="flex justify-between items-center px-2 border-b border-custom-bg-tertiary pb-4">
           <h1 className="text-2xl font-semibold text-custom-text-primary">Loan List</h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 py-2">
             <input
               type="text"
               value={filtering}
               onChange={(e) => setFiltering(e.target.value)}
               placeholder="Search loans..."
-              className="w-64 p-2 bg-custom-bg-secondary text-custom-text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-custom-accent"
+              className="px-4 py-2 bg-custom-bg-secondary text-custom-text-primary rounded-md border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
             />
+            <ColumnVisibilityMenu
+              columns={table.getAllLeafColumns()}
+              onToggleColumn={(columnId) => {
+                const column = table.getColumn(columnId);
+                column.toggleVisibility();
+              }}
+            />
+
             <button
               onClick={() => {
                 setSelectedLoan(null);
@@ -324,11 +377,11 @@ const LoanTable = () => {
           </div>
         </div>
 
-        <div className="flex-1 bg-custom-bg-secondary rounded-lg overflow-hidden min-h-0">
-          <div className="h-full overflow-x-auto">
+        <div className="flex flex-col h-[calc(100vh-200px)]">
+          <div className="flex-1 overflow-x-auto rounded-lg border border-custom-bg-tertiary">
             {loans && loans.length > 0 ? (
               <table className="min-w-full table-auto">
-                <thead className="bg-custom-bg-tertiary text-custom-text-secondary sticky top-0 z-10">
+                <thead className="bg-custom-bg-secondary text-custom-text-secondary sticky top-0 z-10">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (

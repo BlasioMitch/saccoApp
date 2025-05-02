@@ -4,13 +4,7 @@ import { createTransaction, updateTransaction } from '../../reducers/transaction
 import { fetchAccounts } from '../../reducers/accountsReducer'
 import { TransactionType, TransactionStatus } from '../../reducers/transactionReducer'
 import { toast } from 'sonner'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "../ui/dialog1"
+import { FiX } from 'react-icons/fi'
 
 const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {} }) => {
   const dispatch = useDispatch()
@@ -94,31 +88,36 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
   // Find the selected account details
   const selectedAccount = accounts?.find(acc => acc.id === formData.accountId)
 
+  if (!isOpen) return null
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-custom-bg-secondary dark:bg-custom-bg-secondary text-custom-text-primary">
-        <DialogHeader>
-          <DialogTitle>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+      <div className="bg-black-900/90 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-gray-50">
             {transactionToEdit ? 'Edit Transaction' : 'Create New Transaction'}
-          </DialogTitle>
-        </DialogHeader>
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-300">
+            <FiX className="w-6 h-6" />
+          </button>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1 text-custom-text-secondary">Account</label>
+            <label className="block text-sm font-medium mb-1 text-gray-200">Account</label>
             {initialValues.accountId ? (
               <input
                 type="text"
                 value={selectedAccount ? `${selectedAccount.accountNumber} - ${selectedAccount.owner?.first_name} ${selectedAccount.owner?.last_name}` : 'Loading...'}
                 readOnly
-                className="w-full p-2 bg-custom-bg-tertiary rounded-md opacity-75 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-custom-brand-primary text-custom-text-primary"
+                className="w-full p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-dcyan-500"
               />
             ) : (
               <select
                 name="accountId"
                 value={formData.accountId}
                 onChange={handleChange}
-                className="w-full p-2 bg-custom-bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-custom-brand-primary text-custom-text-primary"
+                className="w-full p-2 bg-black-800 text-gray-700 secondary rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
                 disabled={initialValues.accountId || transactionToEdit}
               >
                 <option value="">Select Account</option>
@@ -130,20 +129,20 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
               </select>
             )}
             {errors.accountId && (
-              <p className="text-red-500 text-sm mt-1">{errors.accountId}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.accountId}</p>
             )}
             {accountsStatus === 'loading' && (
-              <p className="text-custom-text-muted text-sm mt-1">Loading accounts...</p>
+              <p className="text-gray-300 text-sm mt-1">Loading accounts...</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-custom-text-secondary">Type</label>
+            <label className="block text-sm font-medium mb-1 text-gray-200">Type</label>
             <select
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className="w-full p-2 bg-custom-bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-custom-brand-primary text-custom-text-primary"
+              className="w-full p-2 bg-black-800/90 text-gray-700 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
               disabled={initialValues.type}
             >
               {Object.entries(TransactionType).map(([key, value]) => (
@@ -155,38 +154,38 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-custom-text-secondary">Amount</label>
+            <label className="block text-sm font-medium mb-1 text-gray-200">Amount</label>
             <input
               type="number"
               name="amount"
               value={formData.amount}
               onChange={handleChange}
-              className="w-full p-2 bg-custom-bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-custom-brand-primary text-custom-text-primary"
+              className="w-full p-2 bg-black-800/90 text-gray-700 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
             />
             {errors.amount && (
-              <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.amount}</p>
             )}
           </div>
 
-          <DialogFooter className="flex justify-end gap-4 mt-6">
+          <div className="flex justify-end gap-4 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-custom-bg-tertiary text-custom-text-primary rounded-md hover:bg-custom-interactive-hover transition-colors"
+              className="px-4 py-2 bg-black-800/90 text-gray-50 rounded-md hover:bg-black-700 border border-black-700"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-custom-brand-primary text-custom-interactive-active-text rounded-md hover:bg-custom-brand-dark transition-colors focus:ring-2 focus:ring-custom-brand-light"
+              className="px-4 py-2 bg-green-500 text-gray-900 rounded-md hover:bg-dcyan-600 hover:cursor-pointer"
               disabled={status === 'loading'}
             >
               {status === 'loading' ? 'Saving...' : (transactionToEdit ? 'Update' : 'Create')}
             </button>
-          </DialogFooter>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   )
 }
 

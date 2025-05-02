@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import StatCards from '../../components/cards/StatCards'
-import TransactionsTable from '../../components/tables/TransactionsTable'
+import TransactionTable from '../../components/tables/TransactionTable'
 import TransactionForm from '../../components/forms/TransactionForm'
-import { fetchTransactions } from '../../reducers/transactionReducer'
+import TransactionDetailsModal from '../../components/Transactions/TransactionDetailsModal'
+import DeleteTransactionModal from '../../components/Transactions/DeleteTransactionModal'
+import { fetchTransactions, deleteTransaction } from '../../reducers/transactionReducer'
 import { toast } from 'sonner'
 import { TransactionType, TransactionStatus } from '../../reducers/transactionReducer'
 
 const Transactions = () => {
   const dispatch = useDispatch()
   const { transactions, status, error } = useSelector(state => state.transactions)
-  const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [selectedTransaction, setSelectedTransaction] = useState(null)
 
   useEffect(() => {
     if (status === 'idle') {
@@ -67,8 +72,52 @@ const Transactions = () => {
     }
   ]
 
-  const handleClosePanel = () => {
-    setIsPanelOpen(false)
+  const handleRowClick = (transaction) => {
+    setSelectedTransaction(transaction)
+  }
+
+  const handleEdit = (transaction) => {
+    setSelectedTransaction(transaction)
+    setIsFormOpen(true)
+  }
+
+  const handleDelete = async (transaction) => {
+    setSelectedTransaction(transaction)
+    setIsDeleteOpen(true)
+  }
+
+  const handleConfirmDelete = async (transaction) => {
+    try {
+      await dispatch(deleteTransaction(transaction.id)).unwrap()
+      toast.success('Transaction deleted successfully')
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete transaction')
+    }
+  }
+
+  const handleView = (transaction) => {
+    setSelectedTransaction(transaction)
+    setIsDetailsOpen(true)
+  }
+
+  const handleAddTransaction = () => {
+    setSelectedTransaction(null)
+    setIsFormOpen(true)
+  }
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false)
+    setSelectedTransaction(null)
+  }
+
+  const handleCloseDetails = () => {
+    setIsDetailsOpen(false)
+    setSelectedTransaction(null)
+  }
+
+  const handleCloseDelete = () => {
+    setIsDeleteOpen(false)
+    setSelectedTransaction(null)
   }
 
   if (status === 'loading') {
@@ -82,7 +131,7 @@ const Transactions = () => {
   return (
     <div className="flex flex-col h-full p-4 py-2">
       <div className='py-2'>
-        <p className='capitalize text-2xl font-semibold'>Transanctions</p>
+        <p className='capitalize text-2xl font-semibold'>Transactions</p>
       </div>
       <div className="mb-6">
         <StatCards stats={stats} />
@@ -93,7 +142,7 @@ const Transactions = () => {
           <p className="text-xl text-dblack-50 mb-4">No transactions found</p>
           <p className="text-dblack-400 mb-6">Start by creating a new transaction</p>
           <button
-            onClick={() => setIsPanelOpen(true)}
+            onClick={handleAddTransaction}
             className="px-4 py-2 bg-dcyan-500 text-white rounded-md hover:bg-dcyan-600"
           >
             Create Transaction
@@ -101,18 +150,34 @@ const Transactions = () => {
         </div>
       ) : (
         <div className="flex-1 bg-dblack-900 rounded-lg overflow-hidden">
-          <TransactionsTable 
+          <TransactionTable 
             transactions={transactions}
-            isPanelOpen={isPanelOpen}
-            setIsPanelOpen={setIsPanelOpen}
+            onRowClick={handleRowClick}
+            onAddTransaction={handleAddTransaction}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onView={handleView}
           />
         </div>
       )}
 
       <TransactionForm 
-        isOpen={isPanelOpen}
-        onClose={handleClosePanel}
-        transactionToEdit={null}
+        isOpen={isFormOpen}
+        onClose={handleCloseForm}
+        transactionToEdit={selectedTransaction}
+      />
+
+      <TransactionDetailsModal
+        isOpen={isDetailsOpen}
+        onClose={handleCloseDetails}
+        transaction={selectedTransaction}
+      />
+
+      <DeleteTransactionModal
+        isOpen={isDeleteOpen}
+        onClose={handleCloseDelete}
+        onConfirm={handleConfirmDelete}
+        transaction={selectedTransaction}
       />
     </div>
   )

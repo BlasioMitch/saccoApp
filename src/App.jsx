@@ -34,7 +34,7 @@ function App() {
           </Route> 
           <Route path="loans" element={<Loans />} />
           <Route path="accounts" element={<Accounts />} />
-          <Route path="profiles" element={<Profiles />} />
+          <Route path="profile" element={<Profiles />} />
         </Route>
       </Routes>
       <Toaster richColors position="top-right" />
