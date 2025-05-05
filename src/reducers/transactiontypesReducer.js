@@ -51,7 +51,6 @@ export const updateTransactiontype = createAsyncThunk(
             if(!id || !objData){
                 throw new Error('Invalid Input: ID and data object are required')
             }
-            console.log(objData,' in reducer')
             const response = await transactiontypesService.updateTransactiontype(id, objData)
             return response
         } catch (error) {
@@ -85,8 +84,8 @@ const transactiontypeslice = createSlice({
         builder
             // Fetch all cases
             .addCase(fetchtransactiontypes.pending, state =>{
-                state.status = 'loading'
                 state.error = null
+                state.status = 'loading'
             })
             .addCase(fetchtransactiontypes.fulfilled, (state,action) => {
                 state.transactiontypes = action.payload
@@ -106,35 +105,35 @@ const transactiontypeslice = createSlice({
                 state.status = 'succeeded'
             })
             .addCase(updateTransactiontype.rejected, (state,action) => {
-                state.status = 'failed'
                 state.error = action.payload
+                state.status = 'failed'
             })
             // delete cases
             .addCase(deleteTransactiontype.pending, state => {
-                state.status = 'loading'
                 state.error = null
+                state.status = 'loading'
             })
             .addCase(deleteTransactiontype.fulfilled,(state,action) => {
-                state.status = 'succeeded'
                 const tranID = action.payload.id
                 state.transactiontypes = state.transactiontypes.filter(tran => tran.id !== tranID)
+                state.status = 'succeeded'
             })
             .addCase(deleteTransactiontype.rejected, (state, action) =>{
-                state.status = 'failed'
                 state.error = action.payload
+                state.status = 'failed'
             })
             // create cases
             .addCase(createTransactiontype.pending, state => {
-                state.status = 'loading'
                 state.error = null
+                state.status = 'loading'
             })
             .addCase(createTransactiontype.fulfilled, (state,action) => {
                 state.transactiontypes.push(action.payload)
                 state.status = 'succeeded'
             })
             .addCase(createTransactiontype.rejected, (state,action) => {
-                state.status = 'failed'
                 state.error = action.payload
+                state.status = 'failed'
             })
     }
 })
