@@ -24,6 +24,19 @@ api.interceptors.request.use(
   }
 )
 
+const saveUserData = (userData) => {
+  localStorage.setItem('user', JSON.stringify(userData))
+}
+
+const clearUserData = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+}
+
+const getUserData = () => {
+  const userData = localStorage.getItem('user')
+  return userData ? JSON.parse(userData) : null
+}
 
 const login = async (credentials) => {
   const response = await api.post('/api/auth/login', credentials)
@@ -38,7 +51,7 @@ const login = async (credentials) => {
 
 const logout = async () => {
   try {
-    const response = await api.post('/logout')
+    const response = await api.post('/api/auth/logout')
     clearUserData()
     return response.data
   } catch (error) {
@@ -47,4 +60,4 @@ const logout = async () => {
   }
 }
 
-export default { login, logout, }
+export default { login, logout, getUserData }

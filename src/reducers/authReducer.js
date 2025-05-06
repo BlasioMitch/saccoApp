@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import authService from '../services/auth'
-import getUserData from '../services/api'
 
 const initialState = {
-  user: getUserData(),
+  user: authService.getUserData(),
   token: localStorage.getItem('token'),
   isAuthenticated: !!localStorage.getItem('token'),
   status: 'idle',
@@ -46,7 +45,7 @@ const authSlice = createSlice({
     },
     initializeAuth: (state) => {
       const token = localStorage.getItem('token')
-      const user = getUserData()
+      const user = authService.getUserData()
       state.token = token
       state.user = user
       state.isAuthenticated = !!token

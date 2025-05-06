@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // const baseUrl = 'http://localhost:3001/api/auth'
-const baseUrl =import.meta.env.VITE_API_URL
+const baseUrl =`${import.meta.env.VITE_API_URL}/api/auth`
 
 // Create axios instance with default config
 const api = axios.create({
@@ -25,19 +25,4 @@ api.interceptors.request.use(
   }
 )
 
-const saveUserData = (userData) => {
-  localStorage.setItem('user', JSON.stringify(userData))
-}
-
-const clearUserData = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
-}
-
-const getUserData = () => {
-  const userData = localStorage.getItem('user')
-  return userData ? JSON.parse(userData) : null
-}
-
-
-export default { api, saveUserData, clearUserData, getUserData }
+export default api
