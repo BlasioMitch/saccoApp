@@ -7,7 +7,7 @@ import { Provider } from 'react-redux'
 import { store } from './Store/store.js'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <Router>
+  <Router basename='/saccoApp'>
 
   <React.StrictMode>
     <Provider store={store}>
