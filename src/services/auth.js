@@ -24,22 +24,9 @@ api.interceptors.request.use(
   }
 )
 
-const saveUserData = (userData) => {
-  localStorage.setItem('user', JSON.stringify(userData))
-}
-
-const clearUserData = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
-}
-
-const getUserData = () => {
-  const userData = localStorage.getItem('user')
-  return userData ? JSON.parse(userData) : null
-}
 
 const login = async (credentials) => {
-  const response = await api.post('/login', credentials)
+  const response = await api.post('/api/auth/login', credentials)
   const { token, user } = response.data
   
   // Save both token and user data
@@ -60,4 +47,4 @@ const logout = async () => {
   }
 }
 
-export default { login, logout, getUserData }
+export default { login, logout, }

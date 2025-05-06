@@ -25,4 +25,19 @@ api.interceptors.request.use(
   }
 )
 
-export default api
+const saveUserData = (userData) => {
+  localStorage.setItem('user', JSON.stringify(userData))
+}
+
+const clearUserData = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+}
+
+const getUserData = () => {
+  const userData = localStorage.getItem('user')
+  return userData ? JSON.parse(userData) : null
+}
+
+
+export default { api, saveUserData, clearUserData, getUserData }
