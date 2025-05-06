@@ -5,7 +5,7 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base:'saccoApp.git',
+  base:'/saccoApp/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
