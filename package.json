@@ -3,11 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage":"https://github.com/BlasioMitch/saccoApp.git",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "predeploy":"npm run build",
+    "deploy":"gh-pages -d build",
     "server": "json-server -p3001 --watch db.json"
   },
   "dependencies": {
@@ -43,6 +46,7 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "gh-pages": "^6.3.0",
     "json-server": "^1.0.0-beta.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
