@@ -143,7 +143,7 @@ const Transactions = () => {
           <p className="text-dblack-400 mb-6">Start by creating a new transaction</p>
           <button
             onClick={handleAddTransaction}
-            className="px-4 py-2 bg-dcyan-500 text-white rounded-md hover:bg-dcyan-600"
+            className="px-4 py-2 bg-custom-brand-primary text-white rounded-md hover:bg-custom-brand-dark"
           >
             Create Transaction
           </button>
