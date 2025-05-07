@@ -14,17 +14,17 @@ import { ThemeSwitcher } from '../../ui/ThemeSwitcher'
 
 const Menu = ({ isSidebarOpen }) => {
   const mainMenuItems = [
-    { icon: <Home />, label: 'Dashboard', path: '/home' },
-    { icon: <Users />, label: 'Members', path: '/members' },
-    { icon: <Wallet />, label: 'Accounts', path: '/accounts' },
-    { icon: <CreditCard />, label: 'Loans', path: '/loans' },
-    { icon: <DollarSign />, label: 'Transactions', path: '/transactions' },
-    { icon: <FileText />, label: 'Profile', path: '/profile' },
+    { icon: <Home />, label: 'Dashboard', path: '/home/dashboard' },
+    { icon: <Users />, label: 'Members', path: '/home/members' },
+    { icon: <Wallet />, label: 'Accounts', path: '/home/accounts' },
+    { icon: <CreditCard />, label: 'Loans', path: '/home/loans' },
+    { icon: <DollarSign />, label: 'Transactions', path: '/home/transactions' },
+    { icon: <FileText />, label: 'Profile', path: '/home/profile' },
   ]
 
   const bottomMenuItems = [
-    { icon: <Settings />, label: 'Settings', path: '/settings' },
-    { icon: <HelpCircle />, label: 'Help', path: '/help' }
+    { icon: <Settings />, label: 'Settings', path: '/home/settings' },
+    { icon: <HelpCircle />, label: 'Help', path: '/home/help' }
   ]
 
   const NavItem = ({ item }) => (

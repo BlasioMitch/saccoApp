@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Bell, ChevronDown, LogOut, Settings, User } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { logout } from '../../reducers/authReducer'
+import { logout, initializeAuth } from '../../reducers/authReducer'
 import { toast } from 'sonner'
 
 const UserDropdown = ({ isOpen, onClose, onLogout }) => {
@@ -89,13 +89,18 @@ const UserAvatar = ({ user, onLogout }) => {
 const TopBar = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { user } = useSelector((state) => state.auth)
+  const { user, isAuthenticated } = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    // Initialize auth state from localStorage on component mount
+    dispatch(initializeAuth())
+  }, [dispatch])
 
   const handleLogout = async () => {
     try {
       await dispatch(logout()).unwrap()
       toast.success('Logged out successfully')
-      navigate('/')
+      navigate('/saccoApp/')
     } catch (error) {
       toast.error(error || 'Logout failed')
     }
@@ -115,7 +120,7 @@ const TopBar = () => {
             <Bell className="w-5 h-5" />
           </button>
           
-          <UserAvatar user={user} onLogout={handleLogout} />
+          {isAuthenticated && user && <UserAvatar user={user} onLogout={handleLogout} />}
         </div>
       </div>
     </div>

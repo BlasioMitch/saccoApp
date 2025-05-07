@@ -1,28 +1,29 @@
 import axios from 'axios'
+import api from './api'
 
-const baseUrl =import.meta.env.VITE_API_URL
+// const baseUrl =import.meta.env.VITE_API_URL
 
-// Create axios instance with default config
-const api = axios.create({
-  baseURL: baseUrl,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+// // Create axios instance with default config
+// const api = axios.create({
+//   baseURL: baseUrl,
+//   headers: {
+//     'Content-Type': 'application/json'
+//   }
+// })
 
-// Add request interceptor to include token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
+// // Add request interceptor to include token
+// api.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem('token')
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`
+//     }
+//     return config
+//   },
+//   (error) => {
+//     return Promise.reject(error)
+//   }
+// )
 
 const saveUserData = (userData) => {
   try {
@@ -45,7 +46,15 @@ const getUserData = () => {
   try {
     const userData = localStorage.getItem('user')
     if (!userData) return null
-    return JSON.parse(userData)
+    
+    // Check if the data is valid JSON before parsing
+    if (userData === 'undefined' || userData === 'null') {
+      clearUserData() // Clear invalid data
+      return null
+    }
+    
+    const parsedData = JSON.parse(userData)
+    return parsedData || null
   } catch (error) {
     console.error('Error getting user data:', error)
     // Clear potentially corrupted data
@@ -56,7 +65,7 @@ const getUserData = () => {
 
 const login = async (credentials) => {
   try {
-    const response = await api.post('/', credentials)
+    const response = await api.post('/auth/login', credentials)
     const { token, user } = response.data
     
     // Save both token and user data
@@ -72,7 +81,7 @@ const login = async (credentials) => {
 
 const logout = async () => {
   try {
-    const response = await api.post('/api/auth/logout')
+    const response = await api.post('/auth/logout')
     clearUserData()
     return response.data
   } catch (error) {

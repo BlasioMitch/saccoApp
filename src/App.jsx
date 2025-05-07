@@ -17,18 +17,18 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/" replace />
 }
 
+{/* <Route path="/login" element={<Navigate to="/" replace />} /> */}
 function App() {
   return (
     <ThemeProvider>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Navigate to="/" replace />} />
-        <Route path="/" element={
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         }>
-          <Route path="home" element={<Grid />}/>
+          <Route path="dashboard" element={<Grid />}/>
           <Route path="members" element={<Team />} />
           <Route path="transactions" element={<Transactions />}>
           </Route> 

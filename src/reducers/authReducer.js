@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import authService from '../services/auth'
 
 const initialState = {
-  user: authService.getUserData(),
-  token: localStorage.getItem('token'),
-  isAuthenticated: authService.isAuthenticated(),
+  user: null,
+  token: null,
+  isAuthenticated: false,
   status: 'idle',
   error: null
 }
@@ -44,11 +44,32 @@ const authSlice = createSlice({
       state.error = null
     },
     initializeAuth: (state) => {
-      const token = localStorage.getItem('token')
-      const user = authService.getUserData()
-      state.token = token
-      state.user = user
-      state.isAuthenticated = !!token
+      try {
+        const token = localStorage.getItem('token')
+        const user = authService.getUserData()
+        
+        // Only set authenticated if both token and user exist
+        if (token && user) {
+          state.token = token
+          state.user = user
+          state.isAuthenticated = true
+        } else {
+          // Clear any partial data
+          state.token = null
+          state.user = null
+          state.isAuthenticated = false
+          // Clear localStorage if data is incomplete
+          if (token || user) {
+            authService.clearUserData()
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error)
+        state.token = null
+        state.user = null
+        state.isAuthenticated = false
+        authService.clearUserData()
+      }
     }
   },
   extraReducers: (builder) => {

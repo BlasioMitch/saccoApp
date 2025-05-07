@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = 'http://localhost:3001/api/auth'
+const baseUrl = 'http://localhost:3001/api'
 
 const getLoanApps = () => {
     const request = axios.get(`${baseUrl}/loanapplications/`)
