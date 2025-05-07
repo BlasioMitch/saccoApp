@@ -59,9 +59,6 @@ function Dashboard() {
     { date: '2024-06', balance: 2200000 }
   ];
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   const handleExport = (format) => {
     // Implement export functionality
@@ -77,12 +74,9 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen bg-custom-bg-primary dark:bg-custom-bg-primary">
-      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopBar />
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 bg-custom-bg-secondary dark:bg-custom-bg-secondary">
           <div className="mx-auto max-w-7xl space-y-6">
-            {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                 <div className="flex justify-between items-start">
