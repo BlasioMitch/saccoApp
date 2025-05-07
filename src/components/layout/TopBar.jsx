@@ -46,8 +46,8 @@ const UserAvatar = ({ user, onLogout }) => {
   if (!user) return null;
 
   // Handle missing name data gracefully
-  const firstName = user?.first_name || user?.name?.split(' ')[0] || 'User'
-  const lastName = user?.last_name || user?.name?.split(' ')[1] || ''
+  const firstName = user?.firstName || user?.first_name?.split(' ')[0] || 'User'
+  const lastName = user?.lastName || user?.last_name?.split(' ')[1] || ''
   const fullName = `${firstName} ${lastName}`.trim()
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase()
   const userRole = user?.role?.toLowerCase() || 'user'
