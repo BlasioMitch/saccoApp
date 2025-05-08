@@ -1,10 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createTransaction, updateTransaction } from '../../reducers/transactionReducer'
+import { createTransaction, fetchTransactions, updateTransaction } from '../../reducers/transactionReducer'
 import { fetchAccounts } from '../../reducers/accountsReducer'
+import { fetchLoans } from '../../reducers/loansReducer'
 import { TransactionType, TransactionStatus } from '../../reducers/transactionReducer'
+import { formatUGX, parseUGX } from '../../utils/currency'
 import { toast } from 'sonner'
 import { FiX } from 'react-icons/fi'
+
+// Currency formatter for UGX
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'UGX',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
 
 const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {} }) => {
   const dispatch = useDispatch()
@@ -12,13 +24,15 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
   const { status } = useSelector(state => state.transactions)
   
   const [formData, setFormData] = useState({
-    accountId: initialValues.accountId || '',
-    type: initialValues.type || TransactionType.SAVINGS_DEPOSIT,
+    accountId: '',
+    type: TransactionType.SAVINGS_DEPOSIT,
     amount: '',
-    status: TransactionStatus.PENDING,
-    loanId: initialValues.loanId || null
+    status: TransactionStatus.COMPLETED,
+    loanId: ''
   })
   const [errors, setErrors] = useState({})
+  // console.log(initialValues, ' from initial values')
+  // console.log(formData,' from make payment action')
 
   // Fetch accounts if not already loaded
   useEffect(() => {
@@ -37,15 +51,36 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
         status: transactionToEdit.status,
         loanId: transactionToEdit.loanId
       })
-    }
-  }, [transactionToEdit])
+    } else if(initialValues.accountId || initialValues.type){
+      // create with initial values
+      setFormData( prev =>({
+        ...prev,
+        accountId: initialValues.accountId || '',
+        type: initialValues.type || TransactionType.SAVINGS_DEPOSIT,
+        amount: Number(initialValues.amount) || '',
+        status: TransactionStatus.COMPLETED,
+        loanId: initialValues.loanId || null      }))
+      }
+    }, [transactionToEdit?.id,
+      initialValues.accountId,
+      initialValues.type,
+      initialValues.amount,
+      initialValues.loanId])
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    if (name === 'amount') {
+      const numericValue = parseUGX(value)
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -76,8 +111,17 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
         })).unwrap()
         toast.success('Transaction updated successfully')
       } else {
-        await dispatch(createTransaction(formData)).unwrap()
+        const cleanedData = { ...formData }
+        if (!cleanedData.loanId) {
+          delete cleanedData.loanId
+        }
+        await dispatch(createTransaction(cleanedData)).unwrap()
         toast.success('Transaction created successfully')
+      }
+      dispatch(fetchTransactions())
+      // Refresh loans data if this is a loan payment
+      if (formData.type === TransactionType.LOAN_PAYMENT) {
+        dispatch(fetchLoans())
       }
       onClose()
     } catch (error) {
@@ -86,7 +130,11 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
   }
 
   // Find the selected account details
-  const selectedAccount = accounts?.find(acc => acc.id === formData.accountId)
+const selectedAccount = useMemo(() => {
+  if (!accounts || !formData.accountId) return null
+  return accounts.find(acc => acc.id === formData.accountId)
+}, [accounts, formData.accountId])
+
 
   if (!isOpen) return null
 
@@ -110,7 +158,7 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
                 type="text"
                 value={selectedAccount ? `${selectedAccount.accountNumber} - ${selectedAccount.owner?.first_name} ${selectedAccount.owner?.last_name}` : 'Loading...'}
                 readOnly
-                className="w-full p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-dcyan-500 "
               />
             ) : (
               <select
@@ -118,7 +166,7 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
                 value={formData.accountId}
                 onChange={handleChange}
                 className="w-full p-2 bg-black-800 text-gray-700 secondary rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
-                disabled={initialValues.accountId || transactionToEdit}
+                disabled={ !!transactionToEdit}
               >
                 <option value="">Select Account</option>
                 {accounts?.map(account => (
@@ -143,7 +191,7 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
               value={formData.type}
               onChange={handleChange}
               className="w-full p-2 bg-black-800/90 text-gray-700 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
-              disabled={initialValues.type}
+              disabled={!!initialValues.type || !!transactionToEdit}
             >
               {Object.entries(TransactionType).map(([key, value]) => (
                 <option key={key} value={value}>
@@ -154,14 +202,17 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-200">Amount</label>
-            <input
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              className="w-full p-2 bg-black-800/90 text-gray-700 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
-            />
+            <label className="block text-sm font-medium mb-1 text-gray-200">Amount (UGX)</label>
+            <div className="relative">
+              <input
+                type="text"
+                name="amount"
+                value={formData.amount ? formatUGX(formData.amount) : ''}
+                onChange={handleChange}
+                className="w-full p-2 bg-black-800/90 text-gray-700 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                placeholder="Enter amount"
+              />
+            </div>
             {errors.amount && (
               <p className="text-red-300 text-sm mt-1">{errors.amount}</p>
             )}

@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useDispatch } from 'react-redux'
+import moment from 'moment'
 import { deleteUser } from '../../reducers/userReducer'
 import { toast } from 'sonner'
 
@@ -229,7 +230,7 @@ function UsersTable({ users, onEdit, onView }) {
       ),
       cell: ({ row }) => {
         const date = new Date(row.getValue('dob'));
-        return date.toLocaleDateString();
+        return  moment(date).format('DD/MMM/YYYY');
       },
     },
     {
@@ -245,7 +246,7 @@ function UsersTable({ users, onEdit, onView }) {
       ),
       cell: ({ row }) => {
         const date = new Date(row.getValue('joinDate'));
-        return date.toLocaleDateString();
+        return moment(date).format('DD/MMM/YYYY')
       },
     },
     {

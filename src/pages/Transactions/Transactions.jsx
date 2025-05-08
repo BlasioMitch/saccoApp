@@ -20,12 +20,16 @@ const Transactions = () => {
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchTransactions())
+        .unwrap()
+        .catch(error => {
+          toast.error(error?.message || 'Failed to fetch transactions')
+        })
     }
   }, [status, dispatch])
 
   useEffect(() => {
     if (error) {
-      toast.error(error)
+      toast.error(error?.message || 'An error occurred')
     }
   }, [error])
 
@@ -73,51 +77,88 @@ const Transactions = () => {
   ]
 
   const handleRowClick = (transaction) => {
-    setSelectedTransaction(transaction)
+    try {
+      setSelectedTransaction(transaction)
+    } catch (error) {
+      toast.error('Failed to select transaction')
+    }
   }
 
   const handleEdit = (transaction) => {
-    setSelectedTransaction(transaction)
-    setIsFormOpen(true)
+    try {
+      setSelectedTransaction(transaction)
+      setIsFormOpen(true)
+    } catch (error) {
+      toast.error('Failed to open edit form')
+    }
   }
 
   const handleDelete = async (transaction) => {
-    setSelectedTransaction(transaction)
-    setIsDeleteOpen(true)
+    try {
+      setSelectedTransaction(transaction)
+      setIsDeleteOpen(true)
+    } catch (error) {
+      toast.error('Failed to open delete confirmation')
+    }
   }
 
   const handleConfirmDelete = async (transaction) => {
     try {
       await dispatch(deleteTransaction(transaction.id)).unwrap()
       toast.success('Transaction deleted successfully')
+      // Refresh the transactions list
+      await dispatch(fetchTransactions()).unwrap()
+      setIsDeleteOpen(false)
+      setSelectedTransaction(null)
     } catch (error) {
-      toast.error(error.message || 'Failed to delete transaction')
+      toast.error(error?.message || 'Failed to delete transaction')
+      setIsDeleteOpen(false)
     }
   }
 
   const handleView = (transaction) => {
-    setSelectedTransaction(transaction)
-    setIsDetailsOpen(true)
+    try {
+      setSelectedTransaction(transaction)
+      setIsDetailsOpen(true)
+    } catch (error) {
+      toast.error('Failed to view transaction details')
+    }
   }
 
   const handleAddTransaction = () => {
-    setSelectedTransaction(null)
-    setIsFormOpen(true)
+    try {
+      setSelectedTransaction(null)
+      setIsFormOpen(true)
+    } catch (error) {
+      toast.error('Failed to open new transaction form')
+    }
   }
 
   const handleCloseForm = () => {
-    setIsFormOpen(false)
-    setSelectedTransaction(null)
+    try {
+      setIsFormOpen(false)
+      setSelectedTransaction(null)
+    } catch (error) {
+      toast.error('Failed to close form')
+    }
   }
 
   const handleCloseDetails = () => {
-    setIsDetailsOpen(false)
-    setSelectedTransaction(null)
+    try {
+      setIsDetailsOpen(false)
+      setSelectedTransaction(null)
+    } catch (error) {
+      toast.error('Failed to close details')
+    }
   }
 
   const handleCloseDelete = () => {
-    setIsDeleteOpen(false)
-    setSelectedTransaction(null)
+    try {
+      setIsDeleteOpen(false)
+      setSelectedTransaction(null)
+    } catch (error) {
+      toast.error('Failed to close delete confirmation')
+    }
   }
 
   if (status === 'loading') {
@@ -129,11 +170,11 @@ const Transactions = () => {
   }
 
   return (
-    <div className="flex flex-col h-full p-4 py-2">
-      <div className='py-2'>
-        <p className='capitalize text-2xl font-semibold'>Transactions</p>
+    <div className="flex flex-col h-[calc(100vh-64px)] p-4">
+      <div className="flex justify-between items-center px-2 border-b border-custom-bg-tertiary pb-4">
+        <h1 className="text-2xl font-semibold text-custom-text-primary">Transactions</h1>
       </div>
-      <div className="mb-6">
+      <div className="mb-6 pt-4">
         <StatCards stats={stats} />
       </div>
       
@@ -149,11 +190,9 @@ const Transactions = () => {
           </button>
         </div>
       ) : (
-        <div className="flex-1 bg-dblack-900 rounded-lg overflow-hidden">
+        <div className="flex-1 bg-custom-bg-secondary rounded-lg overflow-hidden min-h-0">
           <TransactionTable 
-            transactions={transactions}
             onRowClick={handleRowClick}
-            onAddTransaction={handleAddTransaction}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onView={handleView}

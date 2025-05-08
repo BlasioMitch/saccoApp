@@ -4,6 +4,7 @@ import UsersTable from '../../components/tables/UsersTable'
 import UserForm from '../../components/forms/UserForm'
 import { fetchUsers } from '../../reducers/userReducer'
 import { FiUserPlus } from 'react-icons/fi'
+import moment from 'moment'
 import { toast } from 'sonner'
 import { Dialog, DialogTrigger, DialogDescription, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog'
 const Team = () => {
@@ -88,7 +89,7 @@ const Team = () => {
         </div>
         <div className="bg-dblack-900 p-4 rounded">
           <h2 className="text-lg text-dcyan-300">Active Members</h2>
-          <p className="text-2xl font-bold">{transformedMembers.filter(m => m.status === 'Active').length}</p>
+          <p className="text-2xl font-bold">{transformedMembers.filter(m => m.status === 'ACTIVE').length}</p>
         </div>
         <div className="bg-dblack-900 p-4 rounded">
           <h2 className="text-lg text-dcyan-300">New This Month</h2>
@@ -155,7 +156,7 @@ const Team = () => {
               </div>
               <div>
                 <span className="font-medium text-gray-200">Date of Birth:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.dob}</span>
+                <span className="text-gray-50 ml-2">{moment(selectedUser.dob).format('DD/MMM/YYYY')}</span>
               </div>
               <div>
                 <span className="font-medium text-gray-200">Role:</span>
@@ -171,7 +172,7 @@ const Team = () => {
               </div>
               <div>
                 <span className="font-medium text-gray-200">Join Date:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.joinDate}</span>
+                <span className="text-gray-50 ml-2">{moment(selectedUser.joinDate).format('DD/MMM/YYYY')}</span>
               </div>
               <div className="flex justify-end">
                 <button

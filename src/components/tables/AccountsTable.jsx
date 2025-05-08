@@ -255,7 +255,7 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
         );
       },
       accessorFn: (row) => row.accountNumber,
-      cell: ({ getValue }) => <div className='text-gray-600'>{getValue()}</div>,
+      cell: ({ getValue }) => <div className='text-gray-200'>{getValue()}</div>,
     },
     {
       id: 'ownerName',
@@ -263,7 +263,7 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
         return (
           <button
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 "
           >
             Owner Name
             {column.getIsSorted() === 'asc' ? (
@@ -281,7 +281,7 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
         return owner ? `${owner.first_name} ${owner.last_name} ${owner.other_name || ''}`.trim() : '';
       },
       cell: ({ getValue }) => (
-        <div className="text-sm text-gray-100">{getValue()}</div>
+        <div className="text-md text-gray-100">{getValue()}</div>
       ),
     },
     {

@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import StatCards from '../../components/ui/StatCards';
 import LoanTable from '../../components/tables/LoanTable';
 import { fetchLoans } from '../../reducers/loansReducer';
+import { toast } from 'sonner'
+
 
 const Loans = () => {
   const dispatch = useDispatch();
@@ -26,9 +28,9 @@ const Loans = () => {
     if (!loans || loans.length === 0) return [];
 
     const totalLoans = loans.length;
-    const activeLoans = loans.filter(loan => loan.status === 'Active').length;
+    const activeLoans = loans.filter(loan => loan.status === 'ACTIVE').length;
     const totalAmount = loans.reduce((sum, loan) => sum + (Number(loan.amount) || 0), 0);
-    const defaultedLoans = loans.filter(loan => loan.status === 'Defaulted').length;
+    const defaultedLoans = loans.filter(loan => loan.status === 'DEFAULTED').length;
     const defaultRate = totalLoans ? (defaultedLoans / totalLoans) * 100 : 0;
 
     return [

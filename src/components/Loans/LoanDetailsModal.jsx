@@ -1,5 +1,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { formatUGX } from '../../utils/currency';
+import moment from 'moment';
 
 const LoanDetailsModal = ({ isOpen, onClose, loan }) => {
   if (!isOpen || !loan) return null;
@@ -36,10 +38,7 @@ const LoanDetailsModal = ({ isOpen, onClose, loan }) => {
                 <div>
                   <label className="block text-sm font-medium mb-1 text-gray-300">Loan Amount</label>
                   <div className="p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                    }).format(loan.amount)}
+                    {formatUGX(loan.amount)}
                   </div>
                 </div>
                 <div>
@@ -58,9 +57,9 @@ const LoanDetailsModal = ({ isOpen, onClose, loan }) => {
                   <label className="block text-sm font-medium mb-1 text-gray-300">Status</label>
                   <div className="p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700">
                     <span className={`px-2 py-1 text-xs rounded-full ${
-                      loan.status === 'ACTIVE'
+                      loan.status === 'PAID'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                        : loan.status === 'PENDING'
+                        : loan.status === 'ACTIVE'
                         ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                         : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                     }`}>
@@ -78,19 +77,13 @@ const LoanDetailsModal = ({ isOpen, onClose, loan }) => {
                 <div>
                   <label className="block text-sm font-medium mb-1 text-gray-300">Monthly Payment</label>
                   <div className="p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                    }).format(loan.monthlyPayment)}
+                    {formatUGX(loan.summary?.monthlyPayment)}
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1 text-gray-300">Remaining Balance</label>
                   <div className="p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                    }).format(loan.remainingBalance)}
+                    {formatUGX(loan.summary?.remainingBalance)}
                   </div>
                 </div>
               </div>
@@ -103,13 +96,13 @@ const LoanDetailsModal = ({ isOpen, onClose, loan }) => {
                 <div>
                   <label className="block text-sm font-medium mb-1 text-gray-300">Start Date</label>
                   <div className="p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700">
-                    {new Date(loan.startDate).toLocaleDateString()}
+                    {moment(loan.startDate).format('DD/MMM/YYYY')}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-300">End Date</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-300">Proposed End Date</label>
                   <div className="p-2 bg-black-800/90 text-gray-100 rounded-md border border-black-700">
-                    {new Date(loan.endDate).toLocaleDateString()}
+                    {moment(loan.endDate).format('DD/MMM/YYYY')}
                   </div>
                 </div>
               </div>

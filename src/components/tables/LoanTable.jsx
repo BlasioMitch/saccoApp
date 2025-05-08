@@ -12,7 +12,9 @@ import { HiPencil, HiTrash, HiPlus, HiEllipsisVertical, HiEye, HiCurrencyDollar 
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteLoan } from '../../reducers/loansReducer';
 import { fetchAccounts } from '../../reducers/accountsReducer';
+import { formatUGX } from '../../utils/currency';
 import { toast } from 'sonner';
+import moment from 'moment';
 import LoanDetailsModal from '../Loans/LoanDetailsModal';
 import DeleteConfirmationModal from '../Loans/DeleteConfirmationModal';
 import LoanForm from '../forms/LoanForm';
@@ -177,10 +179,10 @@ const LoanTable = () => {
         },
         accessorFn: (row) => {
           const owner = row.account?.owner;
-          return owner ? `${owner.first_name} ${owner.last_name}` : '';
+          return owner ? `${owner.first_name} ${owner.last_name} ${owner.other_name? owner.other_name: ''}` : '';
         },
         cell: ({ getValue }) => (
-          <div className="text-sm text-gray-600">{getValue()}</div>
+          <div className="text-sm text-gray-100">{getValue()}</div>
         ),
       },
     {
@@ -188,10 +190,7 @@ const LoanTable = () => {
       header: 'Amount',
       cell: ({ row }) => {
         const amount = row.getValue('amount');
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(amount);
+        return formatUGX(amount);
       },
     },
     {
@@ -214,9 +213,9 @@ const LoanTable = () => {
         return (
           <span
             className={`px-2 py-1 rounded-full text-xs ${
-              status === 'Active'
+              status === 'PAID'
                 ? 'bg-green-100 text-green-800'
-                : status === 'Pending'
+                : status =='ACTIVE'
                 ? 'bg-yellow-100 text-yellow-800'
                 : 'bg-red-100 text-red-800'
             }`}
@@ -229,50 +228,41 @@ const LoanTable = () => {
     {
       accessorKey: 'monthlyPayment',
       header: 'Monthly Payment',
-      cell: ({ row }) => {
-        const payment = row.getValue('monthlyPayment');
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(payment);
+      accessorFn: (row) => row.summary?.monthlyPayment,
+      cell: ({ getValue }) => {
+        return formatUGX(getValue());
       },
     },
     {
       accessorKey: 'totalInterest',
       header: 'Total Interest',
-      cell: ({ row }) => {
-        const interest = row.getValue('totalInterest');
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(interest);
+      accessorFn: (row) => row.summary?.totalInterest,
+      cell: ({ getValue }) => {
+        return formatUGX(getValue());
       },
     },
     {
       accessorKey: 'remainingBalance',
       header: 'Remaining Balance',
-      cell: ({ row }) => {
-        const balance = row.getValue('remainingBalance');
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(balance);
+      accessorFn: (row) => row.summary?.remainingBalance,
+      cell: ({ getValue }) => {
+        return formatUGX(getValue());
       },
     },
     {
       accessorKey: 'startDate',
       header: 'Start Date',
       cell: ({ row }) => {
-        const date = new Date(row.getValue('startDate'));
-        return date.toLocaleDateString();
+        const date = row.getValue('startDate');
+        return moment(date).format('DD/MMM/YYYY');
       },
     },
     {
       accessorKey: 'endDate',
       header: 'End Date',
       cell: ({ row }) => {
-        const date = new Date(row.getValue('endDate'));
-        return date.toLocaleDateString();
+        const date = row.getValue('endDate');
+        return moment(date).format('DD/MMM/YYYY');
       },
     },
   ];
@@ -511,7 +501,8 @@ const LoanTable = () => {
         }}
         initialValues={{
           loanId: selectedLoan?.id,
-          accountId: selectedLoan?.accountId,
+          accountId: selectedLoan?.account?.id,
+          amount: selectedLoan?.summary?.monthlyPayment,
           type: 'LOAN_PAYMENT'
         }}
       />

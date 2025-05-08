@@ -12,7 +12,6 @@ const Login = () => {
   const handleSubmit = async (e, formData) => {
     e.preventDefault()
     try {
-      console.log('Login with Form data:', formData)
       await dispatch(login(formData)).unwrap()
       toast.success('Login successful!')
       navigate('/home/dashboard')

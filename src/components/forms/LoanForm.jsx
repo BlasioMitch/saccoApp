@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createLoan, patchLoan } from '../../reducers/loansReducer';
 import { toast } from 'sonner';
 import { FiX } from 'react-icons/fi';
+import { formatUGX } from '../../utils/currency';
 
 const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
   const dispatch = useDispatch();
@@ -21,7 +22,8 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
   const [loanSummary, setLoanSummary] = useState({
     monthlyPayment: 0,
     totalInterest: 0,
-    totalPayment: 0
+    totalPayment: 0,
+    sumToPay:0
   });
   const [errors, setErrors] = useState({});
 
@@ -59,11 +61,12 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
   useEffect(() => {
     if (formData.amount && formData.interestRate && formData.term) {
       const principal = Number(formData.amount);
-      const rate = Number(formData.interestRate) / 100 / 12; // Monthly interest rate
+      const rate = Number(formData.interestRate) / 100 ; 
       const numberOfPayments = Number(formData.term);
 
       // Monthly payment calculation using the loan amortization formula
-      const monthlyPayment = principal * (rate * Math.pow(1 + rate, numberOfPayments)) / (Math.pow(1 + rate, numberOfPayments) - 1);
+      // const monthlyPayment = principal * (rate * Math.pow(1 + rate, numberOfPayments)) / (Math.pow(1 + rate, numberOfPayments) - 1);
+      const monthlyPayment = principal * (1 + rate ) / numberOfPayments
       const totalPayment = monthlyPayment * numberOfPayments;
       const totalInterest = totalPayment - principal;
 
@@ -222,28 +225,19 @@ const LoanForm = ({ isOpen, onClose, loanToEdit }) => {
                 <div>
                   <p className="text-gray-400">Monthly Payment</p>
                   <p className="text-dcyan-300 font-medium">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'UGX'
-                    }).format(loanSummary.monthlyPayment)}
+                    {formatUGX(loanSummary.monthlyPayment)}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-400">Total Interest</p>
                   <p className="text-dcyan-300 font-medium">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'UGX'
-                    }).format(loanSummary.totalInterest)}
+                    {formatUGX(loanSummary.totalInterest)}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-400">Total Payment</p>
                   <p className="text-dcyan-300 font-medium">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'UGX'
-                    }).format(loanSummary.totalPayment)}
+                    {formatUGX(loanSummary.totalPayment)}
                   </p>
                 </div>
               </div>

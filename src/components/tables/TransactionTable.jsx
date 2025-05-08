@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,7 +9,11 @@ import {
 } from '@tanstack/react-table';
 import { FaSort, FaSortUp, FaSortDown, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { HiPlus, HiEllipsisVertical, HiEye, HiPencil, HiTrash } from 'react-icons/hi2';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTransactions } from '../../reducers/transactionReducer';
+import { toast } from 'sonner';
 import TransactionForm from '../forms/TransactionForm';
+import { formatUGX } from '../../utils/currency';
 
 const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView }) => {
   if (!isOpen) return null;
@@ -87,7 +91,9 @@ const ColumnVisibilityMenu = ({ columns, onToggleColumn }) => {
   );
 };
 
-const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, onDelete, onView }) => {
+const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
+  const dispatch = useDispatch();
+  const { transactions, status } = useSelector((state) => state.transactions);
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState('');
   const [activeMenu, setActiveMenu] = useState(null);
@@ -95,10 +101,16 @@ const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, 
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [columnVisibility, setColumnVisibility] = useState({});
 
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchTransactions());
+    }
+  }, [status, dispatch]);
+
   const handleEditClick = (transaction) => {
     setActiveMenu(null);
     setSelectedTransaction(transaction);
-    setIsFormOpen(true);
+    onEdit(transaction);
   };
 
   const handleDeleteClick = (transaction) => {
@@ -177,11 +189,15 @@ const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, 
         const type = row.getValue('type');
         return (
           <span className={`px-2 py-1 text-xs rounded-full ${
-            type === 'DEPOSIT'
-              ? 'bg-green-900/50 text-green-300'
-              : type === 'WITHDRAWAL'
-              ? 'bg-red-900/50 text-red-300'
-              : 'bg-yellow-900/50 text-yellow-300'
+            type === 'SAVINGS_DEPOSIT'
+            ? 'bg-green-900/50 text-green-300'
+            : type === 'ACCOUNT_WITHDRAW' || type === 'CLOSURE_WITHDRAW'
+            ? 'bg-red-900/50 text-red-300'
+            : type === 'LOAN_PAYMENT'
+            ? 'bg-blue-900/50 text-blue-300'
+            : type === 'MEMBERSHIP_FEE'
+            ? 'bg-yellow-900/50 text-yellow-300'
+            : 'bg-gray-800/50 text-gray-300'
           }`}>
             {type}
           </span>
@@ -195,10 +211,7 @@ const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, 
         const amount = row.getValue('amount');
         return (
           <div className="text-gray-100">
-            {new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            }).format(amount)}
+            {formatUGX(amount)}
           </div>
         );
       },
@@ -248,7 +261,7 @@ const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, 
   };
 
   const table = useReactTable({
-    data: transactions,
+    data: transactions || [],
     columns: [...columns, actionColumn],
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -265,7 +278,7 @@ const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, 
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-[1200px]">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-custom-text-primary">Transaction List</h2>
         <div className="flex items-center gap-4 py-2">
@@ -287,14 +300,14 @@ const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, 
           </div>
           <button
             onClick={handleAddTransaction}
-            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-gray-900 rounded-md hover:bg-dcyan-600"
+            className="flex items-center gap-2 px-4 py-2 bg-custom-brand-primary text-custom-interactive-active-text rounded-md hover:bg-custom-brand-dark transition-colors"
           >
             <HiPlus className="w-5 h-5" />
             Add Transaction
           </button>
         </div>
       </div>
-
+      
       <div className="flex flex-col h-[calc(100vh-200px)]">
         <div className="flex-1 overflow-x-auto rounded-lg border border-custom-bg-tertiary">
           <table className="w-full">
@@ -302,10 +315,7 @@ const TransactionTable = ({ transactions, onRowClick, onAddTransaction, onEdit, 
               {table.getHeaderGroups().map(headerGroup => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map(header => (
-                    <th
-                      key={header.id}
-                      className="px-6 py-3 text-left text-xs font-medium text-custom-text-secondary uppercase tracking-wider"
-                    >
+                    <th key={header.id} className="px-6 py-3 text-left text-xs font-medium text-custom-text-secondary uppercase tracking-wider">
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()

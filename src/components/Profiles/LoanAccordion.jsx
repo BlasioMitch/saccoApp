@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
-import Accordion from '../ui/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import moment from 'moment';
+import { formatUGX } from '../../utils/currency';
 
 const LoanAccordion = ({ loans, loanPayments }) => {
   const formatCurrency = (amount) => {
@@ -11,7 +12,7 @@ const LoanAccordion = ({ loans, loanPayments }) => {
   };
 
   const formatDate = (dateString) => {
-    return moment(dateString).format('MMM DD, YYYY');
+    return moment(dateString).format('DD/MMM/YYYY');
   };
 
   // Sort loans by creation date, newest first
@@ -47,7 +48,7 @@ const LoanAccordion = ({ loans, loanPayments }) => {
             </span>
           </div>
           <span className="text-sm font-normal">
-             {formatCurrency(loan.amount)}
+             {formatUGX(loan.amount)}
           </span>
         </div>
       ),
@@ -75,11 +76,11 @@ const LoanAccordion = ({ loans, loanPayments }) => {
           <div className="pt-4 border-t border-gray-200">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-500">Total Paid</span>
-              <span className="font-medium">{formatCurrency(totalPaid)}</span>
+              <span className="font-medium">{formatUGX(totalPaid)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-500">Remaining Balance</span>
-              <span className="font-medium">{formatCurrency(remainingBalance)}</span>
+              <span className="font-medium">{formatUGX(remainingBalance)}</span>
             </div>
           </div>
 
@@ -97,7 +98,7 @@ const LoanAccordion = ({ loans, loanPayments }) => {
                       <span className="text-xs text-gray-500">Transaction ID: {payment.id.slice(0, 8)}</span>
                     </div>
                     <span className="font-medium text-green-600 dark:text-green-400">
-                      {formatCurrency(payment.amount)}
+                      {formatUGX(payment.amount)}
                     </span>
                   </div>
                 ))}
@@ -117,7 +118,18 @@ const LoanAccordion = ({ loans, loanPayments }) => {
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Loan History</h3>
       {sortedLoans.length > 0 ? (
-        <Accordion items={loanItems} />
+        <Accordion type="single" collapsible className="w-full">
+          {loanItems.map((item) => (
+            <AccordionItem key={item.title} value={item.title.toString()}>
+              <AccordionTrigger className="text-gray-200 hover:text-gray-100">
+                {item.title}
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-300">
+                {item.content}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       ) : (
         <p className="text-sm text-gray-500">No loans found</p>
       )}
