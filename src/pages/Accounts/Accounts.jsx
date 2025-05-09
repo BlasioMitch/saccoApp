@@ -4,6 +4,7 @@ import StatCards from '../../components/cards/StatCards'
 import AccountsTable from '../../components/tables/AccountsTable'
 import { fetchAccounts } from '../../reducers/accountsReducer'
 import { toast } from 'sonner'
+import { formatUGX } from '../../utils/currency'
 
 const Accounts = () => {
   const dispatch = useDispatch()
@@ -31,10 +32,7 @@ const Accounts = () => {
     },
     {
       title: 'Total Balance',
-      value: accounts?.reduce((sum, acc) => sum + (Number(acc.balance) || 0), 0).toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }) || '$0',
+      value: formatUGX(accounts?.reduce((sum, acc) => sum + (Number(acc.balance) || 0), 0)) || '$0',
       icon: '💰',
       color: 'bg-green-500',
     },
@@ -46,10 +44,7 @@ const Accounts = () => {
     },
     {
       title: 'Average Balance',
-      value: accounts?.length ? (accounts.reduce((sum, acc) => sum + (Number(acc.balance) || 0), 0) / accounts.length).toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }) : '$0',
+      value: accounts?.length ? formatUGX(accounts.reduce((sum, acc) => sum + (Number(acc.balance) || 0), 0) / accounts.length) : '$0',
       icon: '📊',
       color: 'bg-yellow-500',
     },

@@ -1,55 +1,54 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Loader2 } from 'lucide-react';
+import {formatUGX} from '../../utils/currency'
+import moment from 'moment'
 
-const SavingsHistory = () => {
-  const { profile, status: profileStatus } = useSelector((state) => state.profile);
-  
-  if (profileStatus === 'loading') {
-    return (
-      <div className="bg-dblack-900 p-6 rounded-lg flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-dcyan-500" />
-      </div>
-    );
-  }
+const SavingsHistory = ({ transactions = [] }) => {
+  if (!transactions) return null;
 
-  if (!profile?.transactions) return null;
-
-  // Flatten all transactions for display
-  const allTransactions = [
-    ...(profile.transactions.SAVINGS_DEPOSIT || []),
-    ...(profile.transactions.LOAN_PAYMENT || [])
-  ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const getTransactionTypeLabel = (type) => {
+    switch (type) {
+      case 'SAVINGS_DEPOSIT':
+        return 'Savings Deposit';
+      case 'LOAN_PAYMENT':
+        return 'Loan Payment';
+      case 'MEMBERSHIP_FEE':
+        return 'Membership Fee';
+      case 'ACCOUNT_WITHDRAW':
+        return 'Account Withdrawal';
+      case 'CLOSURE_WITHDRAW':
+        return 'Closure Withdrawal';
+      default:
+        return type;
+    }
+  };
 
   return (
-    <div className="bg-dblack-900 p-6 rounded-lg">
-      <h2 className="text-xl font-semibold mb-4 text-slate-100">Transaction History</h2>
+    <div className="bg-dblack-900 p-6 py-2 rounded-lg">
+      <h2 className="text-xl font-semibold mb-2 text-slate-100">Savings History</h2>
       <div className="space-y-4">
-        {allTransactions.length > 0 ? (
+        {transactions.length > 0 ? (
           <div className="overflow-hidden">
             <table className="min-w-full">
               <thead className="bg-dblack-800">
                 <tr>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-400">Date</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-400">Type</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-400">Amount</th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-400">Status</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-200">Date</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-200">Type</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-200">Amount</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-slate-200">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-dblack-700">
-                {allTransactions.map((transaction) => (
+                {transactions.map((transaction) => (
                   <tr key={transaction.id} className="hover:bg-dblack-800">
                     <td className="px-4 py-2 text-sm text-slate-300">
-                      {new Date(transaction.createdAt).toLocaleDateString()}
+                      {moment(transaction.createdAt).format('DD/MMM/YYYY')}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-300">
-                      {transaction.type === 'SAVINGS_DEPOSIT' ? 'Deposit' : 'Loan Payment'}
+                      {getTransactionTypeLabel(transaction.type)}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-300">
-                      {new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'UGX',
-                      }).format(transaction.amount)}
+                      {formatUGX  (transaction.amount)}
                     </td>
                     <td className="px-4 py-2">
                       <span className={`px-2 py-1 rounded-full text-xs ${

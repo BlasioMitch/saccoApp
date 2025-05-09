@@ -12,6 +12,7 @@ import { HiPlus, HiEllipsisVertical, HiEye, HiPencil, HiTrash } from 'react-icon
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTransactions } from '../../reducers/transactionReducer';
 import { toast } from 'sonner';
+import moment from 'moment';
 import TransactionForm from '../forms/TransactionForm';
 import { formatUGX } from '../../utils/currency';
 
@@ -106,7 +107,7 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
       dispatch(fetchTransactions());
     }
   }, [status, dispatch]);
-
+console.log(transactions)
   const handleEditClick = (transaction) => {
     setActiveMenu(null);
     setSelectedTransaction(transaction);
@@ -220,8 +221,8 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
       accessorKey: 'date',
       header: 'Date',
       cell: ({ row }) => {
-        const date = new Date(row.getValue('date'));
-        return <div className="text-gray-100">{date.toLocaleDateString()}</div>;
+        const date = row.original.createdAt;
+        return <div className="text-gray-100">{moment(date).format('DD/MMM/YYYY')}</div>;
       },
     },
     {

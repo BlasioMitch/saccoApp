@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import userService from '../services/user'
 
 const initialState = {
-    user: null,
+    profile: null,
     error: null,
     users: [],
     status: 'idle',
@@ -161,6 +161,18 @@ const usersSlice = createSlice({
                 state.success = 'User updated successfully'
             })
             .addCase(patchUser.rejected, (state,action) => {
+                state.error = action.payload
+                state.status = 'failed'
+            })
+            // fetch user by id cases
+            .addCase(fetchUserById.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(fetchUserById.fulfilled, (state,action) => {
+                state.profile = action.payload
+                state.status = 'succeeded'
+            })
+            .addCase(fetchUserById.rejected, (state,action) => {
                 state.error = action.payload
                 state.status = 'failed'
             })

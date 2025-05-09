@@ -1,22 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Loader2 } from 'lucide-react';
+import moment from 'moment'
+import { formatUGX } from '../../utils/currency'
 
-const UserBioData = ({ user, statistics }) => {
-  const { profile, status: profileStatus } = useSelector((state) => state.profile);
-  
-  if (profileStatus === 'loading') {
-    return (
-      <div className="bg-dblack-900 p-6 rounded-lg flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-dcyan-500" />
-      </div>
-    );
-  }
-
-  if (!profile?.user) return null;
-
-  const profileData = profile.user;
-  const accountData = profile.account;
+const UserBioData = ({ user, account, statistics }) => {
+  if (!user) return null;
 
   return (
     <div className="bg-dblack-900 p-6 rounded-lg">
@@ -26,34 +14,34 @@ const UserBioData = ({ user, statistics }) => {
           <div>
             <p className="text-sm text-slate-400">Full Name</p>
             <p className="text-slate-200">
-              {`${profileData.first_name} ${profileData.last_name} ${profileData.other_name || ''}`}
+              {`${user.first_name} ${user.last_name} ${user.other_name || ''}`}
             </p>
           </div>
           <div>
             <p className="text-sm text-slate-400">Email</p>
-            <p className="text-slate-200">{profileData.email}</p>
+            <p className="text-slate-200">{user.email}</p>
           </div>
           <div>
             <p className="text-sm text-slate-400">Contact</p>
-            <p className="text-slate-200">{profileData.contact || 'Not provided'}</p>
+            <p className="text-slate-200">{user.contact || 'Not provided'}</p>
           </div>
           <div>
             <p className="text-sm text-slate-400">Member Since</p>
             <p className="text-slate-200">
-              {profileData.joinDate 
-                ? new Date(profileData.joinDate).toLocaleDateString()
+              {user.joinDate 
+                ? moment(user.joinDate).format('DD-MMM-YYYY')
                 : 'Not available'}
             </p>
           </div>
           <div>
             <p className="text-sm text-slate-400">Gender</p>
-            <p className="text-slate-200">{profileData.gender || 'Not specified'}</p>
+            <p className="text-slate-200">{user.gender || 'Not specified'}</p>
           </div>
           <div>
             <p className="text-sm text-slate-400">Date of Birth</p>
             <p className="text-slate-200">
-              {profileData.dob 
-                ? new Date(profileData.dob).toLocaleDateString()
+              {user.dob 
+                ? moment(user.dob).format('DD-MMM-YYYY')
                 : 'Not provided'}
             </p>
           </div>
@@ -64,16 +52,16 @@ const UserBioData = ({ user, statistics }) => {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-sm text-slate-400">Account Number</p>
-              <p className="text-slate-200">{accountData?.accountNumber || 'No account'}</p>
+              <p className="text-slate-200">{account?.accountNumber || 'No account'}</p>
             </div>
             <div>
               <p className="text-sm text-slate-400">Account Status</p>
               <span className={`px-2 py-1 rounded-full text-xs ${
-                accountData?.status === 'ACTIVE'
+                account?.status === 'ACTIVE'
                   ? 'bg-green-100 text-green-800'
                   : 'bg-yellow-100 text-yellow-800'
               }`}>
-                {accountData?.status || 'N/A'}
+                {account?.status || 'N/A'}
               </span>
             </div>
           </div>
@@ -82,11 +70,8 @@ const UserBioData = ({ user, statistics }) => {
             <div className="bg-dblack-800 p-4 rounded-lg">
               <p className="text-sm text-slate-400">Current Balance</p>
               <p className="text-xl font-semibold text-dcyan-500">
-                {accountData?.balance
-                  ? new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'UGX',
-                    }).format(accountData.balance)
+                {account?.balance
+                  ? formatUGX(account.balance)
                   : 'UGX 0'}
               </p>
             </div>
@@ -100,11 +85,7 @@ const UserBioData = ({ user, statistics }) => {
               <p className="text-sm text-slate-400">Monthly Avg Savings</p>
               <p className="text-xl font-semibold text-dcyan-500">
                 {statistics?.monthlySavingsAvg
-                  ? new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'UGX',
-                      maximumFractionDigits: 0,
-                    }).format(statistics.monthlySavingsAvg)
+                  ? formatUGX(statistics.monthlySavingsAvg)
                   : 'UGX 0'}
               </p>
             </div>

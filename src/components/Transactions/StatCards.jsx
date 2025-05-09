@@ -2,16 +2,14 @@ import React, { useEffect, useState} from 'react'
 import { NavLink } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchTransactions } from '../../reducers/transactionReducer'
-import { fetchtransactiontypes } from '../../reducers/transactiontypesReducer'
+import formatUGX from '../../utils/currency'
 
 function StatCards() {
     const dispatch = useDispatch()
 
     const { status, error, transactions } = useSelector(state => state.transactions)
-    const {transactiontypes } = useSelector(state => state.transactiontypes)
     useEffect(() => {
         dispatch(fetchTransactions())
-        dispatch(fetchtransactiontypes())
     },[ dispatch])
     
     // create filtered data on transactions

@@ -8,6 +8,7 @@ import DeleteTransactionModal from '../../components/Transactions/DeleteTransact
 import { fetchTransactions, deleteTransaction } from '../../reducers/transactionReducer'
 import { toast } from 'sonner'
 import { TransactionType, TransactionStatus } from '../../reducers/transactionReducer'
+import {formatUGX} from '../../utils/currency'
 
 const Transactions = () => {
   const dispatch = useDispatch()
@@ -49,10 +50,7 @@ const Transactions = () => {
     },
     {
       title: 'Total Amount',
-      value: totalAmount.toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }),
+      value: formatUGX(totalAmount),
       icon: '💰',
       color: 'bg-green-500',
     },

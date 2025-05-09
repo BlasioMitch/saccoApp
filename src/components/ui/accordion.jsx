@@ -1,44 +1,48 @@
-import React, { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import * as React from "react"
+import * as AccordionPrimitive from "@radix-ui/react-accordion"
+import { ChevronDown } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-const Accordion = ({ items }) => {
-  const [openIndex, setOpenIndex] = useState(null)
+const Accordion = AccordionPrimitive.Root
 
-  const toggleItem = (index) => {
-    setOpenIndex(openIndex === index ? null : index)
-  }
+const AccordionItem = React.forwardRef(({ className, ...props }, ref) => (
+  <AccordionPrimitive.Item
+    ref={ref}
+    className={cn("border-b", className)}
+    {...props}
+  />
+))
+AccordionItem.displayName = "AccordionItem"
 
-  return (
-    <div className="space-y-2">
-      {items.map((item, index) => (
-        <div
-          key={index}
-          className="border border-light-bg-tertiary dark:border-dark-bg-tertiary rounded-lg"
-        >
-          <button
-            onClick={() => toggleItem(index)}
-            className="flex items-center justify-between w-full p-4 text-left bg-light-bg-secondary dark:bg-dark-bg-secondary hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary transition-colors rounded-lg"
-          >
-            <span className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
-              {item.title}
-            </span>
-            <ChevronDown
-              className={`w-4 h-4 text-light-text-secondary dark:text-dark-text-secondary transition-transform ${
-                openIndex === index ? 'transform rotate-180' : ''
-              }`}
-            />
-          </button>
-          {openIndex === index && (
-            <div className="p-4 bg-light-bg-primary dark:bg-dark-bg-primary rounded-b-lg">
-              <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                {item.content}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
+const AccordionTrigger = React.forwardRef(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+    </AccordionPrimitive.Trigger>
+  </AccordionPrimitive.Header>
+))
+AccordionTrigger.displayName = "AccordionTrigger"
 
-export default Accordion
+const AccordionContent = React.forwardRef(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Content
+    ref={ref}
+    className={cn(
+      "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+      className
+    )}
+    {...props}
+  >
+    <div className="pb-4 pt-0">{children}</div>
+  </AccordionPrimitive.Content>
+))
+AccordionContent.displayName = "AccordionContent"
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
