@@ -14,14 +14,14 @@ import { ThemeProvider } from './components/ui/ThemeProvider'
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useSelector(state => state.auth)
-  return isAuthenticated ? children : <Navigate to="/" replace />
+  return isAuthenticated ? children : <Navigate to="/login" replace />
 }
 
 function App() {
   return (
     <ThemeProvider>
       <Routes>
-        <Route path="/" element={<Navigate to="login" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={
           <ProtectedRoute>
@@ -29,10 +29,8 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<Dashboard />} />
-          <Route path="dashboard" element={<Dashboard />}/>
           <Route path="members" element={<Team />} />
-          <Route path="transactions" element={<Transactions />}>
-          </Route> 
+          <Route path="transactions" element={<Transactions />} />
           <Route path="loans" element={<Loans />} />
           <Route path="accounts" element={<Accounts />} />
           <Route path="profile" element={<Profiles />} />

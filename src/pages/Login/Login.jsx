@@ -9,13 +9,15 @@ const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+
   const handleSubmit = async (e, formData) => {
     e.preventDefault()
     try {
       await dispatch(login(formData)).unwrap()
       toast.success('Login successful!')
-      navigate('/home/dashboard')
+      navigate('/home')
     } catch (error) {
+      console.error('Login error:', error)
       toast.error(error || 'Login failed')
     }
   }

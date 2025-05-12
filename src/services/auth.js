@@ -1,33 +1,11 @@
-import axios from 'axios'
 import api from './api'
 
-// const baseUrl =import.meta.env.VITE_API_URL
-
-// // Create axios instance with default config
-// const api = axios.create({
-//   baseURL: baseUrl,
-//   headers: {
-//     'Content-Type': 'application/json'
-//   }
-// })
-
-// // Add request interceptor to include token
-// api.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem('token')
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`
-//     }
-//     return config
-//   },
-//   (error) => {
-//     return Promise.reject(error)
-//   }
-// )
-
-const saveUserData = (userData) => {
+const saveUserData = (userData, token) => {
   try {
     localStorage.setItem('user', JSON.stringify(userData))
+    if (token) {
+      localStorage.setItem('token', token)
+    }
   } catch (error) {
     console.error('Error saving user data:', error)
   }
@@ -35,8 +13,8 @@ const saveUserData = (userData) => {
 
 const clearUserData = () => {
   try {
-    localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
   } catch (error) {
     console.error('Error clearing user data:', error)
   }
@@ -65,43 +43,50 @@ const getUserData = () => {
 
 const login = async (credentials) => {
   try {
-    const response = await api.post('/auth/login', credentials)
-    const { token, user } = response.data
-    
-    // Save both token and user data
-    localStorage.setItem('token', token)
-    saveUserData(user)
-    
-    return response.data
+    const response = await api.post('/auth/login', credentials, {
+      withCredentials: true, // Include cookies in the request
+    });
+    const { user, token } = response.data;
+
+    // Save both user data and token
+    saveUserData(user, token);
+
+    return response.data;
   } catch (error) {
-    console.error('Login error:', error)
-    throw error
+    console.error('Login error:', error);
+    throw error;
   }
-}
+};
 
 const logout = async () => {
   try {
-    const response = await api.post('/auth/logout')
-    clearUserData()
-    return response.data
+    const response = await api.post('/auth/logout', {}, {
+      withCredentials: true, // Include cookies in the request
+    });
+    clearUserData();
+    return response.data;
   } catch (error) {
-    console.error('Logout error:', error)
-    clearUserData() // Clear data even if logout request fails
-    throw error
+    console.error('Logout error:', error);
+    clearUserData(); // Clear data even if logout request fails
+    throw error;
   }
-}
+};
 
-// Check if user is authenticated
-const isAuthenticated = () => {
+const isAuthenticated = async () => {
   try {
-    const token = localStorage.getItem('token')
-    const user = getUserData()
-    return !!(token && user)
+    const user = getUserData();
+    if (!user) return false;
+
+    // Optionally, verify the session with the backend
+    const response = await api.get('/auth/verify', {
+      withCredentials: true, // Include cookies in the request
+    });
+    return response.status === 200;
   } catch (error) {
-    console.error('Error checking authentication:', error)
-    return false
+    console.error('Error checking authentication:', error);
+    return false;
   }
-}
+};
 
 export default { 
   login, 

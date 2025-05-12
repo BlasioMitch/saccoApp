@@ -14,7 +14,7 @@ import { ThemeSwitcher } from '../../ui/ThemeSwitcher'
 
 const Menu = ({ isSidebarOpen }) => {
   const mainMenuItems = [
-    { icon: <Home />, label: 'Dashboard', path: '/home/dashboard' },
+    { icon: <Home />, label: 'Dashboard', path: '/home' },
     { icon: <Users />, label: 'Members', path: '/home/members' },
     { icon: <Wallet />, label: 'Accounts', path: '/home/accounts' },
     { icon: <CreditCard />, label: 'Loans', path: '/home/loans' },
