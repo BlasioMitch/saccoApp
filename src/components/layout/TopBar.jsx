@@ -100,7 +100,7 @@ const TopBar = () => {
     try {
       await dispatch(logout()).unwrap()
       toast.success('Logged out successfully')
-      navigate('/saccoApp/')
+      navigate('/')
     } catch (error) {
       toast.error(error || 'Logout failed')
     }

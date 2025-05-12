@@ -1,9 +1,11 @@
-import axios from 'axios'
 import api from './api'
 
-const saveUserData = (userData) => {
+const saveUserData = (userData, token) => {
   try {
     localStorage.setItem('user', JSON.stringify(userData))
+    if (token) {
+      localStorage.setItem('token', token)
+    }
   } catch (error) {
     console.error('Error saving user data:', error)
   }
@@ -12,6 +14,7 @@ const saveUserData = (userData) => {
 const clearUserData = () => {
   try {
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
   } catch (error) {
     console.error('Error clearing user data:', error)
   }
@@ -43,10 +46,10 @@ const login = async (credentials) => {
     const response = await api.post('/auth/login', credentials, {
       withCredentials: true, // Include cookies in the request
     });
-    const { user } = response.data;
+    const { user, token } = response.data;
 
-    // Save user data only (JWT is stored in HttpOnly cookie)
-    saveUserData(user);
+    // Save both user data and token
+    saveUserData(user, token);
 
     return response.data;
   } catch (error) {

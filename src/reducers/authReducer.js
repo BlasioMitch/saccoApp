@@ -19,6 +19,7 @@ export const login = createAsyncThunk(
         user: response.user
       }
     } catch (error) {
+      console.error('Login error in thunk:', error)
       return rejectWithValue(error.response?.data || 'Login failed')
     }
   }
@@ -53,21 +54,23 @@ const authSlice = createSlice({
           state.token = token
           state.user = user
           state.isAuthenticated = true
+          state.status = 'succeeded'
         } else {
           // Clear any partial data
           state.token = null
           state.user = null
           state.isAuthenticated = false
+          state.status = 'idle'
           // Clear localStorage if data is incomplete
           if (token || user) {
             authService.clearUserData()
           }
         }
       } catch (error) {
-        console.error('Error initializing auth:', error)
         state.token = null
         state.user = null
         state.isAuthenticated = false
+        state.status = 'failed'
         authService.clearUserData()
       }
     }
