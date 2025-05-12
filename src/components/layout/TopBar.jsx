@@ -100,11 +100,7 @@ const TopBar = () => {
     try {
       await dispatch(logout()).unwrap()
       toast.success('Logged out successfully')
-<<<<<<< HEAD
-      navigate('/login')
-=======
       navigate('/')
->>>>>>> frontend
     } catch (error) {
       toast.error(error || 'Logout failed')
     }
