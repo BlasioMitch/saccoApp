@@ -27,22 +27,20 @@ const LoanAccordion = ({ loans = [], transactions = {} }) => {
   const loanItems = loans.map((loan) => {
     const loanPayments = getLoanPayments(loan.id);
     const totalPaid = loanPayments.reduce((sum, payment) => sum + Number(payment.amount), 0);
-    const remainingBalance = Number(loan.amount) - totalPaid;
+    const remainingBalance = (Number(loan.amount) + Number(loan.summary.totalInterest)) - totalPaid;
 
     return {
       id: loan.id,
+      status: loan.status,
       title: `Loan amounting to ${formatUGX(Number(loan.amount) + Number(loan.summary.totalInterest))}`,
       content: (
         <div className="space-y-6">
           {/* Loan Details */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-slate-400">Amount</p>
               <p className="text-slate-200">
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'UGX',
-                }).format(loan.amount)}
+                {formatUGX(loan.amount)}
               </p>
             </div>
             <div>
@@ -54,29 +52,24 @@ const LoanAccordion = ({ loans = [], transactions = {} }) => {
               <p className="text-slate-200">{loan.interestRate}%</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Status</p>
-              <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(loan.status)}`}>
-                {loan.status}
-              </span>
-            </div>
-            <div>
               <p className="text-sm text-slate-400">Total Paid</p>
               <p className="text-slate-200">
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'UGX',
-                }).format(totalPaid)}
+                {formatUGX(totalPaid)}
               </p>
             </div>
             <div>
               <p className="text-sm text-slate-400">Remaining Balance</p>
               <p className="text-slate-200">
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'UGX',
-                }).format(remainingBalance)}
+                {formatUGX(Number(remainingBalance))}
               </p>
             </div>
+            <div>
+              <p className="text-sm text-slate-400">Status</p>
+              <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(loan.status)}`}>
+                {loan.status}
+              </span>
+            </div>
+
           </div>
 
           {/* Payment History */}
@@ -99,10 +92,7 @@ const LoanAccordion = ({ loans = [], transactions = {} }) => {
                           {moment(payment.createdAt).format('DD/MMM/YYYY')}
                         </td>
                         <td className="px-4 py-2 text-sm text-slate-300">
-                          {new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'UGX',
-                          }).format(payment.amount)}
+                          {formatUGX(payment.amount)}
                         </td>
                         <td className="px-4 py-2">
                           <span className={`px-2 py-1 rounded-full text-xs ${
@@ -136,8 +126,9 @@ const LoanAccordion = ({ loans = [], transactions = {} }) => {
         <Accordion type="single" collapsible className="w-full">
           {loanItems.map((item) => (
             <AccordionItem key={item.id} value={item.id.toString()}>
-              <AccordionTrigger className="text-slate-200 hover:text-slate-100">
-                {item.title}
+              <AccordionTrigger className="text-slate-200  hover:text-slate-100">
+                {item.title} 
+                <span className={`${getStatusColor(item.status)} rounded-lg px-2`}>{item.status}</span>
               </AccordionTrigger>
               <AccordionContent className="text-slate-300">
                 {item.content}

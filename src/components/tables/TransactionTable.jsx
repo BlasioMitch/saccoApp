@@ -107,7 +107,7 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
       dispatch(fetchTransactions());
     }
   }, [status, dispatch]);
-console.log(transactions)
+// console.log(transactions)
   const handleEditClick = (transaction) => {
     setActiveMenu(null);
     setSelectedTransaction(transaction);

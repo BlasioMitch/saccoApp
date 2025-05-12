@@ -10,6 +10,7 @@ import {
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa'
 import { HiPlus, HiEllipsisVertical, HiEye, HiPencil, HiTrash } from 'react-icons/hi2'
 import AccountForm from '../forms/AccountForm'
+import { formatUGX } from '../../utils/currency'
 
 const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm, account }) => {
   const [deleteText, setDeleteText] = useState('')
@@ -180,7 +181,7 @@ const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView }) => {
   );
 };
 
-const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, onView }) => {
+const AccountsTable = ({ accounts, onDelete }) => {
   const [sorting, setSorting] = useState([])
   const [filtering, setFiltering] = useState('')
   const [activeMenu, setActiveMenu] = useState(null)
@@ -286,13 +287,10 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
     },
     {
       accessorKey: 'balance',
-      header: 'Balance',
+      header: 'Account Balance',
       cell: ({ row }) => {
         const balance = row.getValue('balance');
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(balance);
+        return formatUGX(balance);
       },
     },
     {
@@ -439,7 +437,6 @@ const AccountsTable = ({ accounts, onRowClick, onAddAccount, onEdit, onDelete, o
               {table.getRowModel().rows.map(row => (
                 <tr
                   key={row.id}
-                  onClick={() => onRowClick(row.original)}
                   className="hover:bg-custom-bg-secondary transition-colors"
                 >
                   {row.getVisibleCells().map(cell => (
