@@ -20,7 +20,7 @@ const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-black-900/90 border border-black-700 z-50">
+    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-custom-bg-secondary border border-black-700 z-50">
       <div className="py-1" role="menu" aria-orientation="vertical">
         <button
           onClick={onView}

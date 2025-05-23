@@ -102,7 +102,7 @@ const UserSearch = ({ users, onSelect }) => {
       {isOpen && filteredUsers.length > 0 && (
         <ul
           ref={listRef}
-          className="absolute z-10 w-full mt-2 bg-dblack-900 rounded-lg shadow-lg max-h-80 overflow-auto border border-dblack-700"
+          className="absolute z-10 w-full mt-2 bg-custom-bg-primary opacity-80 rounded-lg shadow-lg max-h-80 overflow-auto border border-dblack-700"
         >
           {filteredUsers.map((user, index) => (
             <li
@@ -131,7 +131,7 @@ const UserSearch = ({ users, onSelect }) => {
                 </p>
               </div>
               <span className={`text-xs px-2 py-1 rounded-full ${
-                user.status === 'Active'
+                user.status === 'ACTIVE'
                   ? index === selectedIndex
                     ? 'bg-green-200 text-green-900'
                     : 'bg-green-900/50 text-green-300'
