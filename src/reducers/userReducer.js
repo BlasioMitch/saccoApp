@@ -117,7 +117,6 @@ const usersSlice = createSlice({
                 state.status = 'loading'
             })
             .addCase(createUser.fulfilled, (state,action) =>{
-                console.log('Backend response:', action.payload)
                 // Format the user data with the name field
                 const userData = action.payload.data || action.payload
                 const formattedUser = {

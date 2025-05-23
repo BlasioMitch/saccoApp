@@ -17,6 +17,22 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" replace />
 }
 
+const UserProfileRoute = ({ children }) => {
+  const { isAuthenticated, user } = useSelector(state => state.auth)
+  const isRegularUser = user?.role?.toLowerCase() === 'user'
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+  
+  if (isRegularUser) {
+    // For regular users, we'll pass their own ID to the Profiles component
+    return <Profiles userId={user.id} isRegularUser={true} />
+  }
+  
+  return children
+}
+
 function App() {
   return (
     <ThemeProvider>
@@ -33,7 +49,11 @@ function App() {
           <Route path="transactions" element={<Transactions />} />
           <Route path="loans" element={<Loans />} />
           <Route path="accounts" element={<Accounts />} />
-          <Route path="profile" element={<Profiles />} />
+          <Route path="profile" element={
+            <UserProfileRoute>
+              <Profiles />
+            </UserProfileRoute>
+          } />
         </Route>
       </Routes>
       <Toaster richColors position="top-right" />

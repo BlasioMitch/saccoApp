@@ -11,6 +11,9 @@ import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa'
 import { HiPlus, HiEllipsisVertical, HiEye, HiPencil, HiTrash } from 'react-icons/hi2'
 import AccountForm from '../forms/AccountForm'
 import { formatUGX } from '../../utils/currency'
+import { useDispatch } from 'react-redux'
+import { deleteAccount } from '../../reducers/accountsReducer'
+import { toast } from 'sonner'
 
 const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm, account }) => {
   const [deleteText, setDeleteText] = useState('')
@@ -189,7 +192,9 @@ const AccountsTable = ({ accounts, onDelete }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [selectedAccount, setSelectedAccount] = useState(null)
-
+  
+  const dispatch = useDispatch()
+  
   const handleEditClick = (account) => {
     setActiveMenu(null)
     setSelectedAccount(account)
@@ -228,10 +233,17 @@ const AccountsTable = ({ accounts, onDelete }) => {
     setSelectedAccount(null)
   }
 
-  const handleConfirmDelete = () => {
-    if (selectedAccount && !selectedAccount.hasLoan) {
-      onDelete(selectedAccount)
-      handleCloseDelete()
+  const handleConfirmDelete = async () => {
+    try{
+
+      if (selectedAccount && !selectedAccount.hasLoan) {
+        // Delete account here
+        await dispatch(deleteAccount(selectedAccount.id))
+        toast.success('Account deleted successfully')
+        handleCloseDelete()
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error)
     }
   }
 

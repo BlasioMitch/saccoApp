@@ -6,23 +6,32 @@ import UserBioData from '../../components/Profiles/UserBioData';
 import SavingsHistory from '../../components/Profiles/SavingsHistory';
 import LoanAccordion from '../../components/Profiles/LoanAccordion';
 import Transactions from '../../components/Profiles/Transactions';
-import { Loader2, X, User2, Wallet, CreditCard, History, Receipt } from 'lucide-react';
+import { Loader2, X, User2, Wallet, CreditCard, History } from 'lucide-react';
 
-const Profiles = () => {
+const Profiles = ({ userId, isRegularUser }) => {
   const dispatch = useDispatch();
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('savings');
   const { users, status: usersStatus, profile } = useSelector((state) => state.users);
+  const { user: currentUser } = useSelector((state) => state.auth);
 
+  // Load initial data
   useEffect(() => {
-    if (usersStatus === 'idle') {
-      dispatch(fetchUsers());
-    }
-  }, [dispatch, usersStatus]);
+    const loadData = async () => {
+      if (isRegularUser && currentUser?.id) {
+        await dispatch(fetchUserById(currentUser.id));
+        setSelectedUser(currentUser);
+      } else if (!isRegularUser && usersStatus === 'idle') {
+        await dispatch(fetchUsers());
+      }
+    };
+    
+    loadData();
+  }, [isRegularUser, currentUser?.id, dispatch]); // Removed usersStatus from dependencies
 
   const handleUserSelect = (user) => {
-    setSelectedUser(user);
     if (user?.id) {
+      setSelectedUser(user);
       dispatch(fetchUserById(user.id));
     }
   };
@@ -73,7 +82,6 @@ const Profiles = () => {
     { id: 'savings', label: 'Savings', icon: <Wallet className="w-4 h-4" /> },
     { id: 'loans', label: 'Loans', icon: <CreditCard className="w-4 h-4" /> },
     { id: 'transactions', label: 'Transactions', icon: <History className="w-4 h-4" /> },
-    // { id: 'membership', label: 'Membership', icon: <Receipt className="w-4 h-4" /> },
   ];
 
   return (
@@ -81,28 +89,32 @@ const Profiles = () => {
       {/* Header Section */}
       <div className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Member Profile</h1>
-          {selectedUser && (
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            {isRegularUser ? 'My Profile' : 'Member Profile'}
+          </h1>
+          {selectedUser && !isRegularUser && (
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
               <User2 className="w-4 h-4" />
               <span>{selectedUser.name}</span>
             </div>
           )}
         </div>
-        <div className="flex items-center gap-4">
-          <div className="w-80">
-            <UserSearch users={users} onSelect={handleUserSelect} />
+        {!isRegularUser && (
+          <div className="flex items-center gap-4">
+            <div className="w-80">
+              <UserSearch users={users} onSelect={handleUserSelect} />
+            </div>
+            {selectedUser && (
+              <button
+                onClick={handleClearProfile}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+                Clear
+              </button>
+            )}
           </div>
-          {selectedUser && (
-            <button
-              onClick={handleClearProfile}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            >
-              <X className="w-4 h-4" />
-              Clear
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Main Content Section */}
@@ -110,7 +122,7 @@ const Profiles = () => {
         <div className="flex items-center justify-center h-[400px] bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <Loader2 className="h-8 w-8 animate-spin text-dcyan-500" />
         </div>
-      ) : profile ? (
+      ) : (selectedUser || isRegularUser) && profile ? (
         <div className="grid grid-cols-12 gap-6 h-[calc(100vh-180px)]">
           {/* Left Column - User Info */}
           <div className="col-span-4">
@@ -162,19 +174,15 @@ const Profiles = () => {
                 {activeTab === 'transactions' && (
                   <Transactions transactions={profile.transactions || {}} />
                 )}
-                {activeTab === 'membership' && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Membership Payments</h3>
-                    {/* Add your membership payments component here */}
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
       ) : (
         <div className="flex items-center justify-center h-[400px] bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <p className="text-gray-500 dark:text-gray-400">Search for a member to view their profile</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            {isRegularUser ? 'Loading your profile...' : 'Search for a member to view their profile'}
+          </p>
         </div>
       )}
     </div>
