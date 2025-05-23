@@ -367,7 +367,7 @@ const LoanTable = () => {
           </div>
         </div>
 
-        <div className="flex flex-col h-[calc(100vh-200px)]">
+        <div className="flex flex-col flex-1 min-h-0">
           <div className="flex-1 overflow-x-auto rounded-lg border border-custom-bg-tertiary">
             {loans && loans.length > 0 ? (
               <table className="min-w-full table-auto">
@@ -426,45 +426,45 @@ const LoanTable = () => {
               </div>
             )}
           </div>
-        </div>
 
-        {loans && loans.length > 0 && (
-          <div className="flex justify-between items-center p-4 border-t border-custom-bg-tertiary">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-custom-text-secondary">
-                Page {table.getState().pagination.pageIndex + 1} of{' '}
-                {table.getPageCount()}
-              </span>
-              <select
-                value={table.getState().pagination.pageSize}
-                onChange={(e) => table.setPageSize(Number(e.target.value))}
-                className="p-1 bg-custom-bg-secondary text-custom-text-primary rounded-md"
-              >
-                {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-                  <option key={pageSize} value={pageSize}>
-                    Show {pageSize}
-                  </option>
-                ))}
-              </select>
+          {loans && loans.length > 0 && (
+            <div className="flex justify-between items-center p-4 border-t border-custom-bg-tertiary bg-custom-bg-primary">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-custom-text-secondary">
+                  Page {table.getState().pagination.pageIndex + 1} of{' '}
+                  {table.getPageCount()}
+                </span>
+                <select
+                  value={table.getState().pagination.pageSize}
+                  onChange={(e) => table.setPageSize(Number(e.target.value))}
+                  className="p-1 bg-custom-bg-secondary text-custom-text-primary rounded-md border border-custom-bg-tertiary"
+                >
+                  {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+                    <option key={pageSize} value={pageSize}>
+                      Show {pageSize}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  className="px-3 py-1 bg-custom-bg-secondary text-custom-text-primary rounded-md disabled:opacity-50 border border-custom-bg-tertiary hover:bg-custom-bg-tertiary"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                  className="px-3 py-1 bg-custom-bg-secondary text-custom-text-primary rounded-md disabled:opacity-50 border border-custom-bg-tertiary hover:bg-custom-bg-tertiary"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="px-3 py-1 bg-custom-bg-secondary text-custom-text-primary rounded-md disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="px-3 py-1 bg-custom-bg-secondary text-custom-text-primary rounded-md disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Modals */}
