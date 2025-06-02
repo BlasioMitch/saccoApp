@@ -8,8 +8,9 @@ import {
   getFilteredRowModel,
 } from '@tanstack/react-table'
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa'
-import { HiPlus, HiEllipsisVertical, HiEye, HiPencil, HiTrash } from 'react-icons/hi2'
+import { HiPlus, HiEllipsisVertical, HiEye, HiPencil, HiTrash, HiCurrencyDollar } from 'react-icons/hi2'
 import AccountForm from '../forms/AccountForm'
+import LoanForm from '../forms/LoanForm'
 import { formatUGX } from '../../utils/currency'
 import { useDispatch } from 'react-redux'
 import { deleteAccount } from '../../reducers/accountsReducer'
@@ -149,7 +150,7 @@ const AccountDetailsModal = ({ isOpen, onClose, account }) => {
   )
 }
 
-const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView }) => {
+const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView, onCreateLoan, hasLoan }) => {
   if (!isOpen) return null;
 
   return (
@@ -171,6 +172,16 @@ const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView }) => {
           <HiPencil className="mr-3 h-5 w-5" />
           Edit
         </button>
+        {!hasLoan && (
+          <button
+            onClick={onCreateLoan}
+            className="flex items-center w-full px-4 py-2 text-sm text-custom-text-primary hover:bg-custom-interactive-hover"
+            role="menuitem"
+          >
+            <HiCurrencyDollar className="mr-3 h-5 w-5" />
+            Create Loan
+          </button>
+        )}
         <button
           onClick={onDelete}
           className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-custom-interactive-hover"
@@ -191,6 +202,7 @@ const AccountsTable = ({ accounts, onDelete }) => {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [isLoanFormOpen, setIsLoanFormOpen] = useState(false)
   const [selectedAccount, setSelectedAccount] = useState(null)
   
   const dispatch = useDispatch()
@@ -213,6 +225,12 @@ const AccountsTable = ({ accounts, onDelete }) => {
     setIsDetailsOpen(true)
   }
 
+  const handleCreateLoan = (account) => {
+    setActiveMenu(null)
+    setSelectedAccount(account)
+    setIsLoanFormOpen(true)
+  }
+
   const handleAddAccount = () => {
     setSelectedAccount(null)
     setIsFormOpen(true)
@@ -233,11 +251,14 @@ const AccountsTable = ({ accounts, onDelete }) => {
     setSelectedAccount(null)
   }
 
+  const handleCloseLoanForm = () => {
+    setIsLoanFormOpen(false)
+    setSelectedAccount(null)
+  }
+
   const handleConfirmDelete = async () => {
     try{
-
       if (selectedAccount && !selectedAccount.hasLoan) {
-        // Delete account here
         await dispatch(deleteAccount(selectedAccount.id))
         toast.success('Account deleted successfully')
         handleCloseDelete()
@@ -360,13 +381,14 @@ const AccountsTable = ({ accounts, onDelete }) => {
     header: '',
     cell: ({ row }) => {
       const isOpen = activeMenu === row.original.id;
+      const account = row.original;
       
       return (
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setActiveMenu(isOpen ? null : row.original.id);
+              setActiveMenu(isOpen ? null : account.id);
             }}
             className="p-1 text-custom-text-secondary hover:text-custom-brand-primary"
           >
@@ -375,9 +397,11 @@ const AccountsTable = ({ accounts, onDelete }) => {
           <ActionMenu
             isOpen={isOpen}
             onClose={() => setActiveMenu(null)}
-            onEdit={() => handleEditClick(row.original)}
-            onDelete={() => handleDeleteClick(row.original)}
-            onView={() => handleViewClick(row.original)}
+            onEdit={() => handleEditClick(account)}
+            onDelete={() => handleDeleteClick(account)}
+            onView={() => handleViewClick(account)}
+            onCreateLoan={() => handleCreateLoan(account)}
+            hasLoan={account.hasLoan}
           />
         </div>
       );
@@ -522,6 +546,21 @@ const AccountsTable = ({ accounts, onDelete }) => {
         onConfirm={handleConfirmDelete}
         account={selectedAccount}
       />
+
+      {selectedAccount && (
+        <LoanForm
+          isOpen={isLoanFormOpen}
+          onClose={handleCloseLoanForm}
+          initialValues={{
+            accountId: selectedAccount.id,
+            accountNumber: selectedAccount.accountNumber,
+            account: {
+              value: selectedAccount.id,
+              label: `${selectedAccount.accountNumber} - ${selectedAccount.owner?.first_name} ${selectedAccount.owner?.last_name}`
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

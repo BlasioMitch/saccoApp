@@ -20,7 +20,7 @@ import DeleteConfirmationModal from '../Loans/DeleteConfirmationModal';
 import LoanForm from '../forms/LoanForm';
 import TransactionForm from '../forms/TransactionForm';
 
-const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView, onMakePayment }) => {
+const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView, onMakePayment, status }) => {
   if (!isOpen) return null;
 
   return (
@@ -42,14 +42,16 @@ const ActionMenu = ({ isOpen, onClose, onEdit, onDelete, onView, onMakePayment }
           <HiPencil className="mr-3 h-5 w-5" />
           Edit
         </button>
-        <button
-          onClick={onMakePayment}
-          className="flex items-center w-full px-4 py-2 text-sm text-slate-300 hover:bg-dblack-700"
-          role="menuitem"
-        >
-          <HiCurrencyDollar className="mr-3 h-5 w-5" />
-          Make Payment
-        </button>
+        {status !== 'PAID' && (
+          <button
+            onClick={onMakePayment}
+            className="flex items-center w-full px-4 py-2 text-sm text-slate-300 hover:bg-dblack-700"
+            role="menuitem"
+          >
+            <HiCurrencyDollar className="mr-3 h-5 w-5" />
+            Make Payment
+          </button>
+        )}
         <button
           onClick={onDelete}
           className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-dblack-700"
@@ -307,6 +309,7 @@ const LoanTable = () => {
               setIsPaymentModalOpen(true);
               setActiveMenu(null);
             }}
+            status={row.original.status}
           />
         </div>
       );
