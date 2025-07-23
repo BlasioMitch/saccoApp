@@ -14,7 +14,6 @@ export const fetchAccounts = createAsyncThunk(
     'accounts/getAccounts',
     async (_,{ rejectWithValue }) => {
         try{
-            // const response = await accountsService.getAccounts()
             const { data } = await client.query({
                 query: GET_ACCOUNTS
             })
