@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import accountsService from '../services/accounts'
+import { GET_ACCOUNTS, GET_ACCOUNT_BY_ID } from "../graphql/queries";
+import client from "../graphql/client";
+import { CREATE_ACCOUNT, UPDATE_ACCOUNT, DELETE_ACCOUNT } from '../graphql/mutations'
 
 const initialState = {
     error : null,
@@ -12,10 +14,13 @@ export const fetchAccounts = createAsyncThunk(
     'accounts/getAccounts',
     async (_,{ rejectWithValue }) => {
         try{
-            const response = await accountsService.getAccounts()
-            return response
+            // const response = await accountsService.getAccounts()
+            const { data } = await client.query({
+                query: GET_ACCOUNTS
+            })
+            return data.getAccounts
         } catch (error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
+            return rejectWithValue(error.message || 'Something went wrong!')
         }
     }
 )
@@ -23,11 +28,14 @@ export const fetchAccounts = createAsyncThunk(
 export const fetchAccountById = createAsyncThunk(
     'accounts/getOneAccount',
     async (id, { rejectWithValue }) => {
-        try{
-            const response = await accountsService.getOneAccount(id)
-            return response
-        } catch(error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
+        try {
+            const { data } = await client.query({
+                query: GET_ACCOUNT_BY_ID,
+                variables: { getAccountByIdId: id }
+            })
+            return data.getAccountById
+        } catch (error) {
+            return rejectWithValue(error.message || 'Something went wrong!')
         }
     }
 )
@@ -36,10 +44,13 @@ export const createAccount = createAsyncThunk(
     'accounts/createAccount',
     async (accountData, { rejectWithValue }) =>{
         try{
-            const response = await accountsService.createAccount(accountData)
-            return response
+            const { data } = await client.mutate({
+                mutation: CREATE_ACCOUNT,
+                variables: { account: accountData }
+            })
+            return data.createAccount
         } catch (error){
-            return rejectWithValue(error.response?.data || 'something went wrong!')
+            return rejectWithValue(error.message || 'something went wrong!')
         }
     }
 )
@@ -48,10 +59,13 @@ export const deleteAccount = createAsyncThunk(
     'accounts/deleteAccount',
     async (id, { rejectWithValue }) => {
         try{
-            const response = await accountsService.deleteAccount(id)
-            return response
+            await client.mutate({
+                mutation: DELETE_ACCOUNT,
+                variables: { deleteAccountId: id }
+            })
+            return id
         } catch(error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
+            return rejectWithValue(error.message || 'Something went wrong!')
         }
     }
 )
@@ -60,10 +74,18 @@ export const patchAccount = createAsyncThunk(
     'accounts/patchAccount',
     async ({id, accountData}, { rejectWithValue}) => {
         try{
-            const response = await accountsService.patchAccount(id, accountData)
-            return response
+            // Only send allowed fields for update
+            const allowedFields = ['balance', 'status', 'paidMembership'];
+            const updateVars = Object.fromEntries(
+                Object.entries(accountData).filter(([key]) => allowedFields.includes(key))
+            );
+            const { data } = await client.mutate({
+                mutation: UPDATE_ACCOUNT,
+                variables: { updateAccountId: id, ...updateVars }
+            })
+            return data.updateAccount
         } catch (error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
+            return rejectWithValue(error.message || 'Something went wrong!')
         }
     }
 )

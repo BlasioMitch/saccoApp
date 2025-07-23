@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import userService from '../services/user'
+import client from '../graphql/client'
+import { GET_USERS } from '../graphql/queries'
+import { CREATE_USER, UPDATE_USER, DELETE_USER } from '../graphql/mutations'
 
 const initialState = {
     profile: null,
@@ -13,10 +15,13 @@ export const createUser = createAsyncThunk(
     'users/createUser',
     async (userData, { rejectWithValue }) =>{
         try {
-            const response = await userService.createUser(userData)
-            return response
+            const { data } = await client.mutate({
+                mutation: CREATE_USER,
+                variables: { user: userData }
+            })
+            return data.createUser
         } catch (error) {
-            return rejectWithValue(error.response?.data || 'Something is not right on our end');
+            return rejectWithValue(error.message || 'Something is not right on our end');
         }
     }
 )
@@ -26,10 +31,13 @@ export const fetchUsers = createAsyncThunk(
     'users/getUsers',
     async (_,{ rejectWithValue }) => {
         try {
-            const response = await userService.getAllUsers()
-            return response
+            const { data } = await client.query({
+                query: GET_USERS
+            })
+            // Adjust for your schema: data.getUsers or data.users
+            return data.getUsers || data.users
         } catch (error) {
-            return rejectWithValue(error.response?.data || 'Something went wrong on our side')
+            return rejectWithValue(error.message || 'Something went wrong on our side')
         }
     }
 )
@@ -55,10 +63,14 @@ export const patchUser = createAsyncThunk(
             if(!id || !objData){
                 throw new Error('Invalid Input: ID and data are required')
             }
-            const response = await userService.patchUser(id,objData)
-            return response
+            const { data } = await client.mutate({
+                mutation: UPDATE_USER,
+                variables: { updateUserId: id, updateData: objData }
+            })
+            return data.updateUser
         } catch (error) {
-            return rejectWithValue(error.response?.data || 'Something went wrong on our side')
+            console.log(error.message, ' patch user')
+            return rejectWithValue(error.message || 'Something went wrong on our side')
         }
     }
 )
@@ -68,10 +80,13 @@ export const deleteUser = createAsyncThunk(
     'users/deleteUser',
     async (id,{ rejectWithValue }) => {
         try {
-            await userService.deleteUser(id)
+            await client.mutate({
+                mutation: DELETE_USER,
+                variables: { deleteUserId: id }
+            })
             return id
         } catch (error) {
-            return rejectWithValue(error.response?.data || 'Something went wrong on our side')
+            return rejectWithValue(error.message || 'Something went wrong on our side')
         }
     }
 )

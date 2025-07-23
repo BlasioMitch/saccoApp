@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, fetchUserById } from '../../reducers/userReducer';
+import { fetchUsers } from '../../reducers/userReducer';
+import { FetchProfile } from '../../reducers/profileReducer';
 import UserSearch from '../../components/Profiles/UserSearch';
 import UserBioData from '../../components/Profiles/UserBioData';
 import SavingsHistory from '../../components/Profiles/SavingsHistory';
@@ -12,27 +13,24 @@ const Profiles = ({ userId, isRegularUser }) => {
   const dispatch = useDispatch();
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('savings');
-  const { users, status: usersStatus, profile } = useSelector((state) => state.users);
+  const { users, status: usersStatus } = useSelector((state) => state.users);
+  const { profile, status: profileStatus } = useSelector((state) => state.profile);
   const { user: currentUser } = useSelector((state) => state.auth);
 
   // Load initial data
   useEffect(() => {
-    const loadData = async () => {
-      if (isRegularUser && currentUser?.id) {
-        await dispatch(fetchUserById(currentUser.id));
-        setSelectedUser(currentUser);
-      } else if (!isRegularUser && usersStatus === 'idle') {
-        await dispatch(fetchUsers());
-      }
-    };
-    
-    loadData();
-  }, [isRegularUser, currentUser?.id, dispatch]); // Removed usersStatus from dependencies
+    if (isRegularUser && currentUser?.id) {
+      dispatch(FetchProfile(currentUser.id));
+      setSelectedUser(currentUser);
+    } else if (!isRegularUser && usersStatus === 'idle') {
+      dispatch(fetchUsers());
+    }
+  }, [isRegularUser, currentUser?.id, usersStatus, dispatch]);
 
   const handleUserSelect = (user) => {
     if (user?.id) {
       setSelectedUser(user);
-      dispatch(fetchUserById(user.id));
+      dispatch(FetchProfile(user.id));
     }
   };
 
@@ -42,18 +40,15 @@ const Profiles = ({ userId, isRegularUser }) => {
 
   // Calculate user statistics from the profile data
   const userStatistics = useMemo(() => {
-    if (!profile?.transactions) return null;
-
-    const savingsTransactions = profile.transactions.SAVINGS_DEPOSIT || [];
+    if (!profile) return null;
+    const savingsTransactions = (profile.account?.transactions || []).filter(t => t.type === 'SAVINGS_DEPOSIT');
     const totalSavings = savingsTransactions.reduce(
       (sum, t) => sum + Number(t.amount),
       0
     );
-
-    const activeLoans = (profile.loans || []).filter(
+    const activeLoans = (profile.account?.loans || []).filter(
       (l) => l.status === 'ACTIVE'
     ).length;
-
     // Calculate monthly average savings
     const monthlyTotals = savingsTransactions.reduce((acc, t) => {
       const date = new Date(t.createdAt);
@@ -61,11 +56,9 @@ const Profiles = ({ userId, isRegularUser }) => {
       acc[monthYear] = (acc[monthYear] || 0) + Number(t.amount);
       return acc;
     }, {});
-
     const monthlySavingsAvg = Object.keys(monthlyTotals).length > 0
       ? Object.values(monthlyTotals).reduce((sum, val) => sum + val, 0) / Object.keys(monthlyTotals).length
       : 0;
-
     return {
       totalSavings,
       activeLoans,
@@ -76,13 +69,23 @@ const Profiles = ({ userId, isRegularUser }) => {
     };
   }, [profile]);
 
-  const isLoading = usersStatus === 'loading';
+  const isLoading = profileStatus === 'loading';
 
   const tabs = [
     { id: 'savings', label: 'Savings', icon: <Wallet className="w-4 h-4" /> },
     { id: 'loans', label: 'Loans', icon: <CreditCard className="w-4 h-4" /> },
     { id: 'transactions', label: 'Transactions', icon: <History className="w-4 h-4" /> },
   ];
+
+  // Prepare transactions by type for tabbed components
+  const transactionsByType = useMemo(() => {
+    if (!profile?.account?.transactions) return {};
+    return profile.account.transactions.reduce((acc, tx) => {
+      if (!acc[tx.type]) acc[tx.type] = [];
+      acc[tx.type].push(tx);
+      return acc;
+    }, {});
+  }, [profile]);
 
   return (
     <div className="flex flex-col h-full p-6 space-y-6 bg-gray-50 dark:bg-gray-900">
@@ -95,7 +98,7 @@ const Profiles = ({ userId, isRegularUser }) => {
           {selectedUser && !isRegularUser && (
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
               <User2 className="w-4 h-4" />
-              <span>{selectedUser.name}</span>
+              <span>{selectedUser.name || `${selectedUser.first_name} ${selectedUser.last_name}`}</span>
             </div>
           )}
         </div>
@@ -128,7 +131,7 @@ const Profiles = ({ userId, isRegularUser }) => {
           <div className="col-span-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 h-full">
               <UserBioData 
-                user={profile.user} 
+                user={profile}
                 account={profile.account}
                 statistics={userStatistics} 
               />
@@ -163,16 +166,16 @@ const Profiles = ({ userId, isRegularUser }) => {
               {/* Tab Content */}
               <div className="flex-1 overflow-y-auto p-6 pb-2">
                 {activeTab === 'savings' && (
-                  <SavingsHistory transactions={profile.transactions?.SAVINGS_DEPOSIT || []} />
+                  <SavingsHistory transactions={transactionsByType.SAVINGS_DEPOSIT || []} />
                 )}
                 {activeTab === 'loans' && (
                   <LoanAccordion 
-                    loans={profile.loans || []} 
-                    transactions={profile.transactions || {}} 
+                    loans={profile.account?.loans || []} 
+                    transactions={transactionsByType} 
                   />
                 )}
                 {activeTab === 'transactions' && (
-                  <Transactions transactions={profile.transactions || {}} />
+                  <Transactions transactions={transactionsByType} />
                 )}
               </div>
             </div>

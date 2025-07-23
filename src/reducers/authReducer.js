@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import authService from '../services/auth'
+import client from '../graphql/client'
+import { LOGIN } from '../graphql/mutations'
 
 const initialState = {
   user: null,
@@ -13,14 +14,17 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await authService.login(credentials)
-      return {
-        token: response.token,
-        user: response.user
-      }
+      const { data } = await client.mutate({
+        mutation: LOGIN,
+        variables: credentials
+      });
+      const { user, token } = data.login;
+      localStorage.setItem('user', JSON.stringify(user));
+      if (token) localStorage.setItem('token', token);
+      return { user, token };
     } catch (error) {
       console.error('Login error in thunk:', error)
-      return rejectWithValue(error.response?.data || 'Login failed')
+      return rejectWithValue(error.message || 'Login failed')
     }
   }
 )
@@ -29,10 +33,11 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await authService.logout()
-      return null
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      return null;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Logout failed')
+      return rejectWithValue(error.message || 'Logout failed')
     }
   }
 )
@@ -47,23 +52,20 @@ const authSlice = createSlice({
     initializeAuth: (state) => {
       try {
         const token = localStorage.getItem('token')
-        const user = authService.getUserData()
-        
-        // Only set authenticated if both token and user exist
+        const user = JSON.parse(localStorage.getItem('user'))
         if (token && user) {
           state.token = token
           state.user = user
           state.isAuthenticated = true
           state.status = 'succeeded'
         } else {
-          // Clear any partial data
           state.token = null
           state.user = null
           state.isAuthenticated = false
           state.status = 'idle'
-          // Clear localStorage if data is incomplete
           if (token || user) {
-            authService.clearUserData()
+            localStorage.removeItem('user')
+            localStorage.removeItem('token')
           }
         }
       } catch (error) {
@@ -71,7 +73,8 @@ const authSlice = createSlice({
         state.user = null
         state.isAuthenticated = false
         state.status = 'failed'
-        authService.clearUserData()
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
       }
     }
   },

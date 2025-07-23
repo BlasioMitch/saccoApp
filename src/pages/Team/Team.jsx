@@ -23,7 +23,7 @@ const Team = () => {
   useEffect(() => {
     if (error) {
       console.log('Error in Team component:', error)
-      toast.error(error)
+      // toast.error(error)
     }
   }, [error])
 

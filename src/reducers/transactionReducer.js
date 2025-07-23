@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import transactionService from '../services/transaction'
+import client from '../graphql/client'
+import { GET_TRANSACTIONS } from '../graphql/queries'
+import { CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION } from '../graphql/mutations'
 
 export const TransactionType = {
   LOAN_PAYMENT: 'LOAN_PAYMENT',
@@ -24,36 +26,45 @@ const initialState = {
 
 export const fetchTransactions = createAsyncThunk(
   'transactions/getTransactions',
-  async (_, { rejectWithValue }) => {
+  async (accountId, { rejectWithValue }) => {
     try {
-      const response = await transactionService.getAllTransactions()
-      return response
+      const { data } = await client.query({
+        query: GET_TRANSACTIONS,
+        variables: accountId ? { accountId } : {}
+      })
+      return data.getTransactions
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Something went wrong!')
+      return rejectWithValue(error.message || 'Something went wrong!')
     }
   }
 )
 
-export const fetchTransactionById = createAsyncThunk(
-  'transactions/getOneTransaction',
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await transactionService.getOneTransaction(id)
-      return response
-    } catch (error) {
-      return rejectWithValue(error.response?.data || 'Something went wrong on our end')
-    }
-  }
-)
+// export const fetchTransactionById = createAsyncThunk(
+//   'transactions/getOneTransaction',
+//   async (id, { rejectWithValue }) => {
+//     try {
+//       const { data } = await client.query({
+//         query: GET_TRANSACTION_BY_ID,
+//         variables: { getTransactionByIdId: id }
+//       })
+//       return data.getTransactionById
+//     } catch (error) {
+//       return rejectWithValue(error.message || 'Something went wrong on our end')
+//     }
+//   }
+// )
 
 export const createTransaction = createAsyncThunk(
   'transactions/createTransaction',
   async (transactionData, { rejectWithValue }) => {
     try {
-      const response = await transactionService.createTransaction(transactionData)
-      return response
+      const { data } = await client.mutate({
+        mutation: CREATE_TRANSACTION,
+        variables: { transaction: transactionData }
+      })
+      return data.createTransaction
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Something went wrong!')
+      return rejectWithValue(error.message || 'Something went wrong!')
     }
   }
 )
@@ -62,10 +73,18 @@ export const updateTransaction = createAsyncThunk(
   'transactions/updateTransaction',
   async ({ id, transactionData }, { rejectWithValue }) => {
     try {
-      const response = await transactionService.updateTransaction(id, transactionData)
-      return response
+      // Only send allowed fields for update
+      const allowedFields = ['type', 'amount', 'accountId', 'status', 'description', 'loanId'];
+      const updateVars = Object.fromEntries(
+        Object.entries(transactionData).filter(([key]) => allowedFields.includes(key))
+      );
+      const { data } = await client.mutate({
+        mutation: UPDATE_TRANSACTION,
+        variables: { updateTransactionId: id, ...updateVars }
+      })
+      return data.updateTransaction
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Something went wrong!')
+      return rejectWithValue(error.message || 'Something went wrong!')
     }
   }
 )
@@ -74,10 +93,13 @@ export const deleteTransaction = createAsyncThunk(
   'transactions/deleteTransaction',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await transactionService.deleteTransaction(id)
-      return response
+      await client.mutate({
+        mutation: DELETE_TRANSACTION,
+        variables: { deleteTransactionId: id }
+      })
+      return { id }
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Something went wrong!')
+      return rejectWithValue(error.message || 'Something went wrong!')
     }
   }
 )

@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import loansService from '../services/loans'
-import accountsService from '../services/accounts'
+import client from '../graphql/client'
+import { GET_LOANS } from '../graphql/queries'
+import { CREATE_LOAN, UPDATE_LOAN, DELETE_LOAN } from '../graphql/mutations'
+// import { GET_LOAN_BY_ID } from '../graphql/queries'
 
 const initialState = {
     error : null,
@@ -10,37 +12,45 @@ const initialState = {
 
 export const fetchLoans = createAsyncThunk(
     'loans/getLoans',
-    async (_,{ rejectWithValue }) => {
+    async (accountId, { rejectWithValue }) => {
         try{
-            const response = await loansService.getAllLoans()
-            return response
+            const { data } = await client.query({
+                query: GET_LOANS,
+                variables: accountId ? { accountId } : {}
+            })
+            return data.getLoans
         } catch (error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
+            return rejectWithValue(error.message || 'Something went wrong!')
         }
     }
 )
 
-export const fetchLoanById = createAsyncThunk(
-    'loans/getOneLoan',
-    async (id, { rejectWithValue }) => {
-        try{
-            const response = await loansService.getOneLoan(id)
-            return response
-        } catch(error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
-        }
-    }
-)
+// export const fetchLoanById = createAsyncThunk(
+//     'loans/getOneLoan',
+//     async (id, { rejectWithValue }) => {
+//         try {
+//             const { data } = await client.query({
+//                 query: GET_LOAN_BY_ID,
+//                 variables: { getLoanByIdId: id }
+//             })
+//             return data.getLoanById
+//         } catch (error) {
+//             return rejectWithValue(error.message || 'Something went wrong!')
+//         }
+//     }
+// )
 
 export const createLoan = createAsyncThunk(
     'loans/createLoan',
     async (loanData, { rejectWithValue }) =>{
         try{
-            // First create the loan
-            const response = await loansService.createLoan(loanData)
-            return response
+            const { data } = await client.mutate({
+                mutation: CREATE_LOAN,
+                variables: { loan: loanData }
+            })
+            return data.createLoan
         } catch (error){
-            return rejectWithValue(error.response?.data || 'something went wrong!')
+            return rejectWithValue(error.message || 'something went wrong!')
         }
     }
 )
@@ -49,10 +59,13 @@ export const deleteLoan = createAsyncThunk(
     'loans/deleteLoan',
     async (id, { rejectWithValue }) => {
         try{
-            const response = await loansService.deleteLoan(id)
-            return { id }; // Return the deleted loan's ID
+            await client.mutate({
+                mutation: DELETE_LOAN,
+                variables: { deleteLoanId: id }
+            })
+            return { id }
         } catch(error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
+            return rejectWithValue(error.message || 'Something went wrong!')
         }
     }
 )
@@ -61,10 +74,18 @@ export const patchLoan = createAsyncThunk(
     'loans/patchLoan',
     async ({id, loanData}, { rejectWithValue}) => {
         try{
-            const response = await loansService.patchLoan(id, loanData)        
-            return response
+            // Only send allowed fields for update
+            const allowedFields = ['accountId', 'amount', 'interestRate', 'status', 'endDate', 'startDate', 'term'];
+            const updateVars = Object.fromEntries(
+                Object.entries(loanData).filter(([key]) => allowedFields.includes(key))
+            );
+            const { data } = await client.mutate({
+                mutation: UPDATE_LOAN,
+                variables: { updateLoanId: id, ...updateVars }
+            })
+            return data.updateLoan
         } catch (error){
-            return rejectWithValue(error.response?.data || 'Something went wrong!')
+            return rejectWithValue(error.message || 'Something went wrong!')
         }
     }
 )

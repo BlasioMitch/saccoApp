@@ -7,6 +7,14 @@
     ],
     "compilerOptions": {
       "baseUrl": ".",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "module": "esnext",
+      "target": "esnext",
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "jsx": "react-jsx",
       "paths": {
         "@/*": ["./src/*"]
       }

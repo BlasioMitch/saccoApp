@@ -177,10 +177,7 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
           </button>
         );
       },
-      accessorFn: (row) => {
-        const owner = row.account?.owner;
-        return owner ? `${owner.first_name} ${owner.last_name}` : '';
-      },
+      accessorFn: (row) => row.account?.owner?.fullName,
       cell: ({ getValue }) => <div className="text-gray-100">{getValue()}</div>,
     },
     {

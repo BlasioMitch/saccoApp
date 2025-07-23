@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import profileService from '../services/profile'
+import client from '../graphql/client'
+import { GET_USER_BY_ID } from '../graphql/queries'
 
 const initialState = {
     profile: null,
@@ -12,10 +13,13 @@ export const FetchProfile = createAsyncThunk(
     'profile/fetchProfile',
     async (userId, { rejectWithValue }) => {
         try {
-            const response = await profileService.fetchProfile(userId)
-            return response
+            const { data } = await client.query({
+                query: GET_USER_BY_ID,
+                variables: { getUserByIdId: userId }
+            })
+            return data.getUserById
         } catch (error) {
-            return rejectWithValue(error.response?.data || 'Something is not right on our end');
+            return rejectWithValue(error.message || 'Something is not right on our end');
         }
     }
 )
