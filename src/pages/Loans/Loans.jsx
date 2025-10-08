@@ -18,7 +18,7 @@ const Loans = () => {
 
   useEffect(() => {
     if (error) {
-      console.log('Error in Loan component:', error)
+      // console.log('Error in Loan component:', error)
       toast.error(error)
     }
   }, [error])

@@ -264,7 +264,7 @@ const AccountsTable = ({ accounts, onDelete }) => {
         handleCloseDelete()
       }
     } catch (error) {
-      console.error('Error deleting account:', error)
+      // console.error('Error deleting account:', error)
     }
   }
 

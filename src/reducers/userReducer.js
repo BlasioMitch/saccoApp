@@ -69,7 +69,7 @@ export const patchUser = createAsyncThunk(
             })
             return data.updateUser
         } catch (error) {
-            console.log(error.message, ' patch user')
+            // console.log(error.message, ' patch user')
             return rejectWithValue(error.message || 'Something went wrong on our side')
         }
     }

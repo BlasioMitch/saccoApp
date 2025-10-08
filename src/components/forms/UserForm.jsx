@@ -117,7 +117,7 @@ const UserForm = ({ isOpen, onClose, userToEdit }) => {
       }
 
       if (userToEdit) {
-        console.log(userData, ' data to edit')
+        // console.log(userData, ' data to edit')
         await dispatch(patchUser({ id: userToEdit.id, objData: userData })).unwrap()
         toast.success('Member updated successfully')
       } else {

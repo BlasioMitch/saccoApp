@@ -16,8 +16,10 @@ const Login = () => {
       toast.success('Login successful!')
       navigate('/home')
     } catch (error) {
-      console.error('Login error:', error)
-      toast.error(error || 'Login failed')
+      // console.error('Login error:', error)
+      // Handle the error object structure properly
+      const errorMessage = error?.message || (typeof error === 'object' ? error.toString() : error) || 'Login failed'
+      toast.error(errorMessage)
     }
   }
 

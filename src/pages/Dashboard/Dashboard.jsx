@@ -62,7 +62,7 @@ function Dashboard() {
 
   const handleExport = (format) => {
     // Implement export functionality
-    console.log(`Exporting to ${format}`);
+    // console.log(`Exporting to ${format}`);
   };
 
   const formatCurrency = (amount) => {
