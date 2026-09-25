@@ -6,29 +6,29 @@ import bkImg from '../../../assets/bk.jpg'
 
 const SidebarHeader = ({ isSidebarOpen, toggleSidebar }) => {
   return (
-    <div className="flex items-center justify-between h-16 px-4 border-b border-custom-bg-tertiary">
-      <div className="flex items-center space-x-3">
-        <div className="flex-shrink-0">
-          <div className="w-8 h-8 rounded-lg overflow-hidden">
-            <img 
-              src={bkImg} 
-              alt="SaccoApp Logo" 
-              className="w-full h-full object-cover"
+    <div className={`flex h-16 shrink-0 items-center border-b border-custom-bg-tertiary ${
+      isSidebarOpen ? 'justify-between px-4' : 'justify-center'
+    }`}>
+      {isSidebarOpen && (
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg">
+            <img
+              src={bkImg}
+              alt="SaccoApp Logo"
+              className="h-full w-full object-cover"
             />
           </div>
-        </div>
-        {isSidebarOpen && (
-          <span className="text-lg font-semibold text-custom-text-primary">
+          <span className="truncate text-lg font-semibold leading-6 text-custom-text-primary">
             SaccoApp
           </span>
-        )}
-      </div>
+        </div>
+      )}
       <button
         onClick={toggleSidebar}
-        className="p-2 rounded-lg  text-custom-text-secondary hover:bg-custom-interactive-hover hover:text-custom-brand-primary transition-colors"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-custom-text-secondary transition-colors hover:bg-custom-interactive-hover hover:text-custom-brand-primary"
         aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
       >
-        <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${
+        <ChevronLeft className={`h-5 w-5 transition-transform duration-300 ${
           !isSidebarOpen ? 'rotate-180' : ''
         }`} />
       </button>
@@ -38,15 +38,15 @@ const SidebarHeader = ({ isSidebarOpen, toggleSidebar }) => {
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   return (
-    <div className={`flex flex-col h-full transition-all duration-300 bg-custom-bg-secondary dark:bg-custom-bg-secondary border-r border-custom-bg-tertiary ${
-      isSidebarOpen ? 'w-64' : 'w-20'
+    <aside className={`flex h-full shrink-0 flex-col border-r border-custom-bg-tertiary bg-custom-bg-secondary transition-all duration-300 ${
+      isSidebarOpen ? 'w-64' : 'w-16'
     }`}>
       <SidebarHeader isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      <Search isSidebarOpen={isSidebarOpen} />
-      <div className="flex-1 overflow-y-auto">
+      {isSidebarOpen && <Search />}
+      <div className="min-h-0 flex-1">
         <Menu isSidebarOpen={isSidebarOpen} />
       </div>
-    </div>
+    </aside>
   )
 }
 

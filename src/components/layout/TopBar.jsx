@@ -1,49 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Bell, ChevronDown, LogOut, Settings, User } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { logout, initializeAuth } from '../../reducers/authReducer'
 import { toast } from 'sonner'
+import DropdownMenu from '../ui/DropdownMenu'
+import { getPageTitle } from './navigation'
 
-const UserDropdown = ({ isOpen, onClose, onLogout }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-custom-bg-secondary border border-custom-bg-tertiary">
-      <div className="py-1" role="menu">
-        <button
-          onClick={() => window.location.href = '/profile'}
-          className="flex w-full items-center px-4 py-2 text-sm text-custom-text-primary hover:bg-custom-interactive-hover"
-          role="menuitem"
-        >
-          <User className="mr-2 h-4 w-4" />
-          Profile
-        </button>
-        <button
-          onClick={() => window.location.href = '/settings'}
-          className="flex w-full items-center px-4 py-2 text-sm text-custom-text-primary hover:bg-custom-interactive-hover"
-          role="menuitem"
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          Settings
-        </button>
-        <button
-          onClick={onLogout}
-          className="flex w-full items-center px-4 py-2 text-sm text-red-500 hover:bg-custom-interactive-hover"
-          role="menuitem"
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </button>
-      </div>
-    </div>
-  )
-}
-
-const UserAvatar = ({ user, onLogout }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  
-  if (!user) return null;
+const UserMenu = ({ user, onLogout }) => {
+  const navigate = useNavigate()
 
   // Handle missing name data gracefully
   const firstName = user?.firstName || user?.first_name?.split(' ')[0] || 'User'
@@ -51,44 +16,40 @@ const UserAvatar = ({ user, onLogout }) => {
   const fullName = `${firstName} ${lastName}`.trim()
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase()
   const userRole = user?.role?.toLowerCase() || 'user'
-  
+
   return (
-    <div className="relative">
-      <button 
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center gap-3 hover:bg-custom-interactive-hover rounded-full py-1 px-2 transition-colors"
-      >
-        <div className="relative inline-flex items-center">
-          <div className="w-10 h-10 rounded-full bg-custom-brand-primary flex items-center justify-center text-custom-interactive-active-text font-medium">
-            {initials || 'U'}
-          </div>
-          <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-custom-bg-secondary bg-green-500"></span>
-        </div>
-        <div className="hidden md:block">
-          <p className="text-sm font-medium text-custom-text-primary text-left">
-            {fullName}
-          </p>
-          <p className="text-xs text-custom-text-secondary text-left">
-            {userRole}
-          </p>
-        </div>
-        <ChevronDown className={`w-4 h-4 text-custom-text-secondary transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-      </button>
-      <UserDropdown 
-        isOpen={isDropdownOpen} 
-        onClose={() => setIsDropdownOpen(false)}
-        onLogout={() => {
-          onLogout();
-          setIsDropdownOpen(false);
-        }}
-      />
-    </div>
+    <DropdownMenu
+      ariaLabel="Account menu"
+      size="md"
+      triggerClassName="h-12 gap-2 px-2 text-left"
+      label={
+        <>
+          <span className="relative inline-flex">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-custom-brand-primary text-xs font-semibold text-custom-interactive-active-text">
+              {initials || 'U'}
+            </span>
+            <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-500 ring-2 ring-custom-bg-secondary" />
+          </span>
+          <span className="hidden md:block">
+            <span className="block text-sm font-medium leading-5 text-custom-text-primary">{fullName}</span>
+            <span className="block text-xs capitalize leading-4 text-custom-text-secondary">{userRole}</span>
+          </span>
+          <ChevronDown className="h-4 w-4 text-custom-text-secondary" />
+        </>
+      }
+      items={[
+        { label: 'Profile', icon: User, onClick: () => navigate('/home/profile') },
+        { label: 'Settings', icon: Settings, onClick: () => navigate('/home/settings') },
+        { label: 'Logout', icon: LogOut, danger: true, onClick: onLogout },
+      ]}
+    />
   )
 }
 
 const TopBar = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const { user, isAuthenticated } = useSelector((state) => state.auth)
 
   useEffect(() => {
@@ -107,23 +68,21 @@ const TopBar = () => {
   }
 
   return (
-    <div className="h-16 px-4 border-b border-custom-bg-tertiary bg-custom-bg-secondary">
-      <div className="h-full flex items-center justify-between">
-        <div className="flex-1">
-          <h1 className="text-xl font-semibold text-custom-text-primary">
-            Dashboard
-          </h1>
-        </div>
-        
-        <div className="flex items-center space-x-4">          
-          <button className="p-2 rounded-full hover:bg-custom-interactive-hover text-custom-text-secondary">
-            <Bell className="w-5 h-5" />
-          </button>
-          
-          {isAuthenticated && user && <UserAvatar user={user} onLogout={handleLogout} />}
-        </div>
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-custom-bg-tertiary bg-custom-bg-secondary px-6">
+      <h1 className="truncate text-xl font-semibold leading-8 text-custom-text-primary">
+        {getPageTitle(pathname)}
+      </h1>
+
+      <div className="flex items-center gap-2">
+        <button
+          className="flex h-10 w-10 items-center justify-center rounded-full text-custom-text-secondary transition-colors hover:bg-custom-interactive-hover hover:text-custom-text-primary"
+          aria-label="Notifications"
+        >
+          <Bell className="h-5 w-5" />
+        </button>
+        {isAuthenticated && user && <UserMenu user={user} onLogout={handleLogout} />}
       </div>
-    </div>
+    </header>
   )
 }
 

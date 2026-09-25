@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import StatCards from '../../components/ui/StatCards';
+import { CreditCard, Activity, Wallet, AlertTriangle } from 'lucide-react';
+import { StatGrid } from '../../components/ui/StatCard';
+import { PageShell, Panel } from '../../components/layout/PageShell';
 import LoanTable from '../../components/tables/LoanTable';
 import { fetchLoans } from '../../reducers/loansReducer';
 import { toast } from 'sonner'
@@ -22,7 +24,7 @@ const Loans = () => {
       toast.error(error)
     }
   }, [error])
-  
+
 
   const stats = useMemo(() => {
     if (!loans || loans.length === 0) return [];
@@ -37,42 +39,42 @@ const Loans = () => {
       {
         title: 'Total Loans',
         value: totalLoans.toString(),
-        change: `${((activeLoans / totalLoans) * 100).toFixed(1)}%`,
-        trend: 'up'
+        meta: `${((activeLoans / totalLoans) * 100).toFixed(1)}% active`,
+        trend: 'up',
+        icon: CreditCard,
+        tone: 'blue'
       },
       {
         title: 'Active Loans',
         value: activeLoans.toString(),
-        change: `${activeLoans} active`,
-        trend: 'up'
+        icon: Activity,
+        tone: 'green'
       },
       {
         title: 'Total Amount',
         value: `UGX ${totalAmount.toLocaleString()}`,
-        change: `${(totalAmount / totalLoans).toLocaleString()} avg`,
-        trend: 'up'
+        note: `UGX ${Math.round(totalAmount / totalLoans).toLocaleString()} average`,
+        icon: Wallet,
+        tone: 'purple'
       },
       {
         title: 'Default Rate',
         value: `${defaultRate.toFixed(1)}%`,
-        change: `${defaultedLoans} loans`,
-        trend: defaultRate > 5 ? 'down' : 'up'
+        meta: `${defaultedLoans} loans`,
+        trend: defaultRate > 5 ? 'down' : 'up',
+        icon: AlertTriangle,
+        tone: 'red'
       }
     ];
   }, [loans]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] p-4">
-      <div className="flex justify-between items-center px-2 border-b border-custom-bg-tertiary pb-4">
-        <h1 className="text-2xl font-semibold text-custom-text-primary">Loans</h1>
-      </div>
-      <div className="mb-6 pt-4">
-        <StatCards stats={stats} />
-      </div>
-      <div className="flex-1 bg-custom-bg-secondary rounded-lg overflow-hidden min-h-0">
+    <PageShell>
+      <StatGrid stats={stats} />
+      <Panel>
         <LoanTable />
-      </div>
-    </div>
+      </Panel>
+    </PageShell>
   );
 }
 

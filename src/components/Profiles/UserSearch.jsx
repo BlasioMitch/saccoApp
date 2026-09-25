@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, User2 } from 'lucide-react';
+import StatusBadge from '../ui/StatusBadge';
 
 const UserSearch = ({ users, onSelect }) => {
   const [query, setQuery] = useState('');
@@ -82,17 +83,17 @@ const UserSearch = ({ users, onSelect }) => {
           }}
           onKeyDown={handleKeyDown}
           onFocus={() => setIsOpen(true)}
-          className="w-full bg-dblack-500 text-slate-800 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+          className="w-full bg-custom-bg-tertiary text-custom-text-primary rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
           placeholder="Search members by name, email, or phone..."
         />
-        <Search className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
+        <Search className="absolute left-3 top-2.5 h-5 w-5 text-custom-text-secondary" />
         {query && (
           <button
             onClick={() => {
               setQuery('');
               inputRef.current?.focus();
             }}
-            className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-300"
+            className="absolute right-3 top-2.5 text-custom-text-secondary hover:text-custom-text-primary"
           >
             <X className="h-5 w-5" />
           </button>
@@ -102,54 +103,44 @@ const UserSearch = ({ users, onSelect }) => {
       {isOpen && filteredUsers.length > 0 && (
         <ul
           ref={listRef}
-          className="absolute z-10 w-full mt-2 bg-custom-bg-primary opacity-80 rounded-lg shadow-lg max-h-80 overflow-auto border border-dblack-700"
+          className="absolute z-10 w-full mt-2 bg-custom-bg-primary rounded-lg shadow-lg max-h-80 overflow-auto border border-custom-bg-tertiary"
         >
           {filteredUsers.map((user, index) => (
             <li
               key={user.id}
-              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+              className={`flex items-center gap-4 px-4 py-2 cursor-pointer transition-colors ${
                 index === selectedIndex
-                  ? 'bg-dcyan-600 text-dblack-900'
-                  : 'hover:bg-dblack-800'
+                  ? 'bg-custom-interactive-focus'
+                  : 'hover:bg-custom-interactive-hover'
               }`}
               onClick={() => handleSelect(user)}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              <div className="h-8 w-8 rounded-full bg-dcyan-700 flex items-center justify-center text-sm font-medium text-dblack-900">
+              <div className="h-8 w-8 rounded-full bg-custom-brand-primary flex items-center justify-center text-sm font-medium text-custom-interactive-active-text">
                 {user.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium truncate ${
-                  index === selectedIndex ? 'text-dblack-900' : 'text-slate-100'
+                  'text-custom-text-primary'
                 }`}>
                   {user.name}
                 </p>
                 <p className={`text-xs truncate ${
-                  index === selectedIndex ? 'text-dblack-800' : 'text-slate-300'
+                  'text-custom-text-secondary'
                 }`}>
                   {user.email}
                 </p>
               </div>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                user.status === 'ACTIVE'
-                  ? index === selectedIndex
-                    ? 'bg-green-200 text-green-900'
-                    : 'bg-green-900/50 text-green-300'
-                  : index === selectedIndex
-                    ? 'bg-red-200 text-red-900'
-                    : 'bg-red-900/50 text-red-300'
-              }`}>
-                {user.status}
-              </span>
+              <StatusBadge status={user.status} />
             </li>
           ))}
         </ul>
       )}
 
       {isOpen && query && filteredUsers.length === 0 && (
-        <div className="absolute z-10 w-full mt-2 bg-dblack-900 rounded-lg shadow-lg p-4 text-center border border-dblack-700">
-          <User2 className="h-6 w-6 mx-auto mb-2 text-slate-400" />
-          <p className="text-slate-300">No members found</p>
+        <div className="absolute z-10 w-full mt-2 bg-custom-bg-primary rounded-lg shadow-lg p-4 text-center border border-custom-bg-tertiary">
+          <User2 className="h-6 w-6 mx-auto mb-2 text-custom-text-secondary" />
+          <p className="text-custom-text-secondary">No members found</p>
         </div>
       )}
     </div>

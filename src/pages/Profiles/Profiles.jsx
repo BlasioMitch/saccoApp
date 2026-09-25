@@ -8,6 +8,8 @@ import SavingsHistory from '../../components/Profiles/SavingsHistory';
 import LoanAccordion from '../../components/Profiles/LoanAccordion';
 import Transactions from '../../components/Profiles/Transactions';
 import { Loader2, X, User2, Wallet, CreditCard, History } from 'lucide-react';
+import { PageShell, Panel } from '../../components/layout/PageShell';
+import Button from '../../components/ui/Button';
 
 const Profiles = ({ userId, isRegularUser }) => {
   const dispatch = useDispatch();
@@ -88,107 +90,97 @@ const Profiles = ({ userId, isRegularUser }) => {
   }, [profile]);
 
   return (
-    <div className="flex flex-col h-full p-6 space-y-6 bg-gray-50 dark:bg-gray-900">
-      {/* Header Section */}
-      <div className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            {isRegularUser ? 'My Profile' : 'Member Profile'}
-          </h1>
-          {selectedUser && !isRegularUser && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              <User2 className="w-4 h-4" />
-              <span>{selectedUser.name || `${selectedUser.first_name} ${selectedUser.last_name}`}</span>
-            </div>
-          )}
-        </div>
-        {!isRegularUser && (
-          <div className="flex items-center gap-4">
+    <PageShell>
+      {/* Toolbar: member search (staff only) */}
+      {!isRegularUser && (
+        <div className="flex h-10 shrink-0 items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-2 text-sm text-custom-text-secondary">
+            <User2 className="h-4 w-4 shrink-0" />
+            {selectedUser ? (
+              <span className="truncate font-medium text-custom-text-primary">
+                {selectedUser.first_name} {selectedUser.last_name}
+              </span>
+            ) : (
+              <span>No member selected</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
             <div className="w-80">
               <UserSearch users={users} onSelect={handleUserSelect} />
             </div>
             {selectedUser && (
-              <button
-                onClick={handleClearProfile}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
-                <X className="w-4 h-4" />
+              <Button variant="secondary" onClick={handleClearProfile}>
+                <X className="h-4 w-4" />
                 Clear
-              </button>
+              </Button>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Main Content Section */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-[400px] bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <Loader2 className="h-8 w-8 animate-spin text-dcyan-500" />
-        </div>
+        <Panel className="items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
+        </Panel>
       ) : (selectedUser || isRegularUser) && profile ? (
-        <div className="grid grid-cols-12 gap-6 h-[calc(100vh-180px)]">
+        <div className="grid min-h-0 flex-1 grid-cols-12 gap-6">
           {/* Left Column - User Info */}
-          <div className="col-span-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 h-full">
-              <UserBioData 
-                user={profile}
-                account={profile.account}
-                statistics={userStatistics} 
-              />
-            </div>
+          <div className="col-span-4 min-h-0 overflow-y-auto rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6">
+            <UserBioData
+              user={profile}
+              account={profile.account}
+              statistics={userStatistics}
+            />
           </div>
 
           {/* Right Column - Tabbed Content */}
-          <div className="col-span-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm h-full flex flex-col">
-              {/* Tabs */}
-              <div className="border-b border-gray-200 dark:border-gray-700">
-                <nav className="flex space-x-8 px-6" aria-label="Tabs">
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`
-                        flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm
-                        ${activeTab === tab.id
-                          ? 'border-dcyan-500 text-dcyan-500'
-                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-                        }
-                      `}
-                    >
-                      {tab.icon}
-                      {tab.label}
-                    </button>
-                  ))}
-                </nav>
-              </div>
+          <div className="col-span-8 flex min-h-0 flex-col overflow-hidden rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary">
+            {/* Tabs */}
+            <nav className="flex h-12 shrink-0 gap-6 border-b border-custom-bg-tertiary px-6" aria-label="Tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    -mb-px flex items-center gap-2 border-b-2 text-sm font-medium transition-colors
+                    ${activeTab === tab.id
+                      ? 'border-custom-brand-primary text-custom-brand-primary'
+                      : 'border-transparent text-custom-text-secondary hover:border-custom-bg-tertiary hover:text-custom-text-primary'
+                    }
+                  `}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
 
-              {/* Tab Content */}
-              <div className="flex-1 overflow-y-auto p-6 pb-2">
-                {activeTab === 'savings' && (
-                  <SavingsHistory transactions={transactionsByType.SAVINGS_DEPOSIT || []} />
-                )}
-                {activeTab === 'loans' && (
-                  <LoanAccordion 
-                    loans={profile.account?.loans || []} 
-                    transactions={transactionsByType} 
-                  />
-                )}
-                {activeTab === 'transactions' && (
-                  <Transactions transactions={transactionsByType} />
-                )}
-              </div>
+            {/* Tab Content: the only scrolling area on this page */}
+            <div className="min-h-0 flex-1 overflow-y-auto p-6">
+              {activeTab === 'savings' && (
+                <SavingsHistory transactions={transactionsByType.SAVINGS_DEPOSIT || []} />
+              )}
+              {activeTab === 'loans' && (
+                <LoanAccordion
+                  loans={profile.account?.loans || []}
+                  transactions={transactionsByType}
+                />
+              )}
+              {activeTab === 'transactions' && (
+                <Transactions transactions={transactionsByType} />
+              )}
             </div>
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-[400px] bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <p className="text-gray-500 dark:text-gray-400">
+        <Panel className="items-center justify-center">
+          <p className="text-sm text-custom-text-secondary">
             {isRegularUser ? 'Loading your profile...' : 'Search for a member to view their profile'}
           </p>
-        </div>
+        </Panel>
       )}
-    </div>
+    </PageShell>
   );
 };
 

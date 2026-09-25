@@ -8,16 +8,16 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, loanId }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-black-900/60 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
+      <div className="bg-custom-bg-primary p-6 rounded-lg w-full max-w-md border border-custom-bg-tertiary shadow-2xl max-h-[calc(100vh-48px)] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-50">Delete Loan</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-300">
+          <h2 className="text-lg leading-6 font-semibold text-custom-text-primary">Delete Loan</h2>
+          <button onClick={onClose} className="text-custom-text-secondary hover:text-custom-text-primary">
             <FiX className="w-6 h-6" />
           </button>
         </div>
         
         <div className="space-y-4">
-          <p className="text-gray-200 font-medium">
+          <p className="text-custom-text-primary font-medium">
             This action cannot be undone. Type "delete" to confirm.
           </p>
           <input
@@ -25,19 +25,19 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, loanId }) => {
             value={deleteText}
             onChange={(e) => setDeleteText(e.target.value)}
             placeholder="Type 'delete' to confirm"
-            className="w-full p-2 bg-black-800/90 text-red-500 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+            className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-red-500 rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
           />
           <div className="flex justify-end gap-4">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-black-800/90 text-gray-100 rounded-md hover:bg-black-700 border border-black-700"
+              className="px-4 h-10 bg-custom-bg-secondary text-custom-text-primary rounded-lg hover:bg-custom-interactive-hover border border-custom-bg-tertiary"
             >
               Cancel
             </button>
             <button
               onClick={() => onConfirm(loanId)}
               disabled={deleteText !== 'delete'}
-              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 h-10 bg-red-500 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Delete
             </button>

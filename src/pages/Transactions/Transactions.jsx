@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import StatCards from '../../components/cards/StatCards'
+import { Activity, Wallet, CheckCircle2, Clock, XCircle, Loader2 } from 'lucide-react'
+import { StatGrid } from '../../components/ui/StatCard'
+import { PageShell, Panel } from '../../components/layout/PageShell'
+import { TableEmpty } from '../../components/tables/TableShell'
+import Button from '../../components/ui/Button'
 import TransactionTable from '../../components/tables/TransactionTable'
 import TransactionForm from '../../components/forms/TransactionForm'
 import TransactionDetailsModal from '../../components/Transactions/TransactionDetailsModal'
@@ -45,32 +49,32 @@ const Transactions = () => {
     {
       title: 'Total Transactions',
       value: totalTransactions,
-      icon: '📊',
-      color: 'bg-blue-500',
+      icon: Activity,
+      tone: 'blue',
     },
     {
       title: 'Total Amount',
       value: formatUGX(totalAmount),
-      icon: '💰',
-      color: 'bg-green-500',
+      icon: Wallet,
+      tone: 'green',
     },
     {
       title: 'Completed',
       value: completedTransactions,
-      icon: '✅',
-      color: 'bg-purple-500',
+      icon: CheckCircle2,
+      tone: 'purple',
     },
     {
       title: 'Pending',
       value: pendingTransactions,
-      icon: '⏳',
-      color: 'bg-yellow-500',
+      icon: Clock,
+      tone: 'yellow',
     },
     {
       title: 'Failed',
       value: failedTransactions,
-      icon: '❌',
-      color: 'bg-red-500',
+      icon: XCircle,
+      tone: 'red',
     }
   ]
 
@@ -161,42 +165,36 @@ const Transactions = () => {
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-dcyan-500"></div>
-      </div>
+      <PageShell>
+        <Panel className="items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
+        </Panel>
+      </PageShell>
     )
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] p-4">
-      <div className="flex justify-between items-center px-2 border-b border-custom-bg-tertiary pb-4">
-        <h1 className="text-2xl font-semibold text-custom-text-primary">Transactions</h1>
-      </div>
-      <div className="mb-6 pt-4">
-        <StatCards stats={stats} />
-      </div>
-      
-      {transactions?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center flex-1 bg-dblack-900 rounded-lg p-8">
-          <p className="text-xl text-dblack-50 mb-4">No transactions found</p>
-          <p className="text-dblack-400 mb-6">Start by creating a new transaction</p>
-          <button
-            onClick={handleAddTransaction}
-            className="px-4 py-2 bg-custom-brand-primary text-white rounded-md hover:bg-custom-brand-dark"
-          >
-            Create Transaction
-          </button>
-        </div>
-      ) : (
-        <div className="flex-1 bg-custom-bg-secondary rounded-lg overflow-hidden min-h-0">
-          <TransactionTable 
+    <PageShell>
+      <StatGrid stats={stats} className="lg:grid-cols-5" />
+
+      <Panel>
+        {transactions?.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
+            <TableEmpty
+              title="No transactions found"
+              description="Start by creating a new transaction"
+              action={<Button onClick={handleAddTransaction}>Create Transaction</Button>}
+            />
+          </div>
+        ) : (
+          <TransactionTable
             onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDelete}
             onView={handleView}
           />
-        </div>
-      )}
+        )}
+      </Panel>
 
       <TransactionForm 
         isOpen={isFormOpen}
@@ -216,7 +214,7 @@ const Transactions = () => {
         onConfirm={handleConfirmDelete}
         transaction={selectedTransaction}
       />
-    </div>
+    </PageShell>
   )
 }
 

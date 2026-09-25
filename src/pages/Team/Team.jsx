@@ -3,10 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import UsersTable from '../../components/tables/UsersTable'
 import UserForm from '../../components/forms/UserForm'
 import { fetchUsers } from '../../reducers/userReducer'
-import { FiUserPlus } from 'react-icons/fi'
+import { Users, UserCheck, UserPlus } from 'lucide-react'
 import moment from 'moment'
 import { toast } from 'sonner'
 import { Dialog, DialogTrigger, DialogDescription, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog'
+import { StatGrid } from '../../components/ui/StatCard'
+import { PageShell, Panel } from '../../components/layout/PageShell'
+import { TableEmpty } from '../../components/tables/TableShell'
+import StatusBadge from '../../components/ui/StatusBadge'
+import Button from '../../components/ui/Button'
 const Team = () => {
   const dispatch = useDispatch()
   const { users, status, error } = useSelector(state => state.users)
@@ -76,117 +81,81 @@ const Team = () => {
 
   // console.log('Transformed members:', transformedMembers)
 
-  return (
-    <div className="flex flex-col h-full p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Members</h1>
-      </div>
-      
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-dblack-900 p-4 rounded">
-          <h2 className="text-lg text-dcyan-300">Total Members</h2>
-          <p className="text-2xl font-bold">{transformedMembers.length}</p>
-        </div>
-        <div className="bg-dblack-900 p-4 rounded">
-          <h2 className="text-lg text-dcyan-300">Active Members</h2>
-          <p className="text-2xl font-bold">{transformedMembers.filter(m => m.status === 'ACTIVE').length}</p>
-        </div>
-        <div className="bg-dblack-900 p-4 rounded">
-          <h2 className="text-lg text-dcyan-300">New This Month</h2>
-          <p className="text-2xl font-bold">
-            {transformedMembers.filter(m => {
-              const joinDate = new Date(m.joinDate)
-              const now = new Date()
-              return joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear()
-            }).length}
-          </p>
-        </div>
-      </div>
+  const newThisMonth = transformedMembers.filter(m => {
+    const joinDate = new Date(m.joinDate)
+    const now = new Date()
+    return joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear()
+  }).length
 
-      <div className="flex-1 bg-dblack-900 rounded-lg overflow-hidden">
+  const stats = [
+    { title: 'Total Members', value: transformedMembers.length, icon: Users, tone: 'blue' },
+    { title: 'Active Members', value: transformedMembers.filter(m => m.status === 'ACTIVE').length, icon: UserCheck, tone: 'green' },
+    { title: 'New This Month', value: newThisMonth, icon: UserPlus, tone: 'purple' },
+  ]
+
+  const details = selectedUser ? [
+    ['First Name', selectedUser.first_name],
+    ['Last Name', selectedUser.last_name],
+    ['Email', selectedUser.email],
+    ['Contact', selectedUser.contact],
+    ['Gender', selectedUser.gender],
+    ['Date of Birth', moment(selectedUser.dob).format('DD/MMM/YYYY')],
+    ['Role', selectedUser.role],
+    ['Status', <StatusBadge key="status" status={selectedUser.status} />],
+    ['Last Login', selectedUser.lastLogin],
+    ['Join Date', moment(selectedUser.joinDate).format('DD/MMM/YYYY')],
+  ] : []
+
+  return (
+    <PageShell>
+      <StatGrid stats={stats} className="lg:grid-cols-3" />
+
+      <Panel>
         {transformedMembers.length > 0 ? (
           <UsersTable users={transformedMembers} onEdit={handleOpenPanel} onView={handleOpenDetailsModal}/>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="text-dcyan-300 text-xl font-semibold mb-2">No Members Found</div>
-            <p className="text-gray-400">Start by adding your first team member</p>
-            <button 
-              onClick={handleOpenPanel}
-              className="mt-4 flex items-center gap-2 bg-dcyan-700 text-white px-4 py-2 rounded hover:bg-dcyan-800 transition-colors"
-            >
-              <FiUserPlus /> Add Member
-            </button>
+          <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
+            <TableEmpty
+              title="No Members Found"
+              description="Start by adding your first team member"
+              action={<Button onClick={() => handleOpenPanel()}><UserPlus className="h-4 w-4" />Add Member</Button>}
+            />
           </div>
         )}
-      </div>
+      </Panel>
       <Dialog open={isPanelOpen} onOpenChange={setIsPanelOpen} className=''>
         <UserForm isOpen={isPanelOpen} onClose={handleClosePanel} userToEdit={userToEdit}/>
       </Dialog>
 
       {/* User Details Modal */}
       <Dialog open={isDetailsModalOpen} onOpenChange={handleCloseDetailsModal}>
-        <DialogContent className="bg-black-900/90 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
+        <DialogContent className="w-full max-w-md rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-gray-50">Member Details</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-lg font-semibold leading-6 text-custom-text-primary">Member Details</DialogTitle>
+            <DialogDescription className="text-sm text-custom-text-secondary">
               Details for {selectedUser?.first_name} {selectedUser?.last_name}
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
-            <div className="space-y-4">
-              <div>
-                <span className="font-medium text-gray-200">First Name:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.first_name}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Last Name:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.last_name}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Email:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.email}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Contact:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.contact}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Gender:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.gender}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Date of Birth:</span>
-                <span className="text-gray-50 ml-2">{moment(selectedUser.dob).format('DD/MMM/YYYY')}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Role:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.role}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Status:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.status}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Last Login:</span>
-                <span className="text-gray-50 ml-2">{selectedUser.lastLogin}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-200">Join Date:</span>
-                <span className="text-gray-50 ml-2">{moment(selectedUser.joinDate).format('DD/MMM/YYYY')}</span>
-              </div>
+            <div className="space-y-6">
+              <dl className="grid grid-cols-[128px_1fr] gap-x-4 gap-y-2 text-sm leading-6">
+                {details.map(([label, value]) => (
+                  <React.Fragment key={label}>
+                    <dt className="text-custom-text-secondary">{label}</dt>
+                    <dd className="font-medium text-custom-text-primary">{value}</dd>
+                  </React.Fragment>
+                ))}
+              </dl>
               <div className="flex justify-end">
-                <button
-                  onClick={handleCloseDetailsModal}
-                  className="px-4 py-2 bg-black-800/90 text-gray-50 rounded-md hover:bg-black-700 border border-black-700"
-                >
+                <Button variant="secondary" onClick={handleCloseDetailsModal}>
                   Close
-                </button>
+                </Button>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageShell>
   )
 }
 

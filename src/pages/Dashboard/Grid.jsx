@@ -11,11 +11,12 @@ function Grid() {
   }
 
   return (
-    <div className="flex h-screen bg-custom-bg-primary dark:bg-custom-bg-primary">
+    <div className="flex h-screen overflow-hidden bg-custom-bg-primary">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col">
         <TopBar />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 bg-custom-bg-secondary dark:bg-custom-bg-secondary">
+        {/* Pages fill this area exactly; only tables/lists scroll inside their own containers */}
+        <main className="min-h-0 flex-1 overflow-hidden bg-custom-bg-secondary p-6">
           <Outlet />
         </main>
       </div>

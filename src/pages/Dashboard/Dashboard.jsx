@@ -1,32 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar/Sidebar';
-import TopBar from '../../components/layout/TopBar';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import React, { useState } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   Legend,
   ResponsiveContainer,
-  // BarChart,
-  // Bar,
-  // ProgressBar
 } from 'recharts';
-import { 
-  Download, 
-  Users, 
-  Wallet, 
-  ArrowUpRight, 
+import {
+  Download,
+  Users,
+  Wallet,
+  ArrowUpRight,
   ArrowDownRight,
   Calendar,
   Filter
 } from 'lucide-react';
+import { StatGrid } from '../../components/ui/StatCard';
+import { PageShell } from '../../components/layout/PageShell';
+import Button from '../../components/ui/Button';
+
+// Theme-aware chart chrome so axis labels stay legible in light and dark mode
+const axisProps = {
+  tick: { fill: 'var(--custom-text-secondary)', fontSize: 12 },
+  stroke: 'var(--custom-bg-tertiary)',
+};
+const tooltipProps = {
+  contentStyle: {
+    background: 'var(--custom-bg-primary)',
+    border: '1px solid var(--custom-bg-tertiary)',
+    borderRadius: 8,
+    color: 'var(--custom-text-primary)',
+    fontSize: 12,
+  },
+};
+
+const selectClass = 'h-10 rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary';
+
+const ChartCard = ({ title, children }) => (
+  <div className="flex min-h-0 flex-col rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6">
+    <h3 className="mb-4 shrink-0 text-base font-semibold leading-6 text-custom-text-primary">{title}</h3>
+    <div className="min-h-0 flex-1">
+      <ResponsiveContainer width="100%" height="100%">
+        {children}
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
 
 function Dashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [dateRange, setDateRange] = useState('month');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [summaryData, setSummaryData] = useState({
@@ -40,7 +64,6 @@ function Dashboard() {
     transactionVolume: 0
   });
 
-  // Mock data for charts - replace with actual data
   const loanRepaymentData = [
     { name: 'Jan', value: 75 },
     { name: 'Feb', value: 82 },
@@ -59,10 +82,8 @@ function Dashboard() {
     { date: '2024-06', balance: 2200000 }
   ];
 
-
   const handleExport = (format) => {
-    // Implement export functionality
-    // console.log(`Exporting to ${format}`);
+    // TODO: Implement export functionality
   };
 
   const formatCurrency = (amount) => {
@@ -72,161 +93,108 @@ function Dashboard() {
     }).format(amount);
   };
 
+  const stats = [
+    {
+      title: 'Total Deposits Today',
+      value: formatCurrency(summaryData.totalDepositsToday),
+      note: `This Month: ${formatCurrency(summaryData.totalDepositsMonth)}`,
+      icon: ArrowUpRight,
+      tone: 'green',
+    },
+    {
+      title: 'Total Withdrawals Today',
+      value: formatCurrency(summaryData.totalWithdrawalsToday),
+      note: `This Month: ${formatCurrency(summaryData.totalWithdrawalsMonth)}`,
+      icon: ArrowDownRight,
+      tone: 'red',
+    },
+    {
+      title: 'Active Users',
+      value: summaryData.activeUsers,
+      note: `New Accounts: ${summaryData.newAccounts}`,
+      icon: Users,
+      tone: 'blue',
+    },
+    {
+      title: 'Loan Disbursals',
+      value: formatCurrency(summaryData.loanDisbursals),
+      note: `Transaction Volume: ${formatCurrency(summaryData.transactionVolume)}`,
+      icon: Wallet,
+      tone: 'purple',
+    },
+  ];
+
   return (
-    <div className="flex h-screen bg-custom-bg-primary dark:bg-custom-bg-primary">
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 bg-custom-bg-secondary dark:bg-custom-bg-secondary">
-          <div className="mx-auto max-w-7xl space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Deposits Today</p>
-                    <p className="text-2xl font-semibold mt-1">{formatCurrency(summaryData.totalDepositsToday)}</p>
-                  </div>
-                  <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
-                    <ArrowUpRight className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  This Month: {formatCurrency(summaryData.totalDepositsMonth)}
-                </p>
-              </div>
+    <PageShell>
+      <StatGrid stats={stats} />
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Withdrawals Today</p>
-                    <p className="text-2xl font-semibold mt-1">{formatCurrency(summaryData.totalWithdrawalsToday)}</p>
-                  </div>
-                  <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
-                    <ArrowDownRight className="w-5 h-5 text-red-600 dark:text-red-400" />
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  This Month: {formatCurrency(summaryData.totalWithdrawalsMonth)}
-                </p>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Active Users</p>
-                    <p className="text-2xl font-semibold mt-1">{summaryData.activeUsers}</p>
-                  </div>
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
-                    <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  New Accounts: {summaryData.newAccounts}
-                </p>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Loan Disbursals</p>
-                    <p className="text-2xl font-semibold mt-1">{formatCurrency(summaryData.loanDisbursals)}</p>
-                  </div>
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-full">
-                    <Wallet className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  Transaction Volume: {formatCurrency(summaryData.transactionVolume)}
-                </p>
-              </div>
-            </div>
-
-            {/* Filters */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-gray-500" />
-                  <select 
-                    className="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
-                    value={dateRange}
-                    onChange={(e) => setDateRange(e.target.value)}
-                  >
-                    <option value="week">This Week</option>
-                    <option value="month">This Month</option>
-                    <option value="quarter">This Quarter</option>
-                    <option value="year">This Year</option>
-                  </select>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Filter className="w-5 h-5 text-gray-500" />
-                  <select 
-                    className="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                  >
-                    <option value="all">All Categories</option>
-                    <option value="savings">Savings</option>
-                    <option value="loans">Loans</option>
-                    <option value="transactions">Transactions</option>
-                  </select>
-                </div>
-                <div className="flex items-center gap-2 ml-auto">
-                  <button 
-                    onClick={() => handleExport('pdf')}
-                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
-                  >
-                    <Download className="w-4 h-4" />
-                    Export PDF
-                  </button>
-                  <button 
-                    onClick={() => handleExport('csv')}
-                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
-                  >
-                    <Download className="w-4 h-4" />
-                    Export CSV
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Loan Repayment Progress */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold mb-4">Loan Repayment Progress</h3>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={loanRepaymentData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="value" stroke="#8884d8" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Account Balance History */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold mb-4">Account Balance History</h3>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={accountBalanceData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="balance" stroke="#82ca9d" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
+      {/* Filters */}
+      <div className="flex h-14 shrink-0 items-center gap-4 rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary px-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-custom-text-secondary" />
+          <select
+            className={selectClass}
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            aria-label="Date range"
+          >
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+            <option value="year">This Year</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-custom-text-secondary" />
+          <select
+            className={selectClass}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            aria-label="Category"
+          >
+            <option value="all">All Categories</option>
+            <option value="savings">Savings</option>
+            <option value="loans">Loans</option>
+            <option value="transactions">Transactions</option>
+          </select>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Button variant="secondary" onClick={() => handleExport('pdf')}>
+            <Download className="h-4 w-4" />
+            Export PDF
+          </Button>
+          <Button variant="secondary" onClick={() => handleExport('csv')}>
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+        </div>
       </div>
-    </div>
+
+      {/* Charts fill the remaining height */}
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-2">
+        <ChartCard title="Loan Repayment Progress">
+          <LineChart data={loanRepaymentData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--custom-bg-tertiary)" />
+            <XAxis dataKey="name" {...axisProps} />
+            <YAxis {...axisProps} />
+            <Tooltip {...tooltipProps} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} />
+          </LineChart>
+        </ChartCard>
+
+        <ChartCard title="Account Balance History">
+          <LineChart data={accountBalanceData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--custom-bg-tertiary)" />
+            <XAxis dataKey="date" {...axisProps} />
+            <YAxis {...axisProps} tickFormatter={(value) => value.toLocaleString()} width={80} />
+            <Tooltip {...tooltipProps} formatter={(value) => formatCurrency(value)} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Line type="monotone" dataKey="balance" stroke="#82ca9d" strokeWidth={2} />
+          </LineChart>
+        </ChartCard>
+      </div>
+    </PageShell>
   );
 }
 

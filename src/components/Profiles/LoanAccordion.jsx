@@ -3,6 +3,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import moment from 'moment';
 import { formatUGX } from '../../utils/currency';
 import { Loader2 } from 'lucide-react';
+import StatusBadge from '../ui/StatusBadge';
 
 const LoanAccordion = ({ loans = [], transactions = {} }) => {
   const getLoanPayments = (loanId) => {
@@ -38,72 +39,62 @@ const LoanAccordion = ({ loans = [], transactions = {} }) => {
           {/* Loan Details */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-sm text-slate-400">Amount</p>
-              <p className="text-slate-200">
+              <p className="text-sm text-custom-text-secondary">Amount</p>
+              <p className="text-custom-text-primary">
                 {formatUGX(loan.amount)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Term</p>
-              <p className="text-slate-200">{loan.term} months</p>
+              <p className="text-sm text-custom-text-secondary">Term</p>
+              <p className="text-custom-text-primary">{loan.term} months</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Interest Rate</p>
-              <p className="text-slate-200">{loan.interestRate}%</p>
+              <p className="text-sm text-custom-text-secondary">Interest Rate</p>
+              <p className="text-custom-text-primary">{loan.interestRate}%</p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Total Paid</p>
-              <p className="text-slate-200">
+              <p className="text-sm text-custom-text-secondary">Total Paid</p>
+              <p className="text-custom-text-primary">
                 {formatUGX(totalPaid)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Remaining Balance</p>
-              <p className="text-slate-200">
+              <p className="text-sm text-custom-text-secondary">Remaining Balance</p>
+              <p className="text-custom-text-primary">
                 {formatUGX(Number(remainingBalance))}
               </p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Status</p>
-              <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(loan.status)}`}>
-                {loan.status}
-              </span>
+              <p className="text-sm text-custom-text-secondary">Status</p>
+              <StatusBadge status={loan.status} />
             </div>
 
           </div>
 
           {/* Payment History */}
           <div>
-            <h3 className="text-lg font-medium mb-3 text-slate-100">Payment History</h3>
+            <h3 className="text-lg font-medium mb-4 text-custom-text-primary">Payment History</h3>
             {loanPayments.length > 0 ? (
               <div className="overflow-hidden">
                 <table className="min-w-full">
-                  <thead className="bg-dblack-800">
+                  <thead className="bg-custom-bg-secondary">
                     <tr>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-slate-400">Date</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-slate-400">Amount</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-slate-400">Status</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-custom-text-secondary">Date</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-custom-text-secondary">Amount</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-custom-text-secondary">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dblack-700">
+                  <tbody className="divide-y divide-custom-bg-tertiary">
                     {loanPayments.map((payment) => (
-                      <tr key={payment.id} className="hover:bg-dblack-800">
-                        <td className="px-4 py-2 text-sm text-slate-300">
+                      <tr key={payment.id} className="hover:bg-custom-bg-secondary">
+                        <td className="px-4 py-2 text-sm text-custom-text-secondary">
                           {moment(payment.createdAt).format('DD/MMM/YYYY')}
                         </td>
-                        <td className="px-4 py-2 text-sm text-slate-300">
+                        <td className="px-4 py-2 text-sm text-custom-text-secondary">
                           {formatUGX(payment.amount)}
                         </td>
                         <td className="px-4 py-2">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            payment.status === 'COMPLETED'
-                              ? 'bg-green-100 text-green-800'
-                              : payment.status === 'PENDING'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {payment.status}
-                          </span>
+                          <StatusBadge status={payment.status} />
                         </td>
                       </tr>
                     ))}
@@ -111,7 +102,7 @@ const LoanAccordion = ({ loans = [], transactions = {} }) => {
                 </table>
               </div>
             ) : (
-              <p className="text-center text-slate-400 py-4">No payments made yet</p>
+              <p className="text-center text-custom-text-secondary py-4">No payments made yet</p>
             )}
           </div>
         </div>
@@ -120,24 +111,24 @@ const LoanAccordion = ({ loans = [], transactions = {} }) => {
   });
 
   return (
-    <div className="bg-dblack-900 p-6 rounded-lg">
-      <h2 className="text-xl font-semibold mb-4 text-slate-100">Loans</h2>
+    <div className="bg-custom-bg-primary p-6 rounded-lg">
+      <h2 className="text-lg leading-6 font-semibold mb-4 text-custom-text-primary">Loans</h2>
       {loans.length > 0 ? (
         <Accordion type="single" collapsible className="w-full">
           {loanItems.map((item) => (
             <AccordionItem key={item.id} value={item.id.toString()}>
-              <AccordionTrigger className="text-slate-200  hover:text-slate-100">
+              <AccordionTrigger className="text-custom-text-primary hover:text-custom-text-primary">
                 {item.title} 
-                <span className={`${getStatusColor(item.status)} rounded-lg px-2`}>{item.status}</span>
+                <StatusBadge status={item.status} />
               </AccordionTrigger>
-              <AccordionContent className="text-slate-300">
+              <AccordionContent className="text-custom-text-secondary">
                 {item.content}
               </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
       ) : (
-        <p className="text-center text-slate-400 py-4">No loans found</p>
+        <p className="text-center text-custom-text-secondary py-4">No loans found</p>
       )}
     </div>
   );

@@ -13,26 +13,26 @@ function LoginForm({ onSubmit }) {
       </h2>
       <form onSubmit={(e) => onSubmit(e, formData)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-custom-text-secondary dark:text-custom-text-secondary">
+          <label className="block text-sm font-medium text-custom-text-primary">
             Email
           </label>
           <input
             type="email"
             required
-            className="mt-1 block w-full px-3 py-2 bg-custom-bg-tertiary dark:bg-custom-bg-tertiary border border-custom-brand-light dark:border-custom-brand-dark rounded-md text-custom-text-primary dark:text-custom-text-primary placeholder-custom-text-muted dark:placeholder-custom-text-muted focus:outline-none focus:ring-2 focus:ring-custom-brand-primary transition-colors"
+            className="mt-2 block w-full h-10 px-4 text-sm bg-custom-bg-tertiary dark:bg-custom-bg-tertiary border border-custom-brand-light dark:border-custom-brand-dark rounded-lg text-custom-text-primary dark:text-custom-text-primary placeholder-custom-text-muted dark:placeholder-custom-text-muted focus:outline-none focus:ring-2 focus:ring-custom-brand-primary transition-colors"
             placeholder="Enter your email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-custom-text-secondary dark:text-custom-text-secondary">
+          <label className="block text-sm font-medium text-custom-text-primary">
             Password
           </label>
           <input
             type="password"
             required
-            className="mt-1 block w-full px-3 py-2 bg-custom-bg-tertiary dark:bg-custom-bg-tertiary border border-custom-brand-light dark:border-custom-brand-dark rounded-md text-custom-text-primary dark:text-custom-text-primary placeholder-custom-text-muted dark:placeholder-custom-text-muted focus:outline-none focus:ring-2 focus:ring-custom-brand-primary transition-colors"
+            className="mt-2 block w-full h-10 px-4 text-sm bg-custom-bg-tertiary dark:bg-custom-bg-tertiary border border-custom-brand-light dark:border-custom-brand-dark rounded-lg text-custom-text-primary dark:text-custom-text-primary placeholder-custom-text-muted dark:placeholder-custom-text-muted focus:outline-none focus:ring-2 focus:ring-custom-brand-primary transition-colors"
             placeholder="Enter your password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -40,7 +40,7 @@ function LoginForm({ onSubmit }) {
         </div>
         <button
           type="submit"
-          className="w-full px-4 py-2 text-custom-interactive-active-text bg-custom-brand-primary hover:bg-custom-brand-dark focus:bg-custom-brand-dark rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-brand-primary"
+          className="w-full px-4 h-10 text-sm font-medium text-custom-interactive-active-text bg-custom-brand-primary hover:bg-custom-brand-dark focus:bg-custom-brand-dark rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-brand-primary"
         >
           Sign In
         </button>

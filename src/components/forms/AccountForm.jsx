@@ -120,8 +120,8 @@ const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-black-900/90 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
-        <h2 className="text-xl font-semibold mb-4 text-gray-50">
+      <div className="bg-custom-bg-primary p-6 rounded-lg w-full max-w-md border border-custom-bg-tertiary shadow-2xl max-h-[calc(100vh-48px)] overflow-y-auto">
+        <h2 className="text-lg leading-6 font-semibold mb-4 text-custom-text-primary">
           {accountToEdit ? 'Edit Account' : 'Create New Account'}
         </h2>
         
@@ -129,89 +129,89 @@ const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
           {accountToEdit ? (
             <>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-200">Account Holder</label>
+                <label className="block text-sm font-medium mb-2 text-custom-text-primary">Account Holder</label>
                 <input
                   type="text"
                   value={selectedUserName}
                   readOnly
-                  className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                  className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-200">Account Number</label>
+                <label className="block text-sm font-medium mb-2 text-custom-text-primary">Account Number</label>
                 <input
                   type="text"
                   value={accountToEdit.accountNumber}
                   readOnly
-                  className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                  className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
                 />
               </div>
             </>
           ) : (
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-200">User</label>
+              <label className="block text-sm font-medium mb-2 text-custom-text-primary">User</label>
               <select
                 name="userId"
                 value={formData.userId}
                 onChange={handleChange}
-                className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+                className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
                 disabled={usersStatus === 'loading'}
               >
-                <option value="" className="text-gray-400">Select User</option>
+                <option value="" className="text-custom-text-secondary">Select User</option>
                 {usersWithNoAccount.map(user => (
-                  <option key={user.id} value={user.id} className="text-gray-400">
+                  <option key={user.id} value={user.id} className="text-custom-text-secondary">
                     {user.first_name} {user.last_name} {user.other_name ? user.other_name : ''}
                   </option>
                 ))}
               </select>
               {errors.userId && (
-                <p className="text-red-300 text-sm mt-1">{errors.userId}</p>
+                <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.userId}</p>
               )}
               {usersStatus === 'loading' && (
-                <p className="text-gray-300 text-sm mt-1">Loading users...</p>
+                <p className="text-custom-text-secondary text-sm mt-1">Loading users...</p>
               )}
               {usersWithNoAccount.length === 0 && !accountToEdit && (
-                <p className="text-yellow-300 text-sm mt-1">No users available for new accounts</p>
+                <p className="text-yellow-700 dark:text-yellow-400 text-sm mt-1">No users available for new accounts</p>
               )}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-200">Balance</label>
+            <label className="block text-sm font-medium mb-2 text-custom-text-primary">Balance</label>
             <input
               type="number"
               name="balance"
               value={formData.balance}
               onChange={handleChange}
-              className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+              className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
             />
             {errors.balance && (
-              <p className="text-red-300 text-sm mt-1">{errors.balance}</p>
+              <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.balance}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-200">Status</label>
+            <label className="block text-sm font-medium mb-2 text-custom-text-primary">Status</label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+              className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
             >
-              <option value="ACTIVE" className="text-gray-50">Active</option>
-              <option value="INACTIVE" className="text-gray-50">Inactive</option>
-              <option value="CLOSED" className="text-gray-50">Closed</option>
+              <option value="ACTIVE" className="text-custom-text-primary">Active</option>
+              <option value="INACTIVE" className="text-custom-text-primary">Inactive</option>
+              <option value="CLOSED" className="text-custom-text-primary">Closed</option>
             </select>
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium mb-1 text-gray-200">
+            <label className="flex items-center gap-2 text-sm font-medium mb-2 text-custom-text-primary">
               <input
                 type="checkbox"
                 name="paidMembership"  
                 checked={formData.paidMembership}
                 onChange={handleChange}
-                className="w-4 h-4 rounded focus:ring-2 focus:ring-dcyan-500 bg-black-800 border-black-700 text-dcyan-500"
+                className="w-4 h-4 rounded focus:ring-2 focus:ring-custom-brand-primary bg-custom-bg-secondary border-custom-bg-tertiary text-custom-brand-primary"
               />
               Paid Membership
             </label>
@@ -221,13 +221,13 @@ const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-black-800/90 text-gray-50 rounded-md hover:bg-black-700 border border-black-700"
+              className="px-4 h-10 bg-custom-bg-secondary text-custom-text-primary rounded-lg hover:bg-custom-interactive-hover border border-custom-bg-tertiary"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-green-500 text-gray-900 rounded-md hover:bg-dcyan-600 hover:cursor-pointer"
+              className="px-4 h-10 bg-green-500 text-gray-900 rounded-lg hover:bg-custom-brand-dark hover:cursor-pointer"
               disabled={status === 'loading'}
             >
               {status === 'loading' ? 'Saving...' : (accountToEdit ? 'Update' : 'Create')}

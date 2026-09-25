@@ -134,151 +134,151 @@ const UserForm = ({ isOpen, onClose, userToEdit }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-black-900/90 p-6 rounded-lg w-full max-w-md border border-black-700 shadow-2xl backdrop-blur-md">
+      <div className="bg-custom-bg-primary p-6 rounded-lg w-full max-w-md border border-custom-bg-tertiary shadow-2xl max-h-[calc(100vh-48px)] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-50">
+          <h2 className="text-lg leading-6 font-semibold text-custom-text-primary">
             {userToEdit ? 'Edit Member' : 'Add New Member'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-300">
+          <button onClick={onClose} className="text-custom-text-secondary hover:text-custom-text-primary">
             <FiX className="w-6 h-6" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">First Name</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">First Name</label>
             <input
               type="text"
               name="first_name"
               value={formData.first_name}
               onChange={handleChange}
-              className={`w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 ${
+              className={`h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary ${
                 errors.first_name ? 'border-red-500' : ''
               }`}
             />
             {errors.first_name && (
-              <p className="mt-1 text-sm text-red-300">{errors.first_name}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.first_name}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Last Name</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">Last Name</label>
             <input
               type="text"
               name="last_name"
               value={formData.last_name}
               onChange={handleChange}
-              className={`w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 ${
+              className={`h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary ${
                 errors.last_name ? 'border-red-500' : ''
               }`}
             />
             {errors.last_name && (
-              <p className="mt-1 text-sm text-red-300">{errors.last_name}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.last_name}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Other Names</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">Other Names</label>
             <input
               type="text"
               name="other_name"
               value={formData.other_name}
               onChange={handleChange}
-              className="w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500"
+              className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Email</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 ${
+              className={`h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary ${
                 errors.email ? 'border-red-500' : ''
               }`}
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-300">{errors.email}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Contact</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">Contact</label>
             <input
               type="text"
               name="contact"
               value={formData.contact}
               onChange={handleChange}
-              className={`w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 ${
+              className={`h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary ${
                 errors.contact ? 'border-red-500' : ''
               }`}
             />
             {errors.contact && (
-              <p className="mt-1 text-sm text-red-300">{errors.contact}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.contact}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Gender</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">Gender</label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className={`w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 ${
+              className={`h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary ${
                 errors.gender ? 'border-red-500' : ''
               }`}
             >
-              <option value="" className="text-gray-400">Select Gender</option>
-              <option value="MALE" className="text-gray-400">Male</option>
-              <option value="FEMALE" className="text-gray-400">Female</option>
+              <option value="" className="text-custom-text-secondary">Select Gender</option>
+              <option value="MALE" className="text-custom-text-secondary">Male</option>
+              <option value="FEMALE" className="text-custom-text-secondary">Female</option>
             </select>
             {errors.gender && (
-              <p className="mt-1 text-sm text-red-300">{errors.gender}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.gender}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Role</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">Role</label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className={`w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 ${
+              className={`h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary ${
                 errors.role ? 'border-red-500' : ''
               }`}
             >
-              <option value="" className="text-gray-400">Select Role</option>
-              <option value="USER" className="text-gray-400">User</option>
-              <option value="MANAGER" className="text-gray-400">Manager</option>
-              <option value="ADMIN" className="text-gray-400">Admin</option>
+              <option value="" className="text-custom-text-secondary">Select Role</option>
+              <option value="USER" className="text-custom-text-secondary">User</option>
+              <option value="MANAGER" className="text-custom-text-secondary">Manager</option>
+              <option value="ADMIN" className="text-custom-text-secondary">Admin</option>
             </select>
             {errors.role && (
-              <p className="mt-1 text-sm text-red-300">{errors.role}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.role}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">Date of Birth</label>
+            <label className="block text-sm font-medium text-custom-text-primary mb-2">Date of Birth</label>
             <input
               type="date"
               name="dob"
               value={formData.dob}
               onChange={handleChange}
-              className={`w-full p-2 bg-black-800/90 text-gray-800 rounded-md border border-black-700 focus:outline-none focus:ring-2 focus:ring-dcyan-500 ${
+              className={`h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary ${
                 errors.dob ? 'border-red-500' : ''
               }`}
             />
             {errors.dob && (
-              <p className="mt-1 text-sm text-red-300">{errors.dob}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.dob}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="w-full bg-green-500 text-gray-900 py-2 px-4 rounded-md hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-green-500 text-gray-900 h-10 px-4 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {status === 'loading' ? (userToEdit ? 'Updating...' : 'Adding...') : (userToEdit ? 'Update Member' : 'Add Member')}
           </button>
