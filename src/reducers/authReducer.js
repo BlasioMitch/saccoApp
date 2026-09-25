@@ -118,6 +118,16 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
+    sessionExpired: (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      state.status = 'idle';
+      state.error = 'Your session has expired. Please log in again.';
+      state.errorCode = 'UNAUTHORIZED';
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    },
     initializeAuth: (state) => {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -190,6 +200,6 @@ const authSlice = createSlice({
   }
 })
 
-export const { clearError, initializeAuth } = authSlice.actions
+export const { clearError, initializeAuth, sessionExpired } = authSlice.actions
 
 export default authSlice.reducer
