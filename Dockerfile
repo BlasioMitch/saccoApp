@@ -19,6 +19,10 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 # Copy the rest of the application source code into the container
 COPY . .
 
+# GraphQL endpoint baked into the bundle at build time (.env files are excluded by .dockerignore)
+ARG VITE_GRAPHQL_PROD_URI=https://sacco-graphql-server.onrender.com
+ENV VITE_GRAPHQL_PROD_URI=$VITE_GRAPHQL_PROD_URI
+
 # Build the React.js application (outputs to /app/dist)
 RUN npm run build
 
