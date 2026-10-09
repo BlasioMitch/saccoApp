@@ -16,6 +16,9 @@ import { TableToolbar, ColumnMenu, DataTable, TablePagination, SortableHeader } 
 import DropdownMenu from '../ui/DropdownMenu'
 import StatusBadge from '../ui/StatusBadge'
 import Button from '../ui/Button'
+import ImportButton from '../import/ImportButton'
+import usersImport from '../import/configs/users'
+import { fetchUsers } from '../../reducers/userReducer'
 
 const inputClass = 'h-10 rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary placeholder:text-custom-text-muted focus:outline-none focus:ring-2 focus:ring-custom-brand-primary'
 
@@ -262,6 +265,7 @@ function UsersTable({ users, onEdit, onView }) {
           />
         )}
         <ColumnMenu table={table} />
+        <ImportButton config={usersImport} onImported={() => dispatch(fetchUsers())} />
         <Button onClick={() => onEdit()}>
           <UserPlus className="h-4 w-4" />
           Add Member

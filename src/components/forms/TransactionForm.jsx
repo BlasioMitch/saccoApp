@@ -3,49 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { createTransaction, fetchTransactions, updateTransaction } from '../../reducers/transactionReducer'
 import { fetchAccounts } from '../../reducers/accountsReducer'
 import { fetchLoans } from '../../reducers/loansReducer'
-import { TransactionType, TransactionStatus } from '../../reducers/transactionReducer'
+import {
+  TransactionType, TransactionStatus, MEMBERSHIP_FEE_AMOUNT, TYPE_OPTIONS, typeLabel, openLoans,
+  ELIGIBILITY, isWithdrawal, loanPaymentDefault, defaultAmount,
+} from '../../utils/transactionRules'
 import { formatUGX } from '../../utils/currency'
 import { ownerName } from '../../utils/names'
 import MoneyInput from '../ui/MoneyInput'
 import { toast } from 'sonner'
 import { FiX } from 'react-icons/fi'
-
-export const MEMBERSHIP_FEE_AMOUNT = 20_000
-
-const TYPE_OPTIONS = [
-  { value: TransactionType.SAVINGS_DEPOSIT, label: 'Savings Deposit' },
-  { value: TransactionType.MEMBERSHIP_FEE, label: 'Membership Fee' },
-  { value: TransactionType.LOAN_PAYMENT, label: 'Loan Payment' },
-  { value: TransactionType.ACCOUNT_WITHDRAW, label: 'Account Withdraw' },
-  { value: TransactionType.CLOSURE_WITHDRAW, label: 'Closure Withdraw' },
-]
-const typeLabel = (type) => TYPE_OPTIONS.find(option => option.value === type)?.label || type
-
-const openLoans = (account) => (account?.loans || []).filter(loan => loan.status === 'ACTIVE' || loan.status === 'DEFAULTED')
-
-// Which accounts can take each transaction type
-const ELIGIBILITY = {
-  [TransactionType.SAVINGS_DEPOSIT]: (account) => account.status === 'ACTIVE',
-  [TransactionType.MEMBERSHIP_FEE]: (account) => !account.paidMembership,
-  [TransactionType.LOAN_PAYMENT]: (account) => openLoans(account).length > 0,
-  [TransactionType.ACCOUNT_WITHDRAW]: (account) => account.status === 'ACTIVE' && Number(account.balance) > 0,
-  [TransactionType.CLOSURE_WITHDRAW]: (account) => account.status !== 'CLOSED' && openLoans(account).length === 0,
-}
-const isWithdrawal = (type) => type === TransactionType.ACCOUNT_WITHDRAW || type === TransactionType.CLOSURE_WITHDRAW
-
-// Suggested payment: one instalment, never more than what is still owed
-const loanPaymentDefault = (loan) => {
-  const monthly = Number(loan?.summary?.monthlyPayment) || 0
-  const remaining = Number(loan?.summary?.remainingBalance) || 0
-  if (monthly && remaining) return Math.min(monthly, remaining)
-  return monthly || remaining || ''
-}
-
-const defaultAmount = (type, loan) => {
-  if (type === TransactionType.MEMBERSHIP_FEE) return MEMBERSHIP_FEE_AMOUNT
-  if (type === TransactionType.LOAN_PAYMENT) return loanPaymentDefault(loan)
-  return ''
-}
 
 const inputClass = 'w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary disabled:opacity-60 disabled:cursor-not-allowed'
 const labelClass = 'block text-sm font-medium mb-2 text-custom-text-primary'

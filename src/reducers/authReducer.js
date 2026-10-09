@@ -128,6 +128,11 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
+    // After the member saves their profile or avatar
+    profileUpdated: (state, action) => {
+      state.user = { ...state.user, ...action.payload };
+      localStorage.setItem('user', JSON.stringify(state.user));
+    },
     sessionExpired: (state) => {
       state.user = null;
       state.token = null;
@@ -208,6 +213,6 @@ const authSlice = createSlice({
   }
 })
 
-export const { clearError, initializeAuth, sessionExpired } = authSlice.actions
+export const { clearError, initializeAuth, sessionExpired, profileUpdated } = authSlice.actions
 
 export default authSlice.reducer

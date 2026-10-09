@@ -457,3 +457,24 @@ export const GET_LOAN_PAYMENTS_REPORT = gql`
     }
   }
 `
+
+// The signed-in user
+export const ME = gql`
+  query Me {
+    me {
+      id
+      first_name
+      last_name
+      other_name
+      email
+      role
+      status
+      contact
+      gender
+      dob
+      joinDate
+      fullName
+      avatar
+    }
+  }
+`

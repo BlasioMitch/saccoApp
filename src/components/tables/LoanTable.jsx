@@ -21,6 +21,9 @@ import { TableToolbar, ColumnMenu, DataTable, TableEmpty, TablePagination, Sorta
 import DropdownMenu from '../ui/DropdownMenu';
 import StatusBadge from '../ui/StatusBadge';
 import Button from '../ui/Button';
+import ImportButton from '../import/ImportButton';
+import loansImport from '../import/configs/loans';
+import { fetchLoans } from '../../reducers/loansReducer';
 
 const LoanTable = () => {
   const dispatch = useDispatch();
@@ -186,6 +189,13 @@ const LoanTable = () => {
     <>
       <TableToolbar search={filtering} onSearch={setFiltering} placeholder="Search loans...">
         <ColumnMenu table={table} />
+        <ImportButton
+          config={loansImport}
+          onImported={() => {
+            dispatch(fetchLoans());
+            dispatch(fetchAccounts());
+          }}
+        />
         <Button onClick={openCreateForm}>
           <Plus className="h-4 w-4" />
           Add Loan

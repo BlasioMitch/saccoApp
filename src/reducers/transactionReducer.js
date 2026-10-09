@@ -3,19 +3,7 @@ import client from '../graphql/client'
 import { GET_TRANSACTIONS } from '../graphql/queries'
 import { CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION } from '../graphql/mutations'
 
-export const TransactionType = {
-  LOAN_PAYMENT: 'LOAN_PAYMENT',
-  MEMBERSHIP_FEE: 'MEMBERSHIP_FEE',
-  SAVINGS_DEPOSIT: 'SAVINGS_DEPOSIT',
-  ACCOUNT_WITHDRAW: 'ACCOUNT_WITHDRAW',
-  CLOSURE_WITHDRAW: 'CLOSURE_WITHDRAW'
-}
-
-export const TransactionStatus = {
-  COMPLETED: 'COMPLETED',
-  PENDING: 'PENDING',
-  FAILED: 'FAILED'
-}
+export { TransactionType, TransactionStatus } from '../utils/transactionRules'
 
 const initialState = {
   error: null,

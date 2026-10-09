@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { logout, initializeAuth } from '../../reducers/authReducer'
 import { toast } from 'sonner'
 import DropdownMenu from '../ui/DropdownMenu'
+import Avatar from '../ui/Avatar'
 import { getPageTitle } from './navigation'
 
 const UserMenu = ({ user, onLogout }) => {
@@ -14,7 +15,6 @@ const UserMenu = ({ user, onLogout }) => {
   const firstName = user?.firstName || user?.first_name?.split(' ')[0] || 'User'
   const lastName = user?.lastName || user?.last_name?.split(' ')[1] || ''
   const fullName = `${firstName} ${lastName}`.trim()
-  const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase()
   const userRole = user?.role?.toLowerCase() || 'user'
 
   return (
@@ -25,9 +25,7 @@ const UserMenu = ({ user, onLogout }) => {
       label={
         <>
           <span className="relative inline-flex">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-custom-brand-primary text-xs font-semibold text-custom-interactive-active-text">
-              {initials || 'U'}
-            </span>
+            <Avatar user={user} className="h-8 w-8" textClassName="text-xs" />
             <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-500 ring-2 ring-custom-bg-secondary" />
           </span>
           <span className="hidden md:block">

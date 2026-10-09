@@ -17,6 +17,10 @@ import { TableToolbar, ColumnMenu, DataTable, TablePagination, SortableHeader } 
 import DropdownMenu from '../ui/DropdownMenu';
 import StatusBadge from '../ui/StatusBadge';
 import Button from '../ui/Button';
+import ImportButton from '../import/ImportButton';
+import transactionsImport from '../import/configs/transactions';
+import { fetchAccounts } from '../../reducers/accountsReducer';
+import { fetchLoans } from '../../reducers/loansReducer';
 
 // Same hues as before, tuned to stay legible in both themes
 const TYPE_STYLES = {
@@ -158,6 +162,14 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
     <>
       <TableToolbar search={filtering} onSearch={setFiltering} placeholder="Search all columns...">
         <ColumnMenu table={table} />
+        <ImportButton
+          config={transactionsImport}
+          onImported={() => {
+            dispatch(fetchTransactions());
+            dispatch(fetchAccounts());
+            dispatch(fetchLoans());
+          }}
+        />
         <Button onClick={handleAddTransaction}>
           <Plus className="h-4 w-4" />
           Add Transaction

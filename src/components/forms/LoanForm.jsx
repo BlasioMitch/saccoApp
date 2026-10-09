@@ -5,32 +5,13 @@ import { toast } from 'sonner';
 import { FiX } from 'react-icons/fi';
 import moment from 'moment';
 import { formatUGX } from '../../utils/currency';
+import { DATE_FORMAT, termInMonths, addMonths, summarize } from '../../utils/loanTerms';
 import MoneyInput from '../ui/MoneyInput';
 
-const DATE_FORMAT = 'YYYY-MM-DD';
 const TERM_PRESETS = [3, 6, 12, 18, 24, 36];
 
 const inputClass = 'w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary disabled:opacity-60';
 const labelClass = 'block text-sm font-medium text-custom-text-primary mb-2';
-
-// Payment periods between two dates; a partial month counts as a period (31 Jan -> 28 Feb is 1 month)
-const termInMonths = (startDate, endDate) => {
-  if (!startDate || !endDate) return 0;
-  const months = moment(endDate).diff(moment(startDate), 'months', true);
-  return months > 0 ? Math.ceil(months - 1e-9) : 0;
-};
-
-const addMonths = (date, months) => moment(date).add(months, 'months').format(DATE_FORMAT);
-
-// Same rounding as the backend (saccoback/src/lib/utils.ts), so the preview matches what is saved
-const summarize = (amount, interestRate, term) => {
-  const totalInterest = Math.round(amount * interestRate / 100);
-  return {
-    totalInterest,
-    totalDue: amount + totalInterest,
-    monthlyPayment: term > 0 ? Math.ceil((amount + totalInterest) / term) : 0,
-  };
-};
 
 const emptyForm = (accountId = '') => ({
   accountId,

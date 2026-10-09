@@ -4,6 +4,81 @@ import { FiX } from 'react-icons/fi'
 import { createUser, patchUser, clearRegError, clearSuccess } from '../../reducers/userReducer'
 import { toast } from 'sonner'
 
+const ROLE_OPTIONS = [['USER', 'User'], ['MANAGER', 'Manager'], ['ADMIN', 'Admin']]
+const STATUS_OPTIONS = [['ACTIVE', 'Active'], ['INACTIVE', 'Inactive']]
+const selectClass = 'w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary'
+
+// Staff editing a member: bio data belongs to the member (Settings page), so only role and status change here
+const MemberAccessForm = ({ user, onClose }) => {
+  const dispatch = useDispatch()
+  const { status } = useSelector(state => state.users)
+  const [role, setRole] = useState(user.role || 'USER')
+  const [memberStatus, setMemberStatus] = useState(user.status || 'ACTIVE')
+
+  const details = [
+    ['Name', [user.first_name, user.last_name, user.other_name].filter(Boolean).join(' ')],
+    ['Email', user.email],
+    ['Contact', user.contact],
+  ]
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      await dispatch(patchUser({ id: user.id, objData: { role, status: memberStatus } })).unwrap()
+      toast.success('Member updated successfully')
+      onClose()
+    } catch (error) {
+      toast.error(error || 'Something went wrong')
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6">
+      <div className="bg-custom-bg-primary p-6 rounded-lg w-full max-w-md border border-custom-bg-tertiary shadow-2xl max-h-[calc(100vh-48px)] overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg leading-6 font-semibold text-custom-text-primary">Edit Member Access</h2>
+          <button onClick={onClose} className="text-custom-text-secondary hover:text-custom-text-primary" aria-label="Close">
+            <FiX className="w-6 h-6" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <dl className="grid grid-cols-[96px_1fr] gap-x-4 gap-y-2 rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary p-4 text-sm">
+            {details.map(([label, value]) => (
+              <React.Fragment key={label}>
+                <dt className="text-custom-text-secondary">{label}</dt>
+                <dd className="truncate font-medium text-custom-text-primary">{value || '–'}</dd>
+              </React.Fragment>
+            ))}
+          </dl>
+          <p className="text-xs text-custom-text-secondary">Only the member can change their own details, from their Settings page.</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-custom-text-primary mb-2">Role</label>
+              <select value={role} onChange={(e) => setRole(e.target.value)} className={selectClass}>
+                {ROLE_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-custom-text-primary mb-2">Status</label>
+              <select value={memberStatus} onChange={(e) => setMemberStatus(e.target.value)} className={selectClass}>
+                {STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <button type="button" onClick={onClose} className="px-4 h-10 bg-custom-bg-secondary text-custom-text-primary rounded-lg hover:bg-custom-interactive-hover border border-custom-bg-tertiary">
+              Cancel
+            </button>
+            <button type="submit" disabled={status === 'loading'} className="px-4 h-10 bg-green-500 text-gray-900 font-medium rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed">
+              {status === 'loading' ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 const UserForm = ({ isOpen, onClose, userToEdit }) => {
   const dispatch = useDispatch()
   const { status, error, success } = useSelector(state => state.users)
@@ -131,6 +206,7 @@ const UserForm = ({ isOpen, onClose, userToEdit }) => {
   }
 
   if (!isOpen) return null
+  if (userToEdit) return <MemberAccessForm user={userToEdit} onClose={onClose} />
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">

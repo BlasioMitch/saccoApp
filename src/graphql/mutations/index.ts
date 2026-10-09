@@ -193,6 +193,7 @@ export const LOGIN = gql`
       dob
       hasAccount
       fullName
+      avatar
     }
   }
 }
@@ -203,3 +204,40 @@ export const LOGOUT = gql`
   logout
 }
 `
+// Bulk CSV import: per-row results ({ row, ok, id, error }), row = index in the submitted list
+export const BULK_CREATE_USERS = gql`
+  mutation BulkCreateUsers($users: [UserInput!]!) {
+    bulkCreateUsers(users: $users) { row ok id error }
+  }
+`;
+export const BULK_CREATE_TRANSACTIONS = gql`
+  mutation BulkCreateTransactions($transactions: [BulkTransactionInput!]!) {
+    bulkCreateTransactions(transactions: $transactions) { row ok id error }
+  }
+`;
+export const BULK_CREATE_LOANS = gql`
+  mutation BulkCreateLoans($loans: [LoanInput!]!) {
+    bulkCreateLoans(loans: $loans) { row ok id error }
+  }
+`;
+
+// The signed-in user's own profile (id comes from the session on the server)
+export const UPDATE_MY_PROFILE = gql`
+  mutation UpdateMyProfile($input: ProfileInput!) {
+    updateMyProfile(input: $input) {
+      id
+      first_name
+      last_name
+      other_name
+      email
+      role
+      status
+      contact
+      gender
+      dob
+      joinDate
+      fullName
+      avatar
+    }
+  }
+`;
