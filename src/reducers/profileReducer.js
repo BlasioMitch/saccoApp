@@ -15,7 +15,8 @@ export const FetchProfile = createAsyncThunk(
         try {
             const { data } = await client.query({
                 query: GET_USER_BY_ID,
-                variables: { getUserByIdId: userId }
+                variables: { getUserByIdId: userId },
+                fetchPolicy: 'network-only'
             })
             return data.getUserById
         } catch (error) {

@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux'
 import moment from 'moment'
 import { deleteUser } from '../../reducers/userReducer'
 import { toast } from 'sonner'
-import { TableToolbar, DataTable, TablePagination, SortableHeader } from './TableShell'
+import { TableToolbar, ColumnMenu, DataTable, TablePagination, SortableHeader } from './TableShell'
 import DropdownMenu from '../ui/DropdownMenu'
 import StatusBadge from '../ui/StatusBadge'
 import Button from '../ui/Button'
@@ -79,6 +79,7 @@ function UsersTable({ users, onEdit, onView }) {
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [filtering, setFiltering] = useState('')
+  const [columnVisibility, setColumnVisibility] = useState({})
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState(null)
 
@@ -175,6 +176,7 @@ function UsersTable({ users, onEdit, onView }) {
   const actionColumn = {
     id: 'actions',
     header: '',
+    enableHiding: false,
     meta: { align: 'right' },
     cell: ({ row }) => (
       <DropdownMenu
@@ -205,7 +207,9 @@ function UsersTable({ users, onEdit, onView }) {
       sorting,
       globalFilter: filtering,
       columnFilters,
+      columnVisibility,
     },
+    onColumnVisibilityChange: setColumnVisibility,
     onSortingChange: setSorting,
     onGlobalFilterChange: setFiltering,
     onColumnFiltersChange: setColumnFilters,
@@ -257,6 +261,7 @@ function UsersTable({ users, onEdit, onView }) {
             className={`${inputClass} w-48`}
           />
         )}
+        <ColumnMenu table={table} />
         <Button onClick={() => onEdit()}>
           <UserPlus className="h-4 w-4" />
           Add Member

@@ -8,7 +8,11 @@ const config: CodegenConfig = {
   generates: {
     "src/graphql/types/": {
       preset: "client",
-      plugins: []
+      plugins: [],
+      config: {
+        // Whole shillings, 64-bit backed on the server; exact as JS numbers up to MAX_SAFE_INTEGER
+        scalars: { Money: "number" }
+      }
     },
     "./graphql.schema.json": {
       plugins: ["introspection"]

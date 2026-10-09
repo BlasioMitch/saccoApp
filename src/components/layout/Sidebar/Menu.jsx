@@ -1,10 +1,15 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import { Moon, Sun } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { ChevronDown, Moon, Sun } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { ThemeSwitcher } from '../../ui/ThemeSwitcher'
 import { useTheme } from '../../ui/ThemeProvider'
-import { MAIN_NAV, BOTTOM_NAV } from '../navigation'
+import DropdownMenu from '../../ui/DropdownMenu'
+import { MAIN_NAV, BOTTOM_NAV, visibleNav } from '../navigation'
+
+const itemClass = (isActive) => isActive
+  ? 'bg-custom-interactive-active-bg text-custom-interactive-active-text'
+  : 'text-custom-text-secondary hover:bg-custom-interactive-hover hover:text-custom-text-primary'
 
 const NavItem = ({ item, isSidebarOpen }) => {
   const Icon = item.icon
@@ -16,15 +21,75 @@ const NavItem = ({ item, isSidebarOpen }) => {
       className={({ isActive }) => `
         flex h-10 items-center rounded-lg text-sm font-medium transition-colors
         ${isSidebarOpen ? 'gap-4 px-4' : 'justify-center'}
-        ${isActive
-          ? 'bg-custom-interactive-active-bg text-custom-interactive-active-text'
-          : 'text-custom-text-secondary hover:bg-custom-interactive-hover hover:text-custom-text-primary'
-        }
+        ${itemClass(isActive)}
       `}
     >
       <Icon className="h-5 w-5 shrink-0" />
       {isSidebarOpen && <span className="truncate">{item.label}</span>}
     </NavLink>
+  )
+}
+
+const isGroupActive = (group, pathname) => group.children.some(child => child.path === pathname)
+
+// Expanded sidebar: accordion header with its pages indented under a guide line
+const NavGroup = ({ group, pathname, open, onToggle }) => {
+  const active = isGroupActive(group, pathname)
+  const Icon = group.icon
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className={`flex h-10 w-full items-center gap-4 rounded-lg px-4 text-sm font-medium transition-colors hover:bg-custom-interactive-hover ${
+          active ? 'text-custom-text-primary' : 'text-custom-text-secondary hover:text-custom-text-primary'
+        }`}
+      >
+        <Icon className="h-5 w-5 shrink-0" />
+        <span className="flex-1 truncate text-left">{group.label}</span>
+        <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? '' : '-rotate-90'}`} />
+      </button>
+      {open && (
+        <div className="ml-6 mt-1 space-y-1 border-l border-custom-bg-tertiary pl-2">
+          {group.children.map(child => (
+            <NavLink
+              key={child.path}
+              to={child.path}
+              end
+              className={({ isActive }) => `flex h-10 items-center rounded-lg px-4 text-sm font-medium transition-colors ${itemClass(isActive)}`}
+            >
+              <span className="truncate">{child.label}</span>
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Collapsed sidebar: the group icon opens a flyout of its pages
+const NavGroupFlyout = ({ group, pathname }) => {
+  const navigate = useNavigate()
+  const active = isGroupActive(group, pathname)
+  const Icon = group.icon
+  return (
+    <DropdownMenu
+      placement="right"
+      ariaLabel={`${group.label} menu`}
+      title={group.label}
+      size="md"
+      triggerClassName={`h-10 w-full px-0 ${active ? 'bg-custom-interactive-active-bg text-custom-interactive-active-text hover:bg-custom-interactive-active-bg' : ''}`}
+      label={<Icon className="h-5 w-5" />}
+      items={group.children.map(child => ({
+        key: child.path,
+        label: child.label,
+        icon: child.icon,
+        active: child.path === pathname,
+        onClick: () => navigate(child.path),
+      }))}
+    />
   )
 }
 
@@ -45,15 +110,36 @@ const CompactThemeToggle = () => {
 
 const Menu = ({ isSidebarOpen }) => {
   const { user } = useSelector((state) => state.auth)
-  const isRegularUser = user?.role?.toLowerCase() === 'user'
-  const mainMenuItems = MAIN_NAV.filter(item => !(isRegularUser && item.adminOnly))
+  const { pathname } = useLocation()
+  const isAdmin = user?.role?.toLowerCase() !== 'user'
+  const mainMenuItems = visibleNav(MAIN_NAV, { isAdmin })
+  const currentPath = pathname.replace(/\/+$/, '')
+
+  // One group open at a time keeps the menu within the viewport (the sidebar never scrolls);
+  // navigating into a group opens it
+  const activeGroup = mainMenuItems.find(item => item.children && isGroupActive(item, currentPath))?.label || null
+  const [openGroup, setOpenGroup] = useState(activeGroup)
+  useEffect(() => {
+    if (activeGroup) setOpenGroup(activeGroup)
+  }, [activeGroup])
 
   return (
     <div className="flex h-full flex-col px-2 py-2">
       <nav className="flex-1 space-y-1">
-        {mainMenuItems.map((item) => (
-          <NavItem key={item.path} item={item} isSidebarOpen={isSidebarOpen} />
-        ))}
+        {mainMenuItems.map((item) => {
+          if (!item.children) return <NavItem key={item.path} item={item} isSidebarOpen={isSidebarOpen} />
+          return isSidebarOpen
+            ? (
+              <NavGroup
+                key={item.label}
+                group={item}
+                pathname={currentPath}
+                open={openGroup === item.label}
+                onToggle={() => setOpenGroup(openGroup === item.label ? null : item.label)}
+              />
+            )
+            : <NavGroupFlyout key={item.label} group={item} pathname={currentPath} />
+        })}
       </nav>
 
       <div className="space-y-1 border-t border-custom-bg-tertiary pt-2">

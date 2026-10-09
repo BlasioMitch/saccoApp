@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CreditCard, Activity, Wallet, AlertTriangle } from 'lucide-react';
+import { Percent, Activity, Wallet, AlertTriangle } from 'lucide-react';
+import { formatUGX } from '../../utils/currency';
 import { StatGrid } from '../../components/ui/StatCard';
 import { PageShell, Panel } from '../../components/layout/PageShell';
 import LoanTable from '../../components/tables/LoanTable';
@@ -13,9 +14,7 @@ const Loans = () => {
   const { loans, status, error } = useSelector((state) => state.loans);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchLoans());
-    }
+    dispatch(fetchLoans());
   }, [dispatch]);
 
   useEffect(() => {
@@ -34,14 +33,17 @@ const Loans = () => {
     const totalAmount = loans.reduce((sum, loan) => sum + (Number(loan.amount) || 0), 0);
     const defaultedLoans = loans.filter(loan => loan.status === 'DEFAULTED').length;
     const defaultRate = totalLoans ? (defaultedLoans / totalLoans) * 100 : 0;
+    // Interest the SACCO expects to earn from loans issued this year
+    const year = new Date().getFullYear();
+    const loansThisYear = loans.filter(loan => loan.startDate && new Date(loan.startDate).getFullYear() === year);
+    const interestThisYear = loansThisYear.reduce((sum, loan) => sum + (Number(loan.summary?.totalInterest) || 0), 0);
 
     return [
       {
-        title: 'Total Loans',
-        value: totalLoans.toString(),
-        meta: `${((activeLoans / totalLoans) * 100).toFixed(1)}% active`,
-        trend: 'up',
-        icon: CreditCard,
+        title: `Loan Interest · ${year}`,
+        value: formatUGX(interestThisYear),
+        note: `${loansThisYear.length} loan${loansThisYear.length === 1 ? '' : 's'} issued in ${year}`,
+        icon: Percent,
         tone: 'blue'
       },
       {

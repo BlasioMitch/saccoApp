@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { formatUGX } from '../../utils/currency';
 import moment from 'moment';
 import StatusBadge from '../ui/StatusBadge';
+import DetailsTitle from '../ui/DetailsTitle';
 
 const LoanDetailsModal = ({ isOpen, onClose, loan }) => {
   if (!isOpen || !loan) return null;
@@ -11,7 +12,7 @@ const LoanDetailsModal = ({ isOpen, onClose, loan }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-custom-bg-primary p-6 rounded-lg w-full max-w-3xl border border-custom-bg-tertiary shadow-2xl max-h-[calc(100vh-48px)] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-lg leading-6 font-semibold text-custom-text-primary">Loan Details</DialogTitle>
+          <DialogTitle className="text-lg leading-6 font-semibold text-custom-text-primary"><DetailsTitle label="Loan Details" value={loan.id} mono /></DialogTitle>
         </DialogHeader>
         <div className="mt-4">
           <div className="grid grid-cols-2 gap-6">

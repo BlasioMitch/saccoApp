@@ -109,6 +109,16 @@ const LoanTable = () => {
       cell: ({ getValue }) => formatUGX(getValue()),
     },
     {
+      id: 'amountPaid',
+      header: 'Amount Paid',
+      meta: { emphasis: 'amount' },
+      // Owed minus remaining: exact, since the backend keeps remaining = owed - COMPLETED payments
+      accessorFn: (row) => row.summary
+        ? Math.max(0, Number(row.amount) + Number(row.summary.totalInterest || 0) - Number(row.summary.remainingBalance || 0))
+        : null,
+      cell: ({ getValue }) => getValue() == null ? '–' : formatUGX(getValue()),
+    },
+    {
       accessorKey: 'remainingBalance',
       header: 'Remaining Balance',
       meta: { emphasis: 'amount' },

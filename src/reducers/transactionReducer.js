@@ -30,7 +30,8 @@ export const fetchTransactions = createAsyncThunk(
     try {
       const { data } = await client.query({
         query: GET_TRANSACTIONS,
-        variables: accountId ? { accountId } : {}
+        variables: accountId ? { accountId } : {},
+        fetchPolicy: 'network-only'
       })
       return data.getTransactions
     } catch (error) {

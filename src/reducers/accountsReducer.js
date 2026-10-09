@@ -15,7 +15,9 @@ export const fetchAccounts = createAsyncThunk(
     async (_,{ rejectWithValue }) => {
         try{
             const { data } = await client.query({
-                query: GET_ACCOUNTS
+                query: GET_ACCOUNTS,
+                // Always fresh: records created elsewhere must appear when returning to the page
+                fetchPolicy: 'network-only'
             })
             return data.getAccounts
         } catch (error){

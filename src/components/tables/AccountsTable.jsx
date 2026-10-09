@@ -17,6 +17,7 @@ import { TableToolbar, DataTable, TableEmpty, TablePagination, SortableHeader } 
 import DropdownMenu from '../ui/DropdownMenu'
 import StatusBadge from '../ui/StatusBadge'
 import Button from '../ui/Button'
+import DetailsTitle from '../ui/DetailsTitle'
 
 const Pill = ({ positive, warn, children }) => (
   <span className={`inline-flex h-6 items-center rounded-full px-2 text-xs font-medium ${
@@ -94,7 +95,7 @@ const AccountDetailsModal = ({ isOpen, onClose, account }) => {
 
   return (
     <ModalOverlay>
-      <h2 className="mb-4 text-lg font-semibold leading-6 text-custom-text-primary">Account Details</h2>
+      <h2 className="mb-4 text-lg font-semibold leading-6 text-custom-text-primary"><DetailsTitle label="Account Details" value={account.accountNumber} /></h2>
       <dl className="grid grid-cols-[128px_1fr] gap-x-4 gap-y-2 text-sm leading-6">
         {details.map(([label, value]) => (
           <React.Fragment key={label}>

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { createAccount, patchAccount, clearSuccess, clearError } from '../../reducers/accountsReducer'
 import { fetchUsers } from '../../reducers/userReducer'
 import { toast } from 'sonner'
+import MoneyInput from '../ui/MoneyInput'
 
 const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
   const dispatch = useDispatch()
@@ -90,6 +91,7 @@ const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
     if (!formData.userId) newErrors.userId = 'User is required'
     if (!formData.balance) newErrors.balance = 'Balance is required'
     if (isNaN(formData.balance)) newErrors.balance = 'Balance must be a number'
+    else if (!Number.isInteger(Number(formData.balance))) newErrors.balance = 'Balance must be a whole number of shillings'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -102,13 +104,14 @@ const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
       if (accountToEdit) {
         // Only send the fields that can be updated
         const updatedData = {
-          balance: formData.balance,
+          balance: Number(formData.balance),
           status: formData.status,
           paidMembership: formData.paidMembership
         }
         await dispatch(patchAccount({ id: accountToEdit.id, accountData: updatedData })).unwrap()
       } else {
-        await dispatch(createAccount(formData)).unwrap()
+        // Inputs always yield strings; GraphQL Float/Int variables need real numbers
+        await dispatch(createAccount({ ...formData, balance: Number(formData.balance) })).unwrap()
       }
       onClose()
     } catch (error) {
@@ -178,11 +181,10 @@ const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
 
           <div>
             <label className="block text-sm font-medium mb-2 text-custom-text-primary">Balance</label>
-            <input
-              type="number"
+            <MoneyInput
               name="balance"
               value={formData.balance}
-              onChange={handleChange}
+              onChange={(value) => handleChange({ target: { name: 'balance', value } })}
               className="w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-text-primary rounded-lg border border-custom-bg-tertiary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
             />
             {errors.balance && (

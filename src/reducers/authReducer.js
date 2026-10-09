@@ -2,11 +2,22 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import client from '../graphql/client'
 import { LOGIN, LOGOUT } from '../graphql/mutations'
 
+// Restore the signed-in user after a page refresh. The httpOnly cookie is the real session:
+// if it has expired, the first query returns UNAUTHORIZED and the session-expired handler signs out.
+const storedUser = (() => {
+  try {
+    return JSON.parse(localStorage.getItem('user'))
+  } catch {
+    return null
+  }
+})()
+localStorage.removeItem('token') // no longer stored; the session lives in the cookie
+
 const initialState = {
-  user: null,
+  user: storedUser,
   token: null,
-  isAuthenticated: false,
-  status: 'idle',
+  isAuthenticated: Boolean(storedUser),
+  status: storedUser ? 'succeeded' : 'idle',
   error: null,
   errorCode: null,
   message: null
@@ -47,7 +58,6 @@ export const login = createAsyncThunk(
         });
       }
       
-      localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       
       return {
@@ -131,11 +141,9 @@ const authSlice = createSlice({
     initializeAuth: (state) => {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
-        const token = localStorage.getItem('token');
         
-        if (user && token) {
+        if (user) {
           state.user = user;
-          state.token = token;
           state.isAuthenticated = true;
           state.status = 'succeeded';
         } else {

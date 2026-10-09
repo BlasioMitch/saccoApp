@@ -12,6 +12,7 @@ import { PageShell, Panel } from '../../components/layout/PageShell'
 import { TableEmpty } from '../../components/tables/TableShell'
 import StatusBadge from '../../components/ui/StatusBadge'
 import Button from '../../components/ui/Button'
+import DetailsTitle from '../../components/ui/DetailsTitle'
 const Team = () => {
   const dispatch = useDispatch()
   const { users, status, error } = useSelector(state => state.users)
@@ -131,10 +132,13 @@ const Team = () => {
       <Dialog open={isDetailsModalOpen} onOpenChange={handleCloseDetailsModal}>
         <DialogContent className="w-full max-w-md rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold leading-6 text-custom-text-primary">Member Details</DialogTitle>
-            <DialogDescription className="text-sm text-custom-text-secondary">
-              Details for {selectedUser?.first_name} {selectedUser?.last_name}
-            </DialogDescription>
+            <DialogTitle className="text-lg font-semibold leading-6 text-custom-text-primary">
+              <DetailsTitle
+                label="Member Details"
+                value={[selectedUser?.first_name, selectedUser?.last_name, selectedUser?.other_name].filter(Boolean).join(' ')}
+              />
+            </DialogTitle>
+            <DialogDescription className="sr-only">Personal and membership details</DialogDescription>
           </DialogHeader>
           {selectedUser && (
             <div className="space-y-6">

@@ -5,6 +5,8 @@ import loansReducer from '../reducers/loansReducer'
 import accountsReducer from '../reducers/accountsReducer'
 import authReducer from '../reducers/authReducer'
 import profileReducer from '../reducers/profileReducer'
+import savingsReducer from '../reducers/savingsReducer'
+import loanPaymentsReducer from '../reducers/loanPaymentsReducer'
 
 
 export const store = configureStore({
@@ -24,6 +26,8 @@ export const store = configureStore({
         // TODO: add auth
         auth: authReducer,
         // TODO: add profile
-        profile: profileReducer
+        profile: profileReducer,
+        savings: savingsReducer,
+        loanPayments: loanPaymentsReducer
     }
 })

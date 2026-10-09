@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client'
+import { LOAN_FIELDS, TRANSACTION_FIELDS } from '../queries'
 
 
 // User Mutations
@@ -84,7 +85,7 @@ export const CREATE_ACCOUNT = gql`
 `;
 
 export const UPDATE_ACCOUNT = gql`
-  mutation UpdateAccount($updateAccountId: String!, $balance: Int, $status: ACCOUNTSTATUS, $paidMembership: Boolean) {
+  mutation UpdateAccount($updateAccountId: String!, $balance: Money, $status: ACCOUNTSTATUS, $paidMembership: Boolean) {
   updateAccount(id: $updateAccountId, balance: $balance, status: $status, paidMembership: $paidMembership) {
     id
     userId
@@ -125,60 +126,19 @@ mutation DeleteAccount($deleteAccountId: String!) {
 export const CREATE_LOAN = gql`
   mutation CreateLoan($loan: LoanInput) {
     createLoan(loan: $loan) {
-      id
-      accountId
-      amount
-      interestRate
-      status
-      endDate
-      startDate
-      term
-      summary {
-        id
-        loanId
-        monthlyPayment
-        totalInterest
-        remainingBalance
-      }
-      createAt
-      updateAt
+      ...LoanFields
     }
   }
+  ${LOAN_FIELDS}
 `;
 
 export const UPDATE_LOAN = gql`
-  mutation UpdateLoan($updateLoanId: String!, $accountId: String, $amount: Int, $interestRate: Float, $status: LOANSTATUS, $endDate: String, $startDate: String, $term: Int) {
+  mutation UpdateLoan($updateLoanId: String!, $accountId: String, $amount: Money, $interestRate: Float, $status: LOANSTATUS, $endDate: String, $startDate: String, $term: Int) {
   updateLoan(id: $updateLoanId, accountId: $accountId, amount: $amount, interestRate: $interestRate, status: $status, endDate: $endDate, startDate: $startDate, term: $term) {
-    id
-    accountId
-    amount
-    interestRate
-    status
-    endDate
-    startDate
-    term
-    summary {
-      id
-      loanId
-      monthlyPayment
-      totalInterest
-      remainingBalance
-    }
-    createAt
-    updateAt
-    account {
-      id
-      userId
-      accountNumber
-      balance
-      status
-      paidMembership
-      hasLoan
-      is_deleted
-      deleted_at
+      ...LoanFields
     }
   }
-}
+  ${LOAN_FIELDS}
 `;
 
 export const DELETE_LOAN = gql`
@@ -191,35 +151,19 @@ export const DELETE_LOAN = gql`
 export const CREATE_TRANSACTION = gql`
   mutation CreateTransaction($transaction: TransactionInput) {
     createTransaction(transaction: $transaction) {
-      id
-      type
-      amount
-      accountId
-      acountName
-      status
-      description
-      loanId
-      createdAt
-      updateAt
+      ...TransactionFields
     }
   }
+  ${TRANSACTION_FIELDS}
 `; 
 
 export const UPDATE_TRANSACTION = gql`
-  mutation UpdateTransaction($updateTransactionId: String!, $type: TRANSACTIONTYPE, $amount: Float, $accountId: String, $status: TRANSACTIONSTATUS, $description: String, $loanId: String) {
+  mutation UpdateTransaction($updateTransactionId: String!, $type: TRANSACTIONTYPE, $amount: Money, $accountId: String, $status: TRANSACTIONSTATUS, $description: String, $loanId: String) {
   updateTransaction(id: $updateTransactionId, type: $type, amount: $amount, accountId: $accountId, status: $status, description: $description, loanId: $loanId) {
-    id
-    type
-    amount
-    accountId
-    acountName
-    status
-    description
-    loanId
-    createdAt
-    updateAt
+      ...TransactionFields
+    }
   }
-}
+  ${TRANSACTION_FIELDS}
 `;
 
 export const DELETE_TRANSACTION = gql`
@@ -229,7 +173,7 @@ export const DELETE_TRANSACTION = gql`
 `;
 
 export const LOGIN = gql`
-  mutation Mutation($email: String!, $password: String!) {
+  mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     success
     message
@@ -255,7 +199,7 @@ export const LOGIN = gql`
 `;
 
 export const LOGOUT = gql`
-  mutation Mutation {
+  mutation Logout {
   logout
 }
 `

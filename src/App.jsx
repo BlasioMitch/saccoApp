@@ -9,6 +9,8 @@ import Loans from './pages/Loans/Loans'
 import { Toaster } from 'sonner'
 import { useSelector } from 'react-redux'
 import Accounts from './pages/Accounts/Accounts'
+import Savings from './pages/Savings/Savings'
+import LoanPayments from './pages/LoanPayments/LoanPayments'
 import Profiles from './pages/Profiles/Profiles'
 import { ThemeProvider } from './components/ui/ThemeProvider'
 
@@ -48,7 +50,9 @@ function App() {
           <Route path="members" element={<Team />} />
           <Route path="transactions" element={<Transactions />} />
           <Route path="loans" element={<Loans />} />
+          <Route path="loan-payments" element={<LoanPayments />} />
           <Route path="accounts" element={<Accounts />} />
+          <Route path="savings" element={<Savings />} />
           <Route path="profile" element={
             <UserProfileRoute>
               <Profiles />

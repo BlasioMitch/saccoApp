@@ -51,6 +51,7 @@ const TopBar = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { user, isAuthenticated } = useSelector((state) => state.auth)
+  const page = getPageTitle(pathname, { isAdmin: user?.role?.toLowerCase() !== 'user' })
 
   useEffect(() => {
     // Initialize auth state from localStorage on component mount
@@ -69,8 +70,14 @@ const TopBar = () => {
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-custom-bg-tertiary bg-custom-bg-secondary px-6">
-      <h1 className="truncate text-xl font-semibold leading-8 text-custom-text-primary">
-        {getPageTitle(pathname)}
+      <h1 className="flex min-w-0 items-baseline gap-2 truncate text-xl font-semibold leading-8 text-custom-text-primary">
+        {page.group && (
+          <>
+            <span className="text-base font-medium text-custom-text-secondary">{page.group}</span>
+            <span className="text-base font-medium text-custom-text-muted" aria-hidden="true">/</span>
+          </>
+        )}
+        <span className="truncate">{page.title}</span>
       </h1>
 
       <div className="flex items-center gap-2">

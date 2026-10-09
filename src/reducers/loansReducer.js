@@ -16,7 +16,8 @@ export const fetchLoans = createAsyncThunk(
         try{
             const { data } = await client.query({
                 query: GET_LOANS,
-                variables: accountId ? { accountId } : {}
+                variables: accountId ? { accountId } : {},
+                fetchPolicy: 'network-only'
             })
             return data.getLoans
         } catch (error){

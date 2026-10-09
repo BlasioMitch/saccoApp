@@ -5,21 +5,35 @@ import { cn } from '../../lib/utils'
 import Button from '../ui/Button'
 import DropdownMenu from '../ui/DropdownMenu'
 
-// Column meta drives emphasis: { emphasis: 'primary' | 'amount', align: 'right' }
+// Column meta drives presentation:
+// { emphasis: 'primary' | 'amount', align: 'right', sticky: 'left', highlight: boolean }
 const isRightAligned = (meta = {}) => meta.align === 'right' || meta.emphasis === 'amount'
 
-const headerClass = (meta) => cn(
+const headerClass = (meta = {}) => cn(
   'sticky top-0 z-10 h-10 whitespace-nowrap border-b border-custom-bg-tertiary bg-custom-bg-secondary px-4',
   'text-xs font-medium uppercase tracking-wide text-custom-text-secondary',
-  isRightAligned(meta) ? 'text-right' : 'text-left'
+  isRightAligned(meta) ? 'text-right' : 'text-left',
+  meta.sticky === 'left' && 'left-0 z-20',
+  meta.highlight && 'bg-custom-interactive-focus text-custom-brand-primary'
 )
 
 const cellClass = (meta = {}) => cn(
   'h-12 whitespace-nowrap border-b border-custom-bg-tertiary px-4 text-sm',
-  isRightAligned(meta) && 'text-right',
+  isRightAligned(meta) && 'text-right tabular-nums',
   meta.emphasis === 'primary' && 'font-medium text-custom-text-primary',
   meta.emphasis === 'amount' && 'font-semibold tabular-nums text-custom-text-primary',
-  !meta.emphasis && 'text-custom-text-secondary'
+  !meta.emphasis && 'text-custom-text-secondary',
+  // Frozen cells need a solid background so scrolled content passes underneath
+  meta.sticky === 'left' && 'sticky left-0 z-[5] bg-custom-bg-primary group-hover:bg-custom-interactive-hover',
+  meta.highlight && 'bg-custom-interactive-focus text-custom-text-primary'
+)
+
+const footerClass = (meta = {}) => cn(
+  'sticky bottom-0 z-10 h-10 whitespace-nowrap border-t border-custom-bg-tertiary bg-custom-bg-secondary px-4',
+  'text-sm font-semibold tabular-nums text-custom-text-primary',
+  isRightAligned(meta) ? 'text-right' : 'text-left',
+  meta.sticky === 'left' && 'left-0 z-20',
+  meta.highlight && 'bg-custom-interactive-focus'
 )
 
 // 56px bar: search on the left, actions on the right
@@ -81,6 +95,8 @@ export const ColumnMenu = ({ table }) => {
 export const DataTable = ({ table, onRowClick, empty }) => {
   const rows = table.getRowModel().rows
   const hasData = table.getCoreRowModel().rows.length > 0
+  // Totals row pinned to the bottom, rendered only when a column defines `footer`
+  const hasFooter = table.getAllLeafColumns().some(column => column.columnDef.footer)
 
   return (
     <div className="min-h-0 flex-1 overflow-auto">
@@ -102,7 +118,7 @@ export const DataTable = ({ table, onRowClick, empty }) => {
               <tr
                 key={row.id}
                 onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                className={cn('transition-colors hover:bg-custom-interactive-hover', onRowClick && 'cursor-pointer')}
+                className={cn('group transition-colors hover:bg-custom-interactive-hover', onRowClick && 'cursor-pointer')}
               >
                 {row.getVisibleCells().map(cell => (
                   <td key={cell.id} className={cellClass(cell.column.columnDef.meta)}>
@@ -112,6 +128,19 @@ export const DataTable = ({ table, onRowClick, empty }) => {
               </tr>
             ))}
           </tbody>
+          {hasFooter && (
+            <tfoot>
+              {table.getFooterGroups().slice(0, 1).map(footerGroup => (
+                <tr key={footerGroup.id}>
+                  {footerGroup.headers.map(header => (
+                    <td key={header.id} className={footerClass(header.column.columnDef.meta)}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.footer, header.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tfoot>
+          )}
         </table>
       ) : (
         <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">

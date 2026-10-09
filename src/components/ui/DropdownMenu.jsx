@@ -7,7 +7,8 @@ const ITEM_HEIGHT = 40
 const MENU_PADDING = 16
 
 // Menu rendered in a portal with fixed positioning so it is never clipped by a scrolling table
-const DropdownMenu = ({ label, ariaLabel, items, width = 192, variant = 'ghost', size = 'icon', keepOpen = false, triggerClassName }) => {
+// placement 'bottom' opens under the trigger (flipping up when needed); 'right' opens beside it (sidebar flyouts)
+const DropdownMenu = ({ label, ariaLabel, items, width = 192, variant = 'ghost', size = 'icon', keepOpen = false, triggerClassName, placement = 'bottom', title }) => {
   const [position, setPosition] = useState(null)
   const triggerRef = useRef(null)
   const menuRef = useRef(null)
@@ -20,6 +21,13 @@ const DropdownMenu = ({ label, ariaLabel, items, width = 192, variant = 'ghost',
     if (position) return close()
     const rect = triggerRef.current.getBoundingClientRect()
     const menuHeight = visibleItems.length * ITEM_HEIGHT + MENU_PADDING
+    if (placement === 'right') {
+      setPosition({
+        top: Math.max(8, Math.min(rect.top, window.innerHeight - menuHeight - 8)),
+        left: rect.right + 8,
+      })
+      return
+    }
     const openUp = rect.bottom + menuHeight + 8 > window.innerHeight
     setPosition({
       top: openUp ? Math.max(8, rect.top - menuHeight - 4) : rect.bottom + 4,
@@ -54,6 +62,7 @@ const DropdownMenu = ({ label, ariaLabel, items, width = 192, variant = 'ghost',
         type="button"
         onClick={toggle}
         aria-label={ariaLabel}
+        title={title}
         aria-haspopup="menu"
         aria-expanded={Boolean(position)}
         className={cn(buttonVariants({ variant, size }), triggerClassName)}
@@ -81,7 +90,8 @@ const DropdownMenu = ({ label, ariaLabel, items, width = 192, variant = 'ghost',
                 }}
                 className={cn(
                   'flex h-10 w-full items-center gap-2 px-4 text-left text-sm transition-colors hover:bg-custom-interactive-hover',
-                  item.danger ? 'text-red-600 dark:text-red-400' : 'text-custom-text-primary'
+                  item.danger ? 'text-red-600 dark:text-red-400' : 'text-custom-text-primary',
+                  item.active && 'font-semibold text-custom-brand-primary'
                 )}
               >
                 {Icon && <Icon className="h-4 w-4 shrink-0" />}

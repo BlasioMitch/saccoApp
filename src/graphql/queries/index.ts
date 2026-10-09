@@ -221,55 +221,64 @@ export const GET_ACCOUNT_BY_ID = gql`
 `;
 
 // Loan Queries
-export const GET_LOANS = gql`
-  query GetLoans {
-    getLoans {
+// Shared by GET_LOANS, CREATE_LOAN and UPDATE_LOAN so every loan in the store has the same shape
+// (including account.owner, which the loans table and details modal display)
+export const LOAN_FIELDS = gql`
+  fragment LoanFields on Loan {
+    id
+    accountId
+    amount
+    interestRate
+    status
+    endDate
+    startDate
+    term
+    summary {
       id
-      accountId
-      amount
-      interestRate
+      loanId
+      monthlyPayment
+      totalInterest
+      remainingBalance
+    }
+    createAt
+    updateAt
+    account {
+      id
+      userId
+      accountNumber
+      balance
       status
-      endDate
-      startDate
-      term
-      summary {
+      paidMembership
+      hasLoan
+      is_deleted
+      deleted_at
+      owner {
         id
-        loanId
-        monthlyPayment
-        totalInterest
-        remainingBalance
-      }
-      createAt
-      updateAt
-      account {
-        id
-        userId
-        accountNumber
-        balance
+        first_name
+        last_name
+        other_name
+        email
+        role
         status
-        paidMembership
-        hasLoan
-        is_deleted
-        deleted_at
-        owner {
-          id
-          first_name
-          last_name
-          other_name
-          email
-          role
-          status
-          lastLogin
-          joinDate
-          contact
-          gender
-          dob
-          hasAccount
-          fullName
-        }
+        lastLogin
+        joinDate
+        contact
+        gender
+        dob
+        hasAccount
+        fullName
       }
     }
   }
+`;
+
+export const GET_LOANS = gql`
+  query GetLoans {
+    getLoans {
+      ...LoanFields
+    }
+  }
+  ${LOAN_FIELDS}
 `;
 
 // export const GET_LOAN_BY_ID = gql`
@@ -324,29 +333,41 @@ export const GET_LOANS = gql`
 // `;
 
 // Transaction Queries
-export const GET_TRANSACTIONS = gql`
-  query GetTransactions {
-    getTransactions {
+// Shared by GET_TRANSACTIONS, CREATE_TRANSACTION and UPDATE_TRANSACTION so every transaction
+// in the store carries the account owner's names (shown in the table and details modal)
+export const TRANSACTION_FIELDS = gql`
+  fragment TransactionFields on Transaction {
+    id
+    type
+    amount
+    accountId
+    acountName
+    status
+    description
+    loanId
+    createdAt
+    updateAt
+    account {
       id
-      type
-      amount
-      accountId
-      acountName
-      status
-      description
-      loanId
-      createdAt
-      updateAt
-      account {
+      accountNumber
+      owner {
         id
-        accountNumber
-        owner {
-          fullName
-          id
-        }
+        first_name
+        last_name
+        other_name
+        fullName
       }
     }
   }
+`;
+
+export const GET_TRANSACTIONS = gql`
+  query GetTransactions {
+    getTransactions {
+      ...TransactionFields
+    }
+  }
+  ${TRANSACTION_FIELDS}
 `;
 
 // export const GET_TRANSACTION_BY_ID = gql`
@@ -365,3 +386,74 @@ export const GET_TRANSACTIONS = gql`
 //     }
 //   }
 // `;
+
+// Savings Queries
+export const GET_SAVINGS_REPORT = gql`
+  query GetSavingsReport($year: Int!, $month: Int) {
+    getSavingsReport(year: $year, month: $month) {
+      year
+      month
+      availableYears
+      stats {
+        totalSavings
+        transactionCount
+        pendingSavings
+        pendingCount
+        highestTotalSaved
+        meanAmount
+        medianAmount
+      }
+      members {
+        accountId
+        accountNumber
+        memberName
+        broughtForward
+        months
+        total
+      }
+      totals {
+        broughtForward
+        months
+        total
+      }
+    }
+  }
+`
+
+// Loan Payments Queries
+export const GET_LOAN_PAYMENTS_REPORT = gql`
+  query GetLoanPaymentsReport($year: Int!, $month: Int) {
+    getLoanPaymentsReport(year: $year, month: $month) {
+      year
+      month
+      availableYears
+      stats {
+        totalRepaid
+        paymentCount
+        pendingRepaid
+        pendingCount
+        outstandingBalance
+        loansCompleted
+      }
+      loans {
+        loanId
+        accountNumber
+        memberName
+        loanAmount
+        broughtForward
+        months
+        totalPaid
+        remainingBalance
+        status
+        completedOn
+      }
+      totals {
+        loanAmount
+        broughtForward
+        months
+        totalPaid
+        remainingBalance
+      }
+    }
+  }
+`

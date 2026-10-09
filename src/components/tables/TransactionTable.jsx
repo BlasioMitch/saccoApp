@@ -12,8 +12,10 @@ import { fetchTransactions } from '../../reducers/transactionReducer';
 import moment from 'moment';
 import TransactionForm from '../forms/TransactionForm';
 import { formatUGX } from '../../utils/currency';
+import { ownerName } from '../../utils/names';
 import { TableToolbar, ColumnMenu, DataTable, TablePagination, SortableHeader } from './TableShell';
 import DropdownMenu from '../ui/DropdownMenu';
+import StatusBadge from '../ui/StatusBadge';
 import Button from '../ui/Button';
 
 // Same hues as before, tuned to stay legible in both themes
@@ -83,7 +85,7 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
       id: 'ownerName',
       meta: { label: 'Owner Name', emphasis: 'primary' },
       header: ({ column }) => <SortableHeader column={column} label="Owner Name" />,
-      accessorFn: (row) => row.account?.owner?.fullName,
+      accessorFn: (row) => row.account?.owner ? ownerName(row.account.owner) : '',
     },
     {
       accessorKey: 'type',
@@ -95,6 +97,11 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
       header: 'Amount',
       meta: { emphasis: 'amount' },
       cell: ({ row }) => formatUGX(row.getValue('amount')),
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => <StatusBadge status={row.getValue('status')} />,
     },
     {
       accessorKey: 'date',

@@ -23,14 +23,12 @@ const Transactions = () => {
   const [selectedTransaction, setSelectedTransaction] = useState(null)
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchTransactions())
-        .unwrap()
-        .catch(error => {
-          toast.error(error?.message || 'Failed to fetch transactions')
-        })
-    }
-  }, [status, dispatch])
+    dispatch(fetchTransactions())
+      .unwrap()
+      .catch(error => {
+        toast.error(error?.message || 'Failed to fetch transactions')
+      })
+  }, [dispatch])
 
   useEffect(() => {
     if (error) {

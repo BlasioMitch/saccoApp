@@ -32,7 +32,8 @@ export const fetchUsers = createAsyncThunk(
     async (_,{ rejectWithValue }) => {
         try {
             const { data } = await client.query({
-                query: GET_USERS
+                query: GET_USERS,
+                fetchPolicy: 'network-only'
             })
             // Adjust for your schema: data.getUsers or data.users
             return data.getUsers || data.users
