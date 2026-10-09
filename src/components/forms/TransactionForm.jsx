@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createTransaction, fetchTransactions, updateTransaction } from '../../reducers/transactionReducer'
+import { createTransaction, fetchTransactions, payLoanFromSavings, updateTransaction } from '../../reducers/transactionReducer'
 import { fetchAccounts } from '../../reducers/accountsReducer'
 import { fetchLoans } from '../../reducers/loansReducer'
 import {
   TransactionType, TransactionStatus, MEMBERSHIP_FEE_AMOUNT, TYPE_OPTIONS, typeLabel, openLoans,
-  ELIGIBILITY, isWithdrawal, loanPaymentDefault, defaultAmount,
+  ELIGIBILITY, isWithdrawal, loanPaymentDefault, savingsPaymentDefault, defaultAmount,
 } from '../../utils/transactionRules'
 import { formatUGX } from '../../utils/currency'
 import { ownerName } from '../../utils/names'
@@ -29,6 +29,8 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
 
   const [formData, setFormData] = useState({ type: TransactionType.SAVINGS_DEPOSIT, accountId: '', loanId: '', amount: '' })
   const [errors, setErrors] = useState({})
+  // New loan payments only: take the money out of the member's savings instead of cash in
+  const [fromSavings, setFromSavings] = useState(false)
 
   const typeLocked = Boolean(transactionToEdit || initialValues.type)
   const accountLocked = Boolean(transactionToEdit || initialValues.accountId)
@@ -54,9 +56,10 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
         type,
         accountId: initialValues.accountId || '',
         loanId: initialValues.loanId || '',
-        amount: Number(initialValues.amount) || defaultAmount(type),
+        amount: Number(initialValues.amount) || defaultAmount(type, null, accounts?.find(account => account.id === initialValues.accountId)),
       })
     }
+    setFromSavings(false)
     setErrors({})
   }, [isOpen, transactionToEdit?.id, initialValues.type, initialValues.accountId, initialValues.loanId, initialValues.amount]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -83,8 +86,18 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
   const withAccount = (prev, accountId, type) => {
     const loans = type === TransactionType.LOAN_PAYMENT ? openLoans(accountById.get(accountId)) : []
     const loan = loans.length === 1 ? loans[0] : null
-    return { ...prev, type, accountId, loanId: loan?.id || '', amount: defaultAmount(type, loan) }
+    return { ...prev, type, accountId, loanId: loan?.id || '', amount: defaultAmount(type, loan, accountById.get(accountId)) }
   }
+
+  // Accounts are refreshed when the form opens: keep a closure payout equal to the latest balance
+  const closureBalance = !transactionToEdit && formData.type === TransactionType.CLOSURE_WITHDRAW ? selectedAccount?.balance : undefined
+  useEffect(() => {
+    if (closureBalance !== undefined) setFormData(prev => ({ ...prev, amount: Number(closureBalance) || '' }))
+  }, [closureBalance])
+
+  const canPayFromSavings = !transactionToEdit && formData.type === TransactionType.LOAN_PAYMENT
+  const savingsBalance = Number(selectedAccount?.balance) || 0
+  const payingFromSavings = canPayFromSavings && fromSavings
 
   const handleTypeChange = (e) => {
     const type = e.target.value
@@ -93,22 +106,31 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
       const keepAccount = account && ELIGIBILITY[type]?.(account)
       return withAccount(prev, keepAccount ? prev.accountId : '', type)
     })
+    setFromSavings(false)
     setErrors({})
   }
 
   const handleAccountChange = (e) => {
     setFormData(prev => withAccount(prev, e.target.value, prev.type))
+    setFromSavings(false)
     clearError('accountId')
   }
 
   const handleLoanChange = (e) => {
     const loan = accountLoans.find(item => item.id === e.target.value)
-    setFormData(prev => ({ ...prev, loanId: e.target.value, amount: loanPaymentDefault(loan) }))
+    setFormData(prev => ({ ...prev, loanId: e.target.value, amount: fromSavings ? savingsPaymentDefault(loan, selectedAccount) : loanPaymentDefault(loan) }))
     clearError('loanId')
   }
 
   const handleAmountChange = (amount) => {
     setFormData(prev => ({ ...prev, amount }))
+    clearError('amount')
+  }
+
+  const handleFromSavingsChange = (e) => {
+    const checked = e.target.checked
+    setFromSavings(checked)
+    setFormData(prev => ({ ...prev, amount: checked ? savingsPaymentDefault(selectedLoan, selectedAccount) : loanPaymentDefault(selectedLoan) }))
     clearError('amount')
   }
 
@@ -120,6 +142,11 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
     if (formData.type === TransactionType.LOAN_PAYMENT && !formData.loanId) newErrors.loanId = 'Select the loan being paid'
     if (isWithdrawal(formData.type) && selectedAccount && amount > Number(selectedAccount.balance)) {
       newErrors.amount = `Cannot withdraw more than the available ${formatUGX(selectedAccount.balance)}`
+    }
+    if (payingFromSavings && !newErrors.amount) {
+      const remaining = Number(selectedLoan?.summary?.remainingBalance) || 0
+      if (amount > savingsBalance) newErrors.amount = `Savings only cover ${formatUGX(savingsBalance)}`
+      else if (selectedLoan?.summary && amount > remaining) newErrors.amount = `Only ${formatUGX(remaining)} is still owed on this loan`
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -139,7 +166,10 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
     }
 
     try {
-      if (transactionToEdit) {
+      if (payingFromSavings) {
+        await dispatch(payLoanFromSavings({ loanId: formData.loanId, amount: Number(formData.amount) })).unwrap()
+        toast.success('Loan paid from savings: withdrawal and loan payment recorded')
+      } else if (transactionToEdit) {
         await dispatch(updateTransaction({ id: transactionToEdit.id, transactionData })).unwrap()
         toast.success('Transaction updated successfully')
       } else {
@@ -222,6 +252,26 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
             </div>
           )}
 
+          {canPayFromSavings && selectedAccount && (
+            <div>
+              <label className="flex items-center gap-2 text-sm text-custom-text-primary cursor-pointer has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60">
+                <input
+                  type="checkbox"
+                  checked={fromSavings}
+                  onChange={handleFromSavingsChange}
+                  disabled={savingsBalance <= 0}
+                  className="w-4 h-4 accent-[var(--custom-brand-primary)]"
+                />
+                Pay from savings
+              </label>
+              <Hint>
+                {savingsBalance > 0
+                  ? `Savings balance ${formatUGX(savingsBalance)}. Records an account withdrawal and the loan payment.`
+                  : 'No savings available on this account'}
+              </Hint>
+            </div>
+          )}
+
           <div>
             <label className={labelClass}>Amount</label>
             <MoneyInput name="amount" value={formData.amount} onChange={handleAmountChange} className={inputClass} />
@@ -241,10 +291,10 @@ const TransactionForm = ({ isOpen, onClose, transactionToEdit, initialValues = {
             </button>
             <button
               type="submit"
-              className="px-4 h-10 bg-green-500 text-gray-900 font-medium rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 h-10 bg-custom-brand-primary text-custom-interactive-active-text font-medium rounded-lg hover:bg-custom-brand-dark disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={status === 'loading'}
             >
-              {status === 'loading' ? 'Saving...' : (transactionToEdit ? 'Update' : 'Create')}
+              {status === 'loading' ? 'Saving...' : (transactionToEdit ? 'Update' : payingFromSavings ? 'Pay from savings' : 'Create')}
             </button>
           </div>
         </form>

@@ -47,8 +47,17 @@ export const loanPaymentDefault = (loan) => {
   return monthly || remaining || ''
 }
 
-export const defaultAmount = (type, loan) => {
+// Paying from savings defaults to clearing the loan, as far as the savings allow
+export const savingsPaymentDefault = (loan, account) => {
+  const remaining = Number(loan?.summary?.remainingBalance) || 0
+  const balance = Number(account?.balance) || 0
+  return Math.min(remaining, balance) || ''
+}
+
+export const defaultAmount = (type, loan, account) => {
   if (type === TransactionType.MEMBERSHIP_FEE) return MEMBERSHIP_FEE_AMOUNT
   if (type === TransactionType.LOAN_PAYMENT) return loanPaymentDefault(loan)
+  // Closing an account pays out everything that is left
+  if (type === TransactionType.CLOSURE_WITHDRAW) return Number(account?.balance) || ''
   return ''
 }

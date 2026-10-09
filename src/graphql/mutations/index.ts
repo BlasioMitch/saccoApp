@@ -241,3 +241,34 @@ export const UPDATE_MY_PROFILE = gql`
     }
   }
 `;
+
+// Manager decisions on loan applications
+export const APPROVE_LOAN = gql`
+  mutation ApproveLoan($id: String!, $interestRate: Float, $startDate: String, $note: String) {
+    approveLoan(id: $id, interestRate: $interestRate, startDate: $startDate, note: $note) {
+      id
+      status
+      interestRate
+      startDate
+      endDate
+    }
+  }
+`;
+export const PAY_LOAN_FROM_SAVINGS = gql`
+  mutation PayLoanFromSavings($id: String!, $amount: Money!) {
+    payLoanFromSavings(id: $id, amount: $amount) {
+      withdrawal { id type amount status accountId createdAt }
+      payment { id type amount status accountId loanId createdAt }
+      loan { id status summary { remainingBalance } }
+    }
+  }
+`;
+export const REJECT_LOAN = gql`
+  mutation RejectLoan($id: String!, $reason: String!) {
+    rejectLoan(id: $id, reason: $reason) {
+      id
+      status
+      decisionNote
+    }
+  }
+`;

@@ -18,6 +18,8 @@ import DropdownMenu from '../ui/DropdownMenu'
 import StatusBadge from '../ui/StatusBadge'
 import Button from '../ui/Button'
 import DetailsTitle from '../ui/DetailsTitle'
+import OwnerCell from '../ui/OwnerCell';
+import { ownerName } from '../../utils/names';
 
 const Pill = ({ positive, warn, children }) => (
   <span className={`inline-flex h-6 items-center rounded-full px-2 text-xs font-medium ${
@@ -180,19 +182,18 @@ const AccountsTable = ({ accounts, onDelete }) => {
 
   const columns = [
     {
+      id: 'ownerName',
+      meta: { label: 'Owner Name', emphasis: 'primary', sticky: 'left' },
+      enableHiding: false,
+      header: ({ column }) => <SortableHeader column={column} label="Owner Name" />,
+      accessorFn: (row) => ownerName(row.owner),
+      cell: ({ row, getValue }) => <OwnerCell owner={row.original.owner} name={getValue() || undefined} />,
+    },
+    {
       id: 'accountNumber',
       meta: { label: 'Account Number', emphasis: 'primary' },
       header: ({ column }) => <SortableHeader column={column} label="Account Number" />,
       accessorFn: (row) => row.accountNumber,
-    },
-    {
-      id: 'ownerName',
-      meta: { label: 'Owner Name', emphasis: 'primary' },
-      header: ({ column }) => <SortableHeader column={column} label="Owner Name" />,
-      accessorFn: (row) => {
-        const owner = row.owner;
-        return owner ? `${owner.first_name} ${owner.last_name} ${owner.other_name || ''}`.trim() : '';
-      },
     },
     {
       accessorKey: 'balance',

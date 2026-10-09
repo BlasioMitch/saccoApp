@@ -26,7 +26,7 @@ const UserMenu = ({ user, onLogout }) => {
         <>
           <span className="relative inline-flex">
             <Avatar user={user} className="h-8 w-8" textClassName="text-xs" />
-            <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-500 ring-2 ring-custom-bg-secondary" />
+            <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-500 ring-2 ring-custom-bg-primary" />
           </span>
           <span className="hidden md:block">
             <span className="block text-sm font-medium leading-5 text-custom-text-primary">{fullName}</span>
@@ -67,8 +67,8 @@ const TopBar = () => {
   }
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-custom-bg-tertiary bg-custom-bg-secondary px-6">
-      <h1 className="flex min-w-0 items-baseline gap-2 truncate text-xl font-semibold leading-8 text-custom-text-primary">
+    <header className="relative z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-custom-bg-tertiary bg-custom-bg-primary px-6 shadow-raised">
+      <h1 className="flex min-w-0 items-baseline gap-2 truncate text-lg font-semibold leading-8 text-custom-text-primary xl:text-xl">
         {page.group && (
           <>
             <span className="text-base font-medium text-custom-text-secondary">{page.group}</span>

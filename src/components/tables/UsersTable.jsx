@@ -19,6 +19,7 @@ import Button from '../ui/Button'
 import ImportButton from '../import/ImportButton'
 import usersImport from '../import/configs/users'
 import { fetchUsers } from '../../reducers/userReducer'
+import OwnerCell from '../ui/OwnerCell';
 
 const inputClass = 'h-10 rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary placeholder:text-custom-text-muted focus:outline-none focus:ring-2 focus:ring-custom-brand-primary'
 
@@ -113,9 +114,11 @@ function UsersTable({ users, onEdit, onView }) {
   const columns = [
     {
       id: 'fullName',
-      meta: { label: 'Full Name', emphasis: 'primary' },
+      meta: { label: 'Full Name', emphasis: 'primary', sticky: 'left' },
+      enableHiding: false,
       header: sortable('Full Name'),
       accessorFn: (row) => `${row.first_name || ''} ${row.last_name || ''} ${row.other_name || ''}`.trim(),
+      cell: ({ row, getValue }) => <OwnerCell owner={row.original} name={getValue()} />,
       filterFn: 'nameFilter',
     },
     {

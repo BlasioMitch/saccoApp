@@ -22,7 +22,7 @@ const inputClass = 'w-full h-10 px-4 text-sm bg-custom-bg-secondary text-custom-
 const labelClass = 'block text-sm font-medium text-custom-text-primary mb-2'
 
 const Card = ({ title, description, children, className = '' }) => (
-  <section className={`flex min-h-0 flex-col rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6 ${className}`}>
+  <section className={`flex min-h-0 flex-col rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-[var(--card-padding)] shadow-card ${className}`}>
     <h2 className="text-base font-semibold leading-6 text-custom-text-primary">{title}</h2>
     {description && <p className="mt-1 text-sm text-custom-text-secondary">{description}</p>}
     <div className="mt-4 min-h-0 flex-1">{children}</div>
@@ -141,8 +141,8 @@ const Settings = () => {
 
   return (
     <PageShell>
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="flex min-h-0 flex-col gap-6">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-[var(--section-gap)] lg:grid-cols-3">
+        <div className="flex min-h-0 flex-col gap-[var(--section-gap)]">
           <Card title="Appearance" description="Choose how SaccoApp looks on this device.">
             <div className="grid grid-cols-2 gap-2">
               {[['light', 'Light', Sun], ['dark', 'Dark', Moon]].map(([value, label, Icon]) => (

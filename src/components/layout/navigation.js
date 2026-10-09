@@ -1,6 +1,6 @@
 import {
   Home, Users, UserRound, IdCard, DollarSign, CreditCard, Settings, HelpCircle,
-  Wallet, PiggyBank, CalendarRange, BookOpen, HandCoins,
+  Wallet, PiggyBank, CalendarRange, BookOpen, HandCoins, ClipboardCheck,
 } from 'lucide-react'
 
 // Single source of truth for the sidebar menu and the TopBar title.
@@ -28,6 +28,8 @@ export const MAIN_NAV = [
     label: 'Lending',
     children: [
       { icon: BookOpen, label: 'Loan Book', path: '/home/loans', adminOnly: true },
+      // badge: live count supplied by the menu (pending member applications)
+      { icon: ClipboardCheck, label: 'Applications', path: '/home/loan-applications', adminOnly: true, badge: 'pendingApplications' },
       { icon: HandCoins, label: 'Repayments', path: '/home/loan-payments', adminOnly: true },
     ],
   },

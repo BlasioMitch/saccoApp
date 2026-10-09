@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '../../reducers/userReducer';
 import { FetchProfile } from '../../reducers/profileReducer';
 import UserSearch from '../../components/Profiles/UserSearch';
-import UserBioData from '../../components/Profiles/UserBioData';
-import SavingsHistory from '../../components/Profiles/SavingsHistory';
-import LoanAccordion from '../../components/Profiles/LoanAccordion';
+import ProfileHeader from '../../components/Profiles/ProfileHeader';
+import SavingsTimeline from '../../components/Profiles/SavingsTimeline';
+import LoanTimeline from '../../components/Profiles/LoanTimeline';
 import Transactions from '../../components/Profiles/Transactions';
-import { Loader2, X, User2, Wallet, CreditCard, History } from 'lucide-react';
+import { activityYears, currentYear, memberFigures } from '../../utils/memberTimeline';
+import { Loader2, X, User2, Wallet, CreditCard, History, CalendarDays } from 'lucide-react';
 import { PageShell, Panel } from '../../components/layout/PageShell';
 import Button from '../../components/ui/Button';
 
@@ -40,54 +41,25 @@ const Profiles = ({ userId, isRegularUser }) => {
     setSelectedUser(null);
   };
 
-  // Calculate user statistics from the profile data
-  const userStatistics = useMemo(() => {
-    if (!profile) return null;
-    const savingsTransactions = (profile.account?.transactions || []).filter(t => t.type === 'SAVINGS_DEPOSIT');
-    const totalSavings = savingsTransactions.reduce(
-      (sum, t) => sum + Number(t.amount),
-      0
-    );
-    const activeLoans = (profile.account?.loans || []).filter(
-      (l) => l.status === 'ACTIVE'
-    ).length;
-    // Calculate monthly average savings
-    const monthlyTotals = savingsTransactions.reduce((acc, t) => {
-      const date = new Date(t.createdAt);
-      const monthYear = date.toLocaleDateString('default', { month: 'long', year: 'numeric' });
-      acc[monthYear] = (acc[monthYear] || 0) + Number(t.amount);
-      return acc;
-    }, {});
-    const monthlySavingsAvg = Object.keys(monthlyTotals).length > 0
-      ? Object.values(monthlyTotals).reduce((sum, val) => sum + val, 0) / Object.keys(monthlyTotals).length
-      : 0;
-    return {
-      totalSavings,
-      activeLoans,
-      monthlySavingsAvg,
-      accountBalance: profile.account?.balance || 0,
-      accountNumber: profile.account?.accountNumber || '',
-      accountStatus: profile.account?.status || '',
-    };
-  }, [profile]);
+  const account = profile?.account;
+  const transactions = account?.transactions || [];
+  const loans = account?.loans || [];
+
+  // Timelines show one year at a time; the current year by default, reset when another member is opened
+  const [year, setYear] = useState(currentYear);
+  useEffect(() => {
+    setYear(currentYear());
+  }, [profile?.id]);
+  const years = useMemo(() => activityYears(transactions, loans), [transactions, loans]);
+  const figures = useMemo(() => memberFigures(account, year), [account, year]);
 
   const isLoading = profileStatus === 'loading';
 
   const tabs = [
-    { id: 'savings', label: 'Savings', icon: <Wallet className="w-4 h-4" /> },
-    { id: 'loans', label: 'Loans', icon: <CreditCard className="w-4 h-4" /> },
-    { id: 'transactions', label: 'Transactions', icon: <History className="w-4 h-4" /> },
+    { id: 'savings', label: 'Savings', icon: Wallet },
+    { id: 'loans', label: 'Loans', icon: CreditCard },
+    { id: 'transactions', label: 'Transactions', icon: History },
   ];
-
-  // Prepare transactions by type for tabbed components
-  const transactionsByType = useMemo(() => {
-    if (!profile?.account?.transactions) return {};
-    return profile.account.transactions.reduce((acc, tx) => {
-      if (!acc[tx.type]) acc[tx.type] = [];
-      acc[tx.type].push(tx);
-      return acc;
-    }, {});
-  }, [profile]);
 
   return (
     <PageShell>
@@ -124,55 +96,55 @@ const Profiles = ({ userId, isRegularUser }) => {
           <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
         </Panel>
       ) : (selectedUser || isRegularUser) && profile ? (
-        <div className="grid min-h-0 flex-1 grid-cols-12 gap-6">
-          {/* Left Column - User Info */}
-          <div className="col-span-4 min-h-0 overflow-y-auto rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6">
-            <UserBioData
-              user={profile}
-              account={profile.account}
-              statistics={userStatistics}
-            />
-          </div>
+        <>
+          <ProfileHeader user={profile} account={account} figures={figures} year={year} />
 
-          {/* Right Column - Tabbed Content */}
-          <div className="col-span-8 flex min-h-0 flex-col overflow-hidden rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary">
-            {/* Tabs */}
-            <nav className="flex h-12 shrink-0 gap-6 border-b border-custom-bg-tertiary px-6" aria-label="Tabs">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`
-                    -mb-px flex items-center gap-2 border-b-2 text-sm font-medium transition-colors
-                    ${activeTab === tab.id
-                      ? 'border-custom-brand-primary text-custom-brand-primary'
-                      : 'border-transparent text-custom-text-secondary hover:border-custom-bg-tertiary hover:text-custom-text-primary'
-                    }
-                  `}
+          <Panel>
+            {/* Tabs on the left, the year they show on the right */}
+            <div className="flex h-12 shrink-0 items-center justify-between gap-4 border-b border-custom-bg-tertiary px-[var(--card-padding)]">
+              <nav className="flex h-full gap-6" aria-label="Tabs">
+                {tabs.map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    onClick={() => setActiveTab(id)}
+                    aria-current={activeTab === id ? 'page' : undefined}
+                    className={`-mb-px flex items-center gap-2 border-b-2 text-sm font-medium transition-colors ${
+                      activeTab === id
+                        ? 'border-custom-brand-primary text-custom-text-primary'
+                        : 'border-transparent text-custom-text-secondary hover:border-custom-bg-tertiary hover:text-custom-text-primary'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </button>
+                ))}
+              </nav>
+              <label className="flex items-center gap-2 text-sm text-custom-text-secondary">
+                <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only">Year</span>
+                <select
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                  className="h-8 rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-2 text-sm font-medium text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary"
                 >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-
-            {/* Tab Content: the only scrolling area on this page */}
-            <div className="min-h-0 flex-1 overflow-y-auto p-6">
-              {activeTab === 'savings' && (
-                <SavingsHistory transactions={transactionsByType.SAVINGS_DEPOSIT || []} />
-              )}
-              {activeTab === 'loans' && (
-                <LoanAccordion
-                  loans={profile.account?.loans || []}
-                  transactions={transactionsByType}
-                />
-              )}
-              {activeTab === 'transactions' && (
-                <Transactions transactions={transactionsByType} />
-              )}
+                  {years.map(option => <option key={option} value={option}>{option}</option>)}
+                </select>
+              </label>
             </div>
-          </div>
-        </div>
+
+            {!account ? (
+              <div className="flex flex-1 items-center justify-center p-8 text-sm text-custom-text-secondary">
+                This member has no SACCO account yet.
+              </div>
+            ) : activeTab === 'savings' ? (
+              <SavingsTimeline transactions={transactions} year={year} />
+            ) : activeTab === 'loans' ? (
+              <LoanTimeline loans={loans} transactions={transactions} year={year} />
+            ) : (
+              <Transactions transactions={transactions} year={year} />
+            )}
+          </Panel>
+        </>
       ) : (
         <Panel className="items-center justify-center">
           <p className="text-sm text-custom-text-secondary">

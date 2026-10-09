@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Moon, Sun } from 'lucide-react'
 import { useSelector } from 'react-redux'
+import { useQuery } from '@apollo/client'
+import { GET_LOAN_APPLICATIONS } from '../../../graphql/queries'
 import { ThemeSwitcher } from '../../ui/ThemeSwitcher'
 import { useTheme } from '../../ui/ThemeProvider'
 import DropdownMenu from '../../ui/DropdownMenu'
@@ -32,8 +34,12 @@ const NavItem = ({ item, isSidebarOpen }) => {
 
 const isGroupActive = (group, pathname) => group.children.some(child => child.path === pathname)
 
+const CountBadge = ({ count, className = '' }) => count > 0
+  ? <span className={`ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white ${className}`}>{count}</span>
+  : null
+
 // Expanded sidebar: accordion header with its pages indented under a guide line
-const NavGroup = ({ group, pathname, open, onToggle }) => {
+const NavGroup = ({ group, pathname, open, onToggle, badges }) => {
   const active = isGroupActive(group, pathname)
   const Icon = group.icon
 
@@ -49,6 +55,7 @@ const NavGroup = ({ group, pathname, open, onToggle }) => {
       >
         <Icon className="h-5 w-5 shrink-0" />
         <span className="flex-1 truncate text-left">{group.label}</span>
+        {!open && <CountBadge count={group.children.reduce((total, child) => total + (badges[child.badge] || 0), 0)} />}
         <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? '' : '-rotate-90'}`} />
       </button>
       {open && (
@@ -61,6 +68,7 @@ const NavGroup = ({ group, pathname, open, onToggle }) => {
               className={({ isActive }) => `flex h-10 items-center rounded-lg px-4 text-sm font-medium transition-colors ${itemClass(isActive)}`}
             >
               <span className="truncate">{child.label}</span>
+              <CountBadge count={badges[child.badge] || 0} />
             </NavLink>
           ))}
         </div>
@@ -70,7 +78,7 @@ const NavGroup = ({ group, pathname, open, onToggle }) => {
 }
 
 // Collapsed sidebar: the group icon opens a flyout of its pages
-const NavGroupFlyout = ({ group, pathname }) => {
+const NavGroupFlyout = ({ group, pathname, badges }) => {
   const navigate = useNavigate()
   const active = isGroupActive(group, pathname)
   const Icon = group.icon
@@ -84,7 +92,7 @@ const NavGroupFlyout = ({ group, pathname }) => {
       label={<Icon className="h-5 w-5" />}
       items={group.children.map(child => ({
         key: child.path,
-        label: child.label,
+        label: badges[child.badge] ? `${child.label} (${badges[child.badge]})` : child.label,
         icon: child.icon,
         active: child.path === pathname,
         onClick: () => navigate(child.path),
@@ -115,6 +123,15 @@ const Menu = ({ isSidebarOpen }) => {
   const mainMenuItems = visibleNav(MAIN_NAV, { isAdmin })
   const currentPath = pathname.replace(/\/+$/, '')
 
+  // Pending member loan applications, shown as a count next to "Applications"
+  const { data: pending } = useQuery(GET_LOAN_APPLICATIONS, {
+    variables: { status: 'PENDING' },
+    skip: !isAdmin,
+    pollInterval: 60_000,
+    fetchPolicy: 'cache-and-network',
+  })
+  const badges = { pendingApplications: pending?.getLoanApplications?.length || 0 }
+
   // One group open at a time keeps the menu within the viewport (the sidebar never scrolls);
   // navigating into a group opens it
   const activeGroup = mainMenuItems.find(item => item.children && isGroupActive(item, currentPath))?.label || null
@@ -135,10 +152,11 @@ const Menu = ({ isSidebarOpen }) => {
                 group={item}
                 pathname={currentPath}
                 open={openGroup === item.label}
+                badges={badges}
                 onToggle={() => setOpenGroup(openGroup === item.label ? null : item.label)}
               />
             )
-            : <NavGroupFlyout key={item.label} group={item} pathname={currentPath} />
+            : <NavGroupFlyout key={item.label} group={item} pathname={currentPath} badges={badges} />
         })}
       </nav>
 

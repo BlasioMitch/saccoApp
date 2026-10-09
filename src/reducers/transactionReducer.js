@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import client from '../graphql/client'
 import { GET_TRANSACTIONS } from '../graphql/queries'
-import { CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION } from '../graphql/mutations'
+import { CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION, PAY_LOAN_FROM_SAVINGS } from '../graphql/mutations'
 
 export { TransactionType, TransactionStatus } from '../utils/transactionRules'
 
@@ -52,6 +52,22 @@ export const createTransaction = createAsyncThunk(
         variables: { transaction: transactionData }
       })
       return data.createTransaction
+    } catch (error) {
+      return rejectWithValue(error.message || 'Something went wrong!')
+    }
+  }
+)
+
+// Records two transactions: the withdrawal from savings and the loan payment
+export const payLoanFromSavings = createAsyncThunk(
+  'transactions/payLoanFromSavings',
+  async ({ loanId, amount }, { rejectWithValue }) => {
+    try {
+      const { data } = await client.mutate({
+        mutation: PAY_LOAN_FROM_SAVINGS,
+        variables: { id: loanId, amount }
+      })
+      return data.payLoanFromSavings
     } catch (error) {
       return rejectWithValue(error.message || 'Something went wrong!')
     }
@@ -127,6 +143,21 @@ const transactionSlice = createSlice({
         state.success = 'Transaction created successfully'
       })
       .addCase(createTransaction.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.payload
+      })
+      // Pay from savings cases
+      .addCase(payLoanFromSavings.pending, state => {
+        state.status = 'loading'
+        state.error = null
+        state.success = null
+      })
+      .addCase(payLoanFromSavings.fulfilled, (state, action) => {
+        state.transactions.push(action.payload.withdrawal, action.payload.payment)
+        state.status = 'succeeded'
+        state.success = 'Loan paid from savings'
+      })
+      .addCase(payLoanFromSavings.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.payload
       })

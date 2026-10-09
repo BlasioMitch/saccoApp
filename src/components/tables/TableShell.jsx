@@ -9,10 +9,14 @@ import DropdownMenu from '../ui/DropdownMenu'
 // { emphasis: 'primary' | 'amount', align: 'right', sticky: 'left', highlight: boolean }
 const isRightAligned = (meta = {}) => meta.align === 'right' || meta.emphasis === 'amount'
 
+// Divider on the frozen column's right edge so scrolled columns visibly pass underneath it
+const FROZEN_EDGE = 'max-w-64 shadow-[inset_-1px_0_0_var(--custom-bg-tertiary)]'
+
 const headerClass = (meta = {}) => cn(
-  'sticky top-0 z-10 h-10 whitespace-nowrap border-b border-custom-bg-tertiary bg-custom-bg-secondary px-4',
-  'text-xs font-medium uppercase tracking-wide text-custom-text-secondary',
+  'sticky top-0 z-10 h-10 whitespace-nowrap border-b border-custom-bg-tertiary bg-custom-bg-table px-4',
+  'text-xs font-semibold uppercase tracking-wide text-custom-text-secondary',
   isRightAligned(meta) ? 'text-right' : 'text-left',
+  meta.sticky === 'left' && FROZEN_EDGE,
   meta.sticky === 'left' && 'left-0 z-20',
   meta.highlight && 'bg-custom-interactive-focus text-custom-brand-primary'
 )
@@ -24,21 +28,21 @@ const cellClass = (meta = {}) => cn(
   meta.emphasis === 'amount' && 'font-semibold tabular-nums text-custom-text-primary',
   !meta.emphasis && 'text-custom-text-secondary',
   // Frozen cells need a solid background so scrolled content passes underneath
-  meta.sticky === 'left' && 'sticky left-0 z-[5] bg-custom-bg-primary group-hover:bg-custom-interactive-hover',
+  meta.sticky === 'left' && cn('sticky left-0 z-[5] bg-custom-bg-primary group-hover:bg-custom-interactive-hover', FROZEN_EDGE),
   meta.highlight && 'bg-custom-interactive-focus text-custom-text-primary'
 )
 
 const footerClass = (meta = {}) => cn(
-  'sticky bottom-0 z-10 h-10 whitespace-nowrap border-t border-custom-bg-tertiary bg-custom-bg-secondary px-4',
+  'sticky bottom-0 z-10 h-10 whitespace-nowrap border-t border-custom-bg-tertiary bg-custom-bg-table px-4',
   'text-sm font-semibold tabular-nums text-custom-text-primary',
   isRightAligned(meta) ? 'text-right' : 'text-left',
-  meta.sticky === 'left' && 'left-0 z-20',
+  meta.sticky === 'left' && cn('left-0 z-20', FROZEN_EDGE),
   meta.highlight && 'bg-custom-interactive-focus'
 )
 
-// 56px bar: search on the left, actions on the right
+// 48px bar: search on the left, actions on the right
 export const TableToolbar = ({ search, onSearch, placeholder = 'Search...', children }) => (
-  <div className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-custom-bg-tertiary px-4">
+  <div className="flex h-12 shrink-0 items-center justify-between gap-4 border-b border-custom-bg-tertiary px-3">
     <div className="relative w-full max-w-xs">
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-custom-text-secondary" />
       <input

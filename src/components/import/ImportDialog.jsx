@@ -170,7 +170,7 @@ const ImportDialog = ({ isOpen, onClose, config, onImported }) => {
               </div>
               <div className="overflow-x-auto rounded-lg border border-custom-bg-tertiary">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-custom-bg-secondary text-xs uppercase tracking-wide text-custom-text-secondary">
+                  <thead className="bg-custom-bg-table text-xs uppercase tracking-wide text-custom-text-secondary">
                     <tr>
                       <th className="h-10 px-4">Column</th>
                       <th className="h-10 px-4">Required</th>
@@ -231,7 +231,7 @@ const ImportDialog = ({ isOpen, onClose, config, onImported }) => {
                 <thead>
                   <tr>
                     {['Line', 'Status', ...config.columns.map(column => column.label), ''].map((label, index) => (
-                      <th key={index} className="sticky top-0 z-10 h-10 whitespace-nowrap border-b border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-left text-xs font-medium uppercase tracking-wide text-custom-text-secondary">
+                      <th key={index} className="sticky top-0 z-10 h-10 whitespace-nowrap border-b border-custom-bg-tertiary bg-custom-bg-table px-4 text-left text-xs font-semibold uppercase tracking-wide text-custom-text-secondary">
                         {label}
                       </th>
                     ))}

@@ -53,6 +53,7 @@ module.exports = {
   			'custom-bg-primary': 'var(--custom-bg-primary)',
   			'custom-bg-secondary': 'var(--custom-bg-secondary)',
   			'custom-bg-tertiary': 'var(--custom-bg-tertiary)',
+  			'custom-bg-table': 'var(--custom-bg-table)',
   			'custom-text-primary': 'var(--custom-text-primary)',
   			'custom-text-secondary': 'var(--custom-text-secondary)',
   			'custom-text-muted': 'var(--custom-text-muted)',
@@ -71,6 +72,11 @@ module.exports = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
+  		},
+  		boxShadow: {
+  			card: 'var(--shadow-card)',
+  			raised: 'var(--shadow-raised)',
+  			sidebar: 'var(--shadow-sidebar)'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

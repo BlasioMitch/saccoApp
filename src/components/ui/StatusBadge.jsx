@@ -15,6 +15,7 @@ const TONE_BY_STATUS = {
   PENDING: 'amber',
   FAILED: 'red',
   DEFAULTED: 'red',
+  REJECTED: 'red',
   INACTIVE: 'neutral',
   CLOSED: 'neutral',
 }

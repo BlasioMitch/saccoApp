@@ -18,6 +18,7 @@ export const GET_USERS = gql`
       dob
       hasAccount
       fullName
+      avatar
       account {
         id
         userId
@@ -51,6 +52,7 @@ query GetUserById($getUserByIdId: ID!) {
     dob
     hasAccount
     fullName
+    avatar
     account {
       id
       userId
@@ -70,6 +72,8 @@ query GetUserById($getUserByIdId: ID!) {
         endDate
         startDate
         term
+        purpose
+        decisionNote
         summary {
           id
           loanId
@@ -112,7 +116,8 @@ export const GET_ACCOUNTS = gql`
       is_deleted
       deleted_at
       owner {
-        id
+        avatar
+id
         first_name
         last_name
         other_name
@@ -171,7 +176,8 @@ export const GET_ACCOUNT_BY_ID = gql`
       is_deleted
       deleted_at
       owner {
-        id
+        avatar
+id
         first_name
         last_name
         other_name
@@ -253,7 +259,8 @@ export const LOAN_FIELDS = gql`
       is_deleted
       deleted_at
       owner {
-        id
+        avatar
+id
         first_name
         last_name
         other_name
@@ -351,7 +358,8 @@ export const TRANSACTION_FIELDS = gql`
       id
       accountNumber
       owner {
-        id
+        avatar
+id
         first_name
         last_name
         other_name
@@ -407,6 +415,7 @@ export const GET_SAVINGS_REPORT = gql`
         accountId
         accountNumber
         memberName
+        memberAvatar
         broughtForward
         months
         total
@@ -439,6 +448,7 @@ export const GET_LOAN_PAYMENTS_REPORT = gql`
         loanId
         accountNumber
         memberName
+        memberAvatar
         loanAmount
         broughtForward
         months
@@ -475,6 +485,39 @@ export const ME = gql`
       joinDate
       fullName
       avatar
+    }
+  }
+`
+
+// Loan applications (member requests from the app) for the staff Applications page
+export const GET_LOAN_APPLICATIONS = gql`
+  query GetLoanApplications($status: LOANSTATUS) {
+    getLoanApplications(status: $status) {
+      id
+      accountId
+      amount
+      interestRate
+      term
+      status
+      purpose
+      decisionNote
+      decidedAt
+      createdAt
+      account {
+        id
+        accountNumber
+        balance
+        status
+        paidMembership
+        hasLoan
+        owner {
+          avatar
+id
+          first_name
+          last_name
+          other_name
+        }
+      }
     }
   }
 `

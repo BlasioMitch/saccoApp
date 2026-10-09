@@ -330,7 +330,7 @@ const LoanForm = ({ isOpen, onClose, loanToEdit, initialValues }) => {
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="w-full bg-green-500 text-gray-900 h-10 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-custom-brand-primary text-custom-interactive-active-text h-10 px-4 rounded-lg font-medium hover:bg-custom-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {status === 'loading' ? 'Saving...' : (loanToEdit ? 'Update' : 'Create')}
           </button>

@@ -40,7 +40,7 @@ const tooltipProps = {
 const selectClass = 'h-10 rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary';
 
 const ChartCard = ({ title, children }) => (
-  <div className="flex min-h-0 flex-col rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6">
+  <div className="flex min-h-0 flex-col rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-[var(--card-padding)] shadow-card">
     <h3 className="mb-4 shrink-0 text-base font-semibold leading-6 text-custom-text-primary">{title}</h3>
     <div className="min-h-0 flex-1">
       <ResponsiveContainer width="100%" height="100%">
@@ -129,7 +129,7 @@ function Dashboard() {
       <StatGrid stats={stats} />
 
       {/* Filters */}
-      <div className="flex h-14 shrink-0 items-center gap-4 rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary px-4">
+      <div className="flex h-14 shrink-0 items-center gap-4 rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary px-4 shadow-card">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-custom-text-secondary" />
           <select
@@ -171,7 +171,7 @@ function Dashboard() {
       </div>
 
       {/* Charts fill the remaining height */}
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-[var(--section-gap)] lg:grid-cols-2">
         <ChartCard title="Loan Repayment Progress">
           <LineChart data={loanRepaymentData}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--custom-bg-tertiary)" />
@@ -179,7 +179,7 @@ function Dashboard() {
             <YAxis {...axisProps} />
             <Tooltip {...tooltipProps} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} />
+            <Line type="monotone" dataKey="value" stroke="var(--chart-line-1)" strokeWidth={2} />
           </LineChart>
         </ChartCard>
 
@@ -190,7 +190,7 @@ function Dashboard() {
             <YAxis {...axisProps} tickFormatter={(value) => value.toLocaleString()} width={80} />
             <Tooltip {...tooltipProps} formatter={(value) => formatCurrency(value)} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Line type="monotone" dataKey="balance" stroke="#82ca9d" strokeWidth={2} />
+            <Line type="monotone" dataKey="balance" stroke="var(--chart-line-2)" strokeWidth={2} />
           </LineChart>
         </ChartCard>
       </div>

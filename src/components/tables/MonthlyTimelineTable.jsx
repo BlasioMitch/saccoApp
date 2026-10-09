@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-table'
 import { Calendar } from 'lucide-react'
 import { TableToolbar, ColumnMenu, DataTable, TableEmpty, TablePagination, SortableHeader } from './TableShell'
+import OwnerCell from '../ui/OwnerCell'
 
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -52,6 +53,7 @@ const MonthlyTimelineTable = ({
       meta: { label: 'Member', emphasis: 'primary', sticky: 'left' },
       enableHiding: false,
       header: ({ column }) => <SortableHeader column={column} label="Member" />,
+      cell: ({ row, getValue }) => <OwnerCell name={getValue()} avatar={row.original.memberAvatar} />,
       footer: 'Totals',
     },
     ...leadingColumns,

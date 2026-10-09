@@ -1,0 +1,12 @@
+{
+  "name": "Green Sprout",
+  "short_name": "Green Sprout",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#000F02",
+  "background_color": "#E7EFD5",
+  "display": "standalone",
+  "start_url": "/"
+}

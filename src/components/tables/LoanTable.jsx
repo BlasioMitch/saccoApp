@@ -24,6 +24,8 @@ import Button from '../ui/Button';
 import ImportButton from '../import/ImportButton';
 import loansImport from '../import/configs/loans';
 import { fetchLoans } from '../../reducers/loansReducer';
+import OwnerCell from '../ui/OwnerCell';
+import { ownerName } from '../../utils/names';
 
 const LoanTable = () => {
   const dispatch = useDispatch();
@@ -61,19 +63,18 @@ const LoanTable = () => {
 
   const columns = [
     {
+      id: 'ownerName',
+      meta: { label: 'Owner Name', emphasis: 'primary', sticky: 'left' },
+      enableHiding: false,
+      header: ({ column }) => <SortableHeader column={column} label="Owner Name" />,
+      accessorFn: (row) => ownerName(row.account?.owner),
+      cell: ({ row, getValue }) => <OwnerCell owner={row.original.account?.owner} name={getValue() || undefined} />,
+    },
+    {
       id: 'accountNumber',
       meta: { label: 'Account Number', emphasis: 'primary' },
       header: ({ column }) => <SortableHeader column={column} label="Account Number" />,
-      accessorFn: (row) => row.account?.accountNumber, // This directly pulls account.accountNumber
-    },
-    {
-      id: 'ownerName',
-      meta: { label: 'Owner Name', emphasis: 'primary' },
-      header: ({ column }) => <SortableHeader column={column} label="Owner Name" />,
-      accessorFn: (row) => {
-        const owner = row.account?.owner;
-        return owner ? `${owner.first_name} ${owner.last_name} ${owner.other_name? owner.other_name: ''}` : '';
-      },
+      accessorFn: (row) => row.account?.accountNumber,
     },
     {
       accessorKey: 'amount',

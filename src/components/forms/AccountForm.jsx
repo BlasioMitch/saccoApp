@@ -229,7 +229,7 @@ const AccountForm = ({ isOpen, onClose, accountToEdit }) => {
             </button>
             <button
               type="submit"
-              className="px-4 h-10 bg-green-500 text-gray-900 rounded-lg hover:bg-custom-brand-dark hover:cursor-pointer"
+              className="px-4 h-10 bg-custom-brand-primary text-custom-interactive-active-text font-medium rounded-lg hover:bg-custom-brand-dark hover:cursor-pointer"
               disabled={status === 'loading'}
             >
               {status === 'loading' ? 'Saving...' : (accountToEdit ? 'Update' : 'Create')}

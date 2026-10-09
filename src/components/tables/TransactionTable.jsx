@@ -21,6 +21,7 @@ import ImportButton from '../import/ImportButton';
 import transactionsImport from '../import/configs/transactions';
 import { fetchAccounts } from '../../reducers/accountsReducer';
 import { fetchLoans } from '../../reducers/loansReducer';
+import OwnerCell from '../ui/OwnerCell';
 
 // Same hues as before, tuned to stay legible in both themes
 const TYPE_STYLES = {
@@ -80,16 +81,18 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
 
   const columns = [
     {
+      id: 'ownerName',
+      meta: { label: 'Owner Name', emphasis: 'primary', sticky: 'left' },
+      enableHiding: false,
+      header: ({ column }) => <SortableHeader column={column} label="Owner Name" />,
+      accessorFn: (row) => ownerName(row.account?.owner),
+      cell: ({ row, getValue }) => <OwnerCell owner={row.original.account?.owner} name={getValue() || undefined} />,
+    },
+    {
       id: 'accountNumber',
       meta: { label: 'Account Number', emphasis: 'primary' },
       header: ({ column }) => <SortableHeader column={column} label="Account Number" />,
       accessorFn: (row) => row.account?.accountNumber,
-    },
-    {
-      id: 'ownerName',
-      meta: { label: 'Owner Name', emphasis: 'primary' },
-      header: ({ column }) => <SortableHeader column={column} label="Owner Name" />,
-      accessorFn: (row) => row.account?.owner ? ownerName(row.account.owner) : '',
     },
     {
       accessorKey: 'type',

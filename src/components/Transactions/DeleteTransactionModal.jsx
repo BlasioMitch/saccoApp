@@ -81,7 +81,7 @@ const DeleteTransactionModal = ({ isOpen, onClose, onConfirm, transaction }) => 
             <button
               onClick={handleConfirm}
               disabled={deleteText.toLowerCase() !== 'delete'}
-              className="px-4 h-10 bg-red-500 text-gray-900 rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 h-10 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Delete
             </button>

@@ -12,6 +12,7 @@ import Accounts from './pages/Accounts/Accounts'
 import Savings from './pages/Savings/Savings'
 import LoanPayments from './pages/LoanPayments/LoanPayments'
 import Settings from './pages/Settings/Settings'
+import LoanApplications from './pages/LoanApplications/LoanApplications'
 import Profiles from './pages/Profiles/Profiles'
 import { ThemeProvider } from './components/ui/ThemeProvider'
 
@@ -52,6 +53,7 @@ function App() {
           <Route path="transactions" element={<Transactions />} />
           <Route path="loans" element={<Loans />} />
           <Route path="loan-payments" element={<LoanPayments />} />
+          <Route path="loan-applications" element={<LoanApplications />} />
           <Route path="settings" element={<Settings />} />
           <Route path="accounts" element={<Accounts />} />
           <Route path="savings" element={<Savings />} />

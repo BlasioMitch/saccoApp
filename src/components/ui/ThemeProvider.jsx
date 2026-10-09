@@ -7,18 +7,20 @@ const ThemeContext = createContext({
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    // Check localStorage for saved theme preference
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("theme") || "dark"
-    }
-    return "dark"
+    // A saved choice wins; on a first visit follow the operating system's theme
+    if (typeof window === "undefined") return "dark"
+    try {
+      const saved = localStorage.getItem("theme")
+      if (saved) return saved
+    } catch { /* storage unavailable */ }
+    return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark"
   })
 
   useEffect(() => {
     const root = window.document.documentElement
     root.classList.remove("light", "dark")
     root.classList.add(theme)
-    localStorage.setItem("theme", theme)
+    try { localStorage.setItem("theme", theme) } catch { /* storage unavailable */ }
   }, [theme])
 
   return (
