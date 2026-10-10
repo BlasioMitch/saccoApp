@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { HandCoins, Receipt, Scale, CheckCircle2, Loader2 } from 'lucide-react'
+import { HandCoins, Receipt, Scale, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { StatGrid } from '../../components/ui/StatCard'
+import { TableRowsSkeleton } from '../../components/ui/Skeleton'
 import { PageShell, Panel } from '../../components/layout/PageShell'
 import LoanPaymentsTable from '../../components/tables/LoanPaymentsTable'
 import { MONTHS } from '../../components/tables/MonthlyTimelineTable'
@@ -73,9 +74,7 @@ const LoanPayments = () => {
       <StatGrid stats={statCards} />
       <Panel>
         {status === 'loading' && !report ? (
-          <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
-          </div>
+          <TableRowsSkeleton rows={10} columns={8} />
         ) : (
           <LoanPaymentsTable
             report={report}

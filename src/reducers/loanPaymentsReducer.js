@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { GET_LOAN_PAYMENTS_REPORT } from "../graphql/queries";
 import client from "../graphql/client";
+import { isOffline } from '../offline/network'
 
 const initialState = {
     error : null,
@@ -22,7 +23,9 @@ export const fetchLoanPaymentsReport = createAsyncThunk(
         } catch (error){
             return rejectWithValue(error.message || 'Something went wrong!')
         }
-    }
+    },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 
 const loanPaymentsSlice = createSlice({

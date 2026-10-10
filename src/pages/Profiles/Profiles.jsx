@@ -8,7 +8,8 @@ import SavingsTimeline from '../../components/Profiles/SavingsTimeline';
 import LoanTimeline from '../../components/Profiles/LoanTimeline';
 import Transactions from '../../components/Profiles/Transactions';
 import { activityYears, currentYear, memberFigures } from '../../utils/memberTimeline';
-import { Loader2, X, User2, Wallet, CreditCard, History, CalendarDays } from 'lucide-react';
+import { X, User2, Wallet, CreditCard, History, CalendarDays } from 'lucide-react';
+import { PageSkeleton } from '../../components/ui/Skeleton'
 import { PageShell, Panel } from '../../components/layout/PageShell';
 import Button from '../../components/ui/Button';
 
@@ -92,9 +93,7 @@ const Profiles = ({ userId, isRegularUser }) => {
 
       {/* Main Content Section */}
       {isLoading ? (
-        <Panel className="items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
-        </Panel>
+        <PageSkeleton variant="profile" />
       ) : (selectedUser || isRegularUser) && profile ? (
         <>
           <ProfileHeader user={profile} account={account} figures={figures} year={year} />

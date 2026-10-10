@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Users, Wallet, CheckCircle2, BarChart3, Loader2 } from 'lucide-react'
+import { Users, Wallet, CheckCircle2, BarChart3 } from 'lucide-react'
 import { StatGrid } from '../../components/ui/StatCard'
+import { TableRowsSkeleton } from '../../components/ui/Skeleton'
 import { PageShell, Panel } from '../../components/layout/PageShell'
 import AccountsTable from '../../components/tables/AccountsTable'
 import { fetchAccounts } from '../../reducers/accountsReducer'
@@ -59,10 +60,8 @@ const Accounts = () => {
     <PageShell>
       <StatGrid stats={stats} />
       <Panel>
-        {status === 'loading' ? (
-          <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
-          </div>
+        {status === 'loading' && !accounts?.length ? (
+          <TableRowsSkeleton rows={10} columns={7} />
         ) : (
           <AccountsTable accounts={accounts || []} />
         )}

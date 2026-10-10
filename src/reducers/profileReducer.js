@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import client from '../graphql/client'
 import { GET_USER_BY_ID } from '../graphql/queries'
+import { isOffline } from '../offline/network'
 
 const initialState = {
     profile: null,
@@ -22,7 +23,9 @@ export const FetchProfile = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error.message || 'Something is not right on our end');
         }
-    }
+    },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 // create a slice of the store
 const profileSlice = createSlice({

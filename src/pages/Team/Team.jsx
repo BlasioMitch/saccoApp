@@ -113,7 +113,7 @@ const Team = () => {
 
       <Panel>
         {transformedMembers.length > 0 ? (
-          <UsersTable users={transformedMembers} onEdit={handleOpenPanel} onView={handleOpenDetailsModal}/>
+          <UsersTable users={transformedMembers} onEdit={handleOpenPanel} onView={handleOpenDetailsModal} loading={status === 'loading'} />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
             <TableEmpty

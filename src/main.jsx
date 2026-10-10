@@ -9,6 +9,7 @@ import { store } from './Store/store.js'
 import client, { setUnauthorizedHandler } from './graphql/client.js'
 import { sessionExpired } from './reducers/authReducer'
 import { toast } from 'sonner'
+import { clearOfflineData, restoreOfflineData, saveOfflineData } from './offline/persist'
 
 // Expired/invalid token: drop local auth state; ProtectedRoute then redirects to /login
 setUnauthorizedHandler(() => {
@@ -16,17 +17,22 @@ setUnauthorizedHandler(() => {
   if (!store.getState().auth.isAuthenticated) return
   store.dispatch(sessionExpired())
   client.clearStore().catch(() => {})
+  clearOfflineData()
   toast.error('Your session has expired. Please log in again.')
 })
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <ApolloProvider client={client}>
-    <Router >
-      <React.StrictMode>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </React.StrictMode>
-    </Router>
-  </ApolloProvider>
-)
+// The data saved in this browser is put back first, so pages open with it straight away (and offline)
+restoreOfflineData(store).finally(() => {
+  saveOfflineData(store)
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <ApolloProvider client={client}>
+      <Router >
+        <React.StrictMode>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </React.StrictMode>
+      </Router>
+    </ApolloProvider>
+  )
+})

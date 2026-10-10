@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import client from '../graphql/client'
+import { mutateOrQueue } from '../offline/mutateOrQueue'
 import { GET_USERS } from '../graphql/queries'
-import { CREATE_USER, UPDATE_USER, DELETE_USER } from '../graphql/mutations'
+import { DELETE_USER } from '../graphql/mutations'
+import { isOffline } from '../offline/network'
 
 const initialState = {
     profile: null,
@@ -13,12 +15,10 @@ const initialState = {
 // register user in backend
 export const createUser = createAsyncThunk(
     'users/createUser',
-    async (userData, { rejectWithValue }) =>{
+    async (userData, { rejectWithValue, getState }) =>{
         try {
-            const { data } = await client.mutate({
-                mutation: CREATE_USER,
-                variables: { user: userData }
-            })
+            // Offline: saved in this browser and sent later (the row shows "Waiting to sync" meanwhile)
+            const { data } = await mutateOrQueue({ operation: 'CREATE_USER', variables: { user: userData }, getState })
             return data.createUser
         } catch (error) {
             return rejectWithValue(error.message || 'Something is not right on our end');
@@ -40,7 +40,9 @@ export const fetchUsers = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error.message || 'Something went wrong on our side')
         }
-    }
+    },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 
 // get one user
@@ -53,21 +55,20 @@ export const fetchUserById = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Something went wrong one our End')
         }
-    }
+    },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 
 // patch one user
 export const patchUser = createAsyncThunk(
     'users/patchUser',
-    async ({ id, objData } , { rejectWithValue }) => {
+    async ({ id, objData } , { rejectWithValue, getState }) => {
         try {
             if(!id || !objData){
                 throw new Error('Invalid Input: ID and data are required')
             }
-            const { data } = await client.mutate({
-                mutation: UPDATE_USER,
-                variables: { updateUserId: id, updateData: objData }
-            })
+            const { data } = await mutateOrQueue({ operation: 'UPDATE_USER', variables: { updateUserId: id, updateData: objData }, getState })
             return data.updateUser
         } catch (error) {
             // console.log(error.message, ' patch user')

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Activity, Wallet, CheckCircle2, Clock, XCircle, Loader2 } from 'lucide-react'
+import { Activity, Wallet, CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { StatGrid } from '../../components/ui/StatCard'
 import { PageShell, Panel } from '../../components/layout/PageShell'
 import { TableEmpty } from '../../components/tables/TableShell'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 import Button from '../../components/ui/Button'
 import TransactionTable from '../../components/tables/TransactionTable'
 import TransactionForm from '../../components/forms/TransactionForm'
@@ -161,15 +162,8 @@ const Transactions = () => {
     }
   }
 
-  if (status === 'loading') {
-    return (
-      <PageShell>
-        <Panel className="items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
-        </Panel>
-      </PageShell>
-    )
-  }
+  // First load only: a refresh keeps the list on screen
+  if (status === 'loading' && !transactions?.length) return <PageSkeleton variant="table" />
 
   return (
     <PageShell>

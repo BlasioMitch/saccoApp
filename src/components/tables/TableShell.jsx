@@ -2,6 +2,7 @@ import React from 'react'
 import { flexRender } from '@tanstack/react-table'
 import { Search, Columns3, Eye, EyeOff, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { TableRowsSkeleton } from '../ui/Skeleton'
 import Button from '../ui/Button'
 import DropdownMenu from '../ui/DropdownMenu'
 
@@ -96,7 +97,8 @@ export const ColumnMenu = ({ table }) => {
 }
 
 // The only scrolling area of a page: sticky header, rows scroll in both axes inside the card
-export const DataTable = ({ table, onRowClick, empty }) => {
+// loading: first load with nothing to show yet; rows in the shape of the table instead of an empty message
+export const DataTable = ({ table, onRowClick, empty, loading = false }) => {
   const rows = table.getRowModel().rows
   const hasData = table.getCoreRowModel().rows.length > 0
   // Totals row pinned to the bottom, rendered only when a column defines `footer`
@@ -118,19 +120,27 @@ export const DataTable = ({ table, onRowClick, empty }) => {
             ))}
           </thead>
           <tbody>
-            {rows.map(row => (
-              <tr
-                key={row.id}
-                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                className={cn('group transition-colors hover:bg-custom-interactive-hover', onRowClick && 'cursor-pointer')}
-              >
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className={cellClass(cell.column.columnDef.meta)}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {rows.map(row => {
+              // Made offline and not sent yet: marked, and not opened (the server has no record of it yet)
+              const pending = row.original?.syncStatus === 'pending'
+              return (
+                <tr
+                  key={row.id}
+                  onClick={onRowClick && !pending ? () => onRowClick(row.original) : undefined}
+                  title={pending ? 'Saved in this browser; it will be sent when you are back online' : undefined}
+                  className={cn('group transition-colors hover:bg-custom-interactive-hover', onRowClick && !pending && 'cursor-pointer', pending && 'bg-yellow-500/5')}
+                >
+                  {row.getVisibleCells().map((cell, index) => (
+                    <td key={cell.id} className={cellClass(cell.column.columnDef.meta)}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {pending && index === 0 && (
+                        <span className="ml-2 inline-flex h-5 items-center rounded-full bg-yellow-500/15 px-2 text-[11px] font-medium text-yellow-700 dark:text-yellow-400">Waiting to sync</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              )
+            })}
           </tbody>
           {hasFooter && (
             <tfoot>
@@ -146,6 +156,8 @@ export const DataTable = ({ table, onRowClick, empty }) => {
             </tfoot>
           )}
         </table>
+      ) : loading && !hasData ? (
+        <TableRowsSkeleton rows={10} columns={Math.min(7, Math.max(3, table.getVisibleLeafColumns().length))} />
       ) : (
         <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
           {hasData ? (

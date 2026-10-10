@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import React, { Suspense, useState } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
+import { RouteSkeleton } from '../../components/ui/Skeleton'
 import Sidebar from '../../components/layout/Sidebar/Sidebar'
 import TopBar from '../../components/layout/TopBar'
+import { OfflineStrip } from '../../components/offline/OfflineStatus'
 
 const SIDEBAR_KEY = 'sidebarOpen'
 
@@ -15,6 +17,7 @@ const initialSidebarOpen = () => {
 }
 
 function Grid() {
+  const { pathname } = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(initialSidebarOpen)
 
   const toggleSidebar = () => {
@@ -30,9 +33,12 @@ function Grid() {
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Attached to the top and to the sidebar's edge (collapsed or not) */}
         <TopBar />
+        <OfflineStrip />
         {/* Pages fill this area exactly; only tables/lists scroll inside their own containers */}
         <main className="min-h-0 flex-1 overflow-hidden p-[var(--page-padding)]">
-          <Outlet />
+          <Suspense fallback={<RouteSkeleton pathname={pathname} />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

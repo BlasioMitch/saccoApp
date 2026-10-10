@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { GET_ACCOUNTS, GET_ACCOUNT_BY_ID } from "../graphql/queries";
 import client from "../graphql/client";
-import { CREATE_ACCOUNT, UPDATE_ACCOUNT, DELETE_ACCOUNT } from '../graphql/mutations'
+import { mutateOrQueue } from "../offline/mutateOrQueue";
+import { DELETE_ACCOUNT } from '../graphql/mutations'
+import { isOffline } from '../offline/network'
 
 const initialState = {
     error : null,
@@ -23,7 +25,9 @@ export const fetchAccounts = createAsyncThunk(
         } catch (error){
             return rejectWithValue(error.message || 'Something went wrong!')
         }
-    }
+    },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 
 export const fetchAccountById = createAsyncThunk(
@@ -38,17 +42,17 @@ export const fetchAccountById = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error.message || 'Something went wrong!')
         }
-    }
+    },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 
 export const createAccount = createAsyncThunk(
     'accounts/createAccount',
-    async (accountData, { rejectWithValue }) =>{
+    async (accountData, { rejectWithValue, getState }) =>{
         try{
-            const { data } = await client.mutate({
-                mutation: CREATE_ACCOUNT,
-                variables: { account: accountData }
-            })
+            // Offline: saved in this browser and sent later (the row shows "Waiting to sync" meanwhile)
+            const { data } = await mutateOrQueue({ operation: 'CREATE_ACCOUNT', variables: { account: accountData }, getState })
             return data.createAccount
         } catch (error){
             return rejectWithValue(error.message || 'something went wrong!')
@@ -73,17 +77,14 @@ export const deleteAccount = createAsyncThunk(
 
 export const patchAccount = createAsyncThunk(
     'accounts/patchAccount',
-    async ({id, accountData}, { rejectWithValue}) => {
+    async ({id, accountData}, { rejectWithValue, getState }) => {
         try{
             // Only send allowed fields for update
             const allowedFields = ['balance', 'status', 'paidMembership'];
             const updateVars = Object.fromEntries(
                 Object.entries(accountData).filter(([key]) => allowedFields.includes(key))
             );
-            const { data } = await client.mutate({
-                mutation: UPDATE_ACCOUNT,
-                variables: { updateAccountId: id, ...updateVars }
-            })
+            const { data } = await mutateOrQueue({ operation: 'UPDATE_ACCOUNT', variables: { updateAccountId: id, ...updateVars }, getState })
             return data.updateAccount
         } catch (error){
             return rejectWithValue(error.message || 'Something went wrong!')

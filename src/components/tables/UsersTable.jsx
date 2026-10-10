@@ -78,7 +78,7 @@ const Pill = ({ className, children }) => (
 
 const sortable = (label) => ({ column }) => <SortableHeader column={column} label={label} />
 
-function UsersTable({ users, onEdit, onView }) {
+function UsersTable({ users, onEdit, onView, loading = false }) {
   const dispatch = useDispatch()
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
@@ -275,7 +275,7 @@ function UsersTable({ users, onEdit, onView }) {
         </Button>
       </TableToolbar>
 
-      <DataTable table={table} />
+      <DataTable table={table} loading={loading} />
 
       <TablePagination table={table} />
 

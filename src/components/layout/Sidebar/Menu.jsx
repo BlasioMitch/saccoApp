@@ -4,6 +4,7 @@ import { ChevronDown, Moon, Sun } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { useQuery } from '@apollo/client'
 import { GET_LOAN_APPLICATIONS } from '../../../graphql/queries'
+import { GET_PASSWORD_RESETS } from '../../../graphql/queries/passwordResets'
 import { ThemeSwitcher } from '../../ui/ThemeSwitcher'
 import { useTheme } from '../../ui/ThemeProvider'
 import DropdownMenu from '../../ui/DropdownMenu'
@@ -120,7 +121,7 @@ const Menu = ({ isSidebarOpen }) => {
   const { user } = useSelector((state) => state.auth)
   const { pathname } = useLocation()
   const isAdmin = user?.role?.toLowerCase() !== 'user'
-  const mainMenuItems = visibleNav(MAIN_NAV, { isAdmin })
+  const mainMenuItems = visibleNav(MAIN_NAV, { isAdmin, role: user?.role })
   const currentPath = pathname.replace(/\/+$/, '')
 
   // Pending member loan applications, shown as a count next to "Applications"
@@ -130,7 +131,17 @@ const Menu = ({ isSidebarOpen }) => {
     pollInterval: 60_000,
     fetchPolicy: 'cache-and-network',
   })
-  const badges = { pendingApplications: pending?.getLoanApplications?.length || 0 }
+  // Password reset requests waiting for a temporary password
+  const { data: resets } = useQuery(GET_PASSWORD_RESETS, {
+    variables: { status: 'PENDING' },
+    skip: !isAdmin,
+    pollInterval: 60_000,
+    fetchPolicy: 'cache-and-network',
+  })
+  const badges = {
+    pendingApplications: pending?.getLoanApplications?.length || 0,
+    pendingResets: resets?.passwordResets?.length || 0,
+  }
 
   // One group open at a time keeps the menu within the viewport (the sidebar never scrolls);
   // navigating into a group opens it

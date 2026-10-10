@@ -74,6 +74,20 @@
     /* Charts */
     --chart-line-1: #1F6B29;
     --chart-line-2: #7CB342;
+    /* Dashboard series: one fixed colour per money flow (validated light/dark pairs, dataviz palette) */
+    --chart-deposits: #2a78d6;
+    --chart-withdrawals: #eb6834;
+    --chart-repayments: #1baf7a;
+    --chart-disbursed: #4a3aa7;
+    --chart-fees: #e87ba4;
+    --chart-interest: #008300;
+    /* Status (arrears): never used for a series */
+    --chart-good: #0ca30c;
+    --chart-warning: #fab219;
+    --chart-serious: #ec835a;
+    --chart-critical: #d03b3b;
+    --chart-grid: #e6ecdc;
+    --chart-axis: #c8d5b3;
   }
 
   .dark {
@@ -122,6 +136,14 @@
 
     --chart-line-1: #8FD18F;
     --chart-line-2: #D1FCD0;
+    --chart-deposits: #3987e5;
+    --chart-withdrawals: #d95926;
+    --chart-repayments: #199e70;
+    --chart-disbursed: #9085e9;
+    --chart-fees: #d55181;
+    --chart-interest: #008300;
+    --chart-grid: #12281a;
+    --chart-axis: #1f3d26;
   }
 
   /* The sidebar keeps the brand green in both themes: re-point the app tokens inside it */

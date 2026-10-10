@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { useMutation, useQuery } from '@apollo/client'
+import { useDispatch, useSelector, useStore } from 'react-redux'
+import { useQuery } from '@apollo/client'
 import moment from 'moment'
 import {
   useReactTable,
@@ -12,7 +12,8 @@ import {
 import { Check, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { GET_LOAN_APPLICATIONS } from '../../graphql/queries'
-import { APPROVE_LOAN, REJECT_LOAN } from '../../graphql/mutations'
+import { mutateOrQueue } from '../../offline/mutateOrQueue'
+import { useOutbox } from '../../offline/outbox'
 import { fetchLoans } from '../../reducers/loansReducer'
 import { fetchAccounts } from '../../reducers/accountsReducer'
 import { PageShell, Panel } from '../../components/layout/PageShell'
@@ -24,6 +25,7 @@ import { ownerName } from '../../utils/names'
 import { DATE_FORMAT, addMonths, summarize } from '../../utils/loanTerms'
 import { cn } from '../../lib/utils'
 import OwnerCell from '../../components/ui/OwnerCell'
+import { isOffline, visibleError } from '../../offline/network'
 
 const TABS = [
   { key: 'PENDING', label: 'Pending', empty: 'No applications waiting', hint: 'Loan applications made from the member app appear here.' },
@@ -76,7 +78,8 @@ const ApproveDialog = ({ application, onClose, onDone }) => {
     return proposed && proposed.isSameOrAfter(moment(), 'day') ? proposed.format(DATE_FORMAT) : moment().format(DATE_FORMAT)
   })
   const [note, setNote] = useState('')
-  const [approve, { loading }] = useMutation(APPROVE_LOAN)
+  const store = useStore()
+  const [loading, setLoading] = useState(false)
 
   const rate = Number(interestRate)
   const rateValid = rate > 0 && rate <= 100
@@ -85,12 +88,23 @@ const ApproveDialog = ({ application, onClose, onDone }) => {
   const submit = async (e) => {
     e.preventDefault()
     if (!rateValid || !startDate) return
+    setLoading(true)
     try {
-      await approve({ variables: { id: application.id, interestRate: rate, startDate, note: note.trim() || null } })
-      toast.success(`Loan approved for ${ownerName(application.account?.owner)}`)
+      // Offline: the decision is saved in this browser and sent (and checked again) when back online
+      const { queued } = await mutateOrQueue({
+        operation: 'APPROVE_LOAN',
+        variables: { id: application.id, interestRate: rate, startDate, note: note.trim() || null },
+        getState: store.getState,
+        label: `Approve the loan of ${formatUGX(application.amount)} for ${ownerName(application.account?.owner)} at ${rate}%`,
+      })
+      toast.success(queued
+        ? `Approval for ${ownerName(application.account?.owner)} saved offline; it will be sent when you're back online`
+        : `Loan approved for ${ownerName(application.account?.owner)}`)
       onDone()
     } catch (error) {
       toast.error(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -144,17 +158,26 @@ const ApproveDialog = ({ application, onClose, onDone }) => {
 
 const RejectDialog = ({ application, onClose, onDone }) => {
   const [reason, setReason] = useState('')
-  const [reject, { loading }] = useMutation(REJECT_LOAN)
+  const store = useStore()
+  const [loading, setLoading] = useState(false)
 
   const submit = async (e) => {
     e.preventDefault()
     if (!reason.trim()) return
+    setLoading(true)
     try {
-      await reject({ variables: { id: application.id, reason: reason.trim() } })
-      toast.success('Application rejected')
+      const { queued } = await mutateOrQueue({
+        operation: 'REJECT_LOAN',
+        variables: { id: application.id, reason: reason.trim() },
+        getState: store.getState,
+        label: `Decline the loan application of ${formatUGX(application.amount)} from ${ownerName(application.account?.owner)}`,
+      })
+      toast.success(queued ? "Rejection saved offline; it will be sent when you're back online" : 'Application rejected')
       onDone()
     } catch (error) {
       toast.error(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -187,6 +210,11 @@ const RejectDialog = ({ application, onClose, onDone }) => {
 // Staff review of member loan applications made from the phone app
 const LoanApplications = () => {
   const dispatch = useDispatch()
+  const userId = useSelector(state => state.auth.user?.id)
+  const { all: outbox } = useOutbox(userId)
+  const queuedDecisions = useMemo(() => new Map(
+    outbox.filter(item => item.operation === 'APPROVE_LOAN' || item.operation === 'REJECT_LOAN').map(item => [item.variables.id, item])
+  ), [outbox])
   const [tab, setTab] = useState('PENDING')
   const [filtering, setFiltering] = useState('')
   const [sorting, setSorting] = useState([])
@@ -205,7 +233,8 @@ const LoanApplications = () => {
   const decided = () => {
     setApproving(null)
     setRejecting(null)
-    refetch()
+    // Offline the saved list stays; it refreshes once the decision has been sent
+    if (!isOffline()) refetch()
     // The loan book, accounts and sidebar count change with each decision
     dispatch(fetchLoans())
     dispatch(fetchAccounts())
@@ -263,15 +292,25 @@ const LoanApplications = () => {
           header: '',
           enableHiding: false,
           meta: { align: 'right' },
-          cell: ({ row }) => (
-            <span className="inline-flex gap-2">
-              <Button size="sm" onClick={() => setApproving(row.original)}>
-                <Check className="h-4 w-4" />
-                Approve
-              </Button>
-              <Button size="sm" variant="secondary" onClick={() => setRejecting(row.original)}>Reject</Button>
-            </span>
-          ),
+          cell: ({ row }) => {
+            // Decided offline: waiting to be sent (or refused when it was sent)
+            const queued = queuedDecisions.get(row.original.id)
+            if (queued) {
+              const what = queued.operation === 'APPROVE_LOAN' ? 'Approval' : 'Rejection'
+              return queued.error
+                ? <StatusBadge status={`${what} not sent`} className="bg-red-500/10 text-red-700 dark:text-red-400" />
+                : <StatusBadge status={`${what} waiting to sync`} className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400" />
+            }
+            return (
+              <span className="inline-flex gap-2">
+                <Button size="sm" onClick={() => setApproving(row.original)}>
+                  <Check className="h-4 w-4" />
+                  Approve
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => setRejecting(row.original)}>Reject</Button>
+              </span>
+            )
+          },
         }]
       : [
           ...(tab === 'REJECTED' ? [] : [{
@@ -297,7 +336,7 @@ const LoanApplications = () => {
             cell: ({ getValue }) => <span className="block max-w-sm truncate" title={getValue() || ''}>{getValue() || '–'}</span>,
           },
         ]),
-  ], [tab])
+  ], [tab, queuedDecisions])
 
   const table = useReactTable({
     data: applications,
@@ -342,11 +381,12 @@ const LoanApplications = () => {
           <div className="flex flex-1 items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
           </div>
-        ) : error ? (
+        ) : visibleError(error) ? (
           <div className="flex flex-1 items-center justify-center p-8 text-sm text-red-600 dark:text-red-400">{error.message}</div>
         ) : (
           <DataTable
             table={table}
+            loading={loading}
             empty={
               <TableEmpty title={current.empty} description={current.hint} />
             }

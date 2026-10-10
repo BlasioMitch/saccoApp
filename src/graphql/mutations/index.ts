@@ -172,31 +172,74 @@ export const DELETE_TRANSACTION = gql`
 }
 `;
 
-export const LOGIN = gql`
-  mutation Login($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
+const SESSION_USER_FIELDS = gql`
+  fragment SessionUserFields on User {
+    id
+    first_name
+    last_name
+    other_name
+    email
+    role
+    status
+    lastLogin
+    joinDate
+    contact
+    gender
+    dob
+    hasAccount
+    fullName
+    avatar
+    twoFactorEnabled
+  }
+`;
+
+// Each sign-in step answers with a session, or asks for the 2-step code (twoFactorRequired + challengeToken),
+// or a new password (mustChangePassword: signed in with a temporary password from staff)
+const AUTH_PAYLOAD_FIELDS = gql`
+  fragment AuthPayloadFields on AuthPayload {
     success
     message
     token
-    user {
-      id
-      first_name
-      last_name
-      other_name
-      email
-      role
-      status
-      lastLogin
-      joinDate
-      contact
-      gender
-      dob
-      hasAccount
-      fullName
-      avatar
-    }
+    twoFactorRequired
+    challengeToken
+    mustChangePassword
+    user { ...SessionUserFields }
   }
-}
+  ${SESSION_USER_FIELDS}
+`;
+
+export const LOGIN = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password) { ...AuthPayloadFields }
+  }
+  ${AUTH_PAYLOAD_FIELDS}
+`;
+
+export const VERIFY_TWO_FACTOR = gql`
+  mutation VerifyTwoFactor($challengeToken: String!, $code: String!) {
+    verifyTwoFactor(challengeToken: $challengeToken, code: $code) { ...AuthPayloadFields }
+  }
+  ${AUTH_PAYLOAD_FIELDS}
+`;
+
+export const SET_NEW_PASSWORD = gql`
+  mutation SetNewPassword($newPassword: String!) {
+    setNewPassword(newPassword: $newPassword) { ...AuthPayloadFields }
+  }
+  ${AUTH_PAYLOAD_FIELDS}
+`;
+
+export const PASSKEY_LOGIN = gql`
+  mutation PasskeyLogin($challengeToken: String!, $response: JSON!) {
+    passkeyLogin(challengeToken: $challengeToken, response: $response) { ...AuthPayloadFields }
+  }
+  ${AUTH_PAYLOAD_FIELDS}
+`;
+
+export const REQUEST_PASSWORD_RESET = gql`
+  mutation RequestPasswordReset($email: String!) {
+    requestPasswordReset(email: $email) { success message }
+  }
 `;
 
 export const LOGOUT = gql`

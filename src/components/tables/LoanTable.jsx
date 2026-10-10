@@ -30,6 +30,7 @@ import { ownerName } from '../../utils/names';
 const LoanTable = () => {
   const dispatch = useDispatch();
   const loans = useSelector((state) => state.loans.loans);
+  const loadingLoans = useSelector((state) => state.loans.status === 'loading');
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState('');
 
@@ -203,7 +204,7 @@ const LoanTable = () => {
         </Button>
       </TableToolbar>
 
-      <DataTable
+      <DataTable loading={loadingLoans}
         table={table}
         empty={
           <TableEmpty

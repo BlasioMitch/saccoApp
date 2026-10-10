@@ -13,6 +13,7 @@ import Avatar from '../../components/ui/Avatar'
 import Button from '../../components/ui/Button'
 import StatusBadge from '../../components/ui/StatusBadge'
 import { imageFileToAvatar } from '../../utils/avatar'
+import PasskeyCard from '../../components/auth/PasskeyCard'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const CONTACT_PATTERN = /^\+?\d{9,15}$/
@@ -142,7 +143,7 @@ const Settings = () => {
   return (
     <PageShell>
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-[var(--section-gap)] lg:grid-cols-3">
-        <div className="flex min-h-0 flex-col gap-[var(--section-gap)]">
+        <div className="flex min-h-0 flex-col gap-[var(--section-gap)] overflow-y-auto">
           <Card title="Appearance" description="Choose how SaccoApp looks on this device.">
             <div className="grid grid-cols-2 gap-2">
               {[['light', 'Light', Sun], ['dark', 'Dark', Moon]].map(([value, label, Icon]) => (
@@ -196,6 +197,8 @@ const Settings = () => {
             </div>
             <p className="mt-4 text-xs text-custom-text-secondary">JPG or PNG up to 5 MB; it is cropped to a square.</p>
           </Card>
+
+          <PasskeyCard Card={Card} />
         </div>
 
         <Card title="Profile" description="Your personal details. Only you can change these." className="lg:col-span-2">

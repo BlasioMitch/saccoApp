@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import client from '../graphql/client'
+import { mutateOrQueue } from '../offline/mutateOrQueue'
 import { GET_TRANSACTIONS } from '../graphql/queries'
-import { CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION, PAY_LOAN_FROM_SAVINGS } from '../graphql/mutations'
+import { DELETE_TRANSACTION, PAY_LOAN_FROM_SAVINGS } from '../graphql/mutations'
+import { isOffline } from '../offline/network'
 
 export { TransactionType, TransactionStatus } from '../utils/transactionRules'
 
@@ -25,7 +27,9 @@ export const fetchTransactions = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message || 'Something went wrong!')
     }
-  }
+  },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 
 // export const fetchTransactionById = createAsyncThunk(
@@ -45,12 +49,10 @@ export const fetchTransactions = createAsyncThunk(
 
 export const createTransaction = createAsyncThunk(
   'transactions/createTransaction',
-  async (transactionData, { rejectWithValue }) => {
+  async (transactionData, { rejectWithValue, getState }) => {
     try {
-      const { data } = await client.mutate({
-        mutation: CREATE_TRANSACTION,
-        variables: { transaction: transactionData }
-      })
+      // Offline: saved in this browser and sent later (the row shows "Waiting to sync" meanwhile)
+      const { data } = await mutateOrQueue({ operation: 'CREATE_TRANSACTION', variables: { transaction: transactionData }, getState })
       return data.createTransaction
     } catch (error) {
       return rejectWithValue(error.message || 'Something went wrong!')
@@ -76,17 +78,14 @@ export const payLoanFromSavings = createAsyncThunk(
 
 export const updateTransaction = createAsyncThunk(
   'transactions/updateTransaction',
-  async ({ id, transactionData }, { rejectWithValue }) => {
+  async ({ id, transactionData }, { rejectWithValue, getState }) => {
     try {
       // Only send allowed fields for update
       const allowedFields = ['type', 'amount', 'accountId', 'status', 'description', 'loanId'];
       const updateVars = Object.fromEntries(
         Object.entries(transactionData).filter(([key]) => allowedFields.includes(key))
       );
-      const { data } = await client.mutate({
-        mutation: UPDATE_TRANSACTION,
-        variables: { updateTransactionId: id, ...updateVars }
-      })
+      const { data } = await mutateOrQueue({ operation: 'UPDATE_TRANSACTION', variables: { updateTransactionId: id, ...updateVars }, getState })
       return data.updateTransaction
     } catch (error) {
       return rejectWithValue(error.message || 'Something went wrong!')

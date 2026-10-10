@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import client from '../graphql/client'
+import { mutateOrQueue } from '../offline/mutateOrQueue'
 import { GET_LOANS } from '../graphql/queries'
-import { CREATE_LOAN, UPDATE_LOAN, DELETE_LOAN } from '../graphql/mutations'
+import { DELETE_LOAN } from '../graphql/mutations'
+import { isOffline } from '../offline/network'
 // import { GET_LOAN_BY_ID } from '../graphql/queries'
 
 const initialState = {
@@ -23,7 +25,9 @@ export const fetchLoans = createAsyncThunk(
         } catch (error){
             return rejectWithValue(error.message || 'Something went wrong!')
         }
-    }
+    },
+  // Offline: keep the saved list instead of failing (it refreshes once the server is back)
+  { condition: () => !isOffline() }
 )
 
 // export const fetchLoanById = createAsyncThunk(
@@ -43,12 +47,10 @@ export const fetchLoans = createAsyncThunk(
 
 export const createLoan = createAsyncThunk(
     'loans/createLoan',
-    async (loanData, { rejectWithValue }) =>{
+    async (loanData, { rejectWithValue, getState }) =>{
         try{
-            const { data } = await client.mutate({
-                mutation: CREATE_LOAN,
-                variables: { loan: loanData }
-            })
+            // Offline: saved in this browser and sent later (the row shows "Waiting to sync" meanwhile)
+            const { data } = await mutateOrQueue({ operation: 'CREATE_LOAN', variables: { loan: loanData }, getState })
             return data.createLoan
         } catch (error){
             return rejectWithValue(error.message || 'something went wrong!')
@@ -73,17 +75,14 @@ export const deleteLoan = createAsyncThunk(
 
 export const patchLoan = createAsyncThunk(
     'loans/patchLoan',
-    async ({id, loanData}, { rejectWithValue}) => {
+    async ({id, loanData}, { rejectWithValue, getState }) => {
         try{
             // Only send allowed fields for update
             const allowedFields = ['accountId', 'amount', 'interestRate', 'status', 'endDate', 'startDate', 'term'];
             const updateVars = Object.fromEntries(
                 Object.entries(loanData).filter(([key]) => allowedFields.includes(key))
             );
-            const { data } = await client.mutate({
-                mutation: UPDATE_LOAN,
-                variables: { updateLoanId: id, ...updateVars }
-            })
+            const { data } = await mutateOrQueue({ operation: 'UPDATE_LOAN', variables: { updateLoanId: id, ...updateVars }, getState })
             return data.updateLoan
         } catch (error){
             return rejectWithValue(error.message || 'Something went wrong!')

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Bell, ChevronDown, LogOut, Settings, User } from 'lucide-react'
+import { ChevronDown, LogOut, Settings, User } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { logout, initializeAuth } from '../../reducers/authReducer'
@@ -7,6 +7,10 @@ import { toast } from 'sonner'
 import DropdownMenu from '../ui/DropdownMenu'
 import Avatar from '../ui/Avatar'
 import { getPageTitle } from './navigation'
+import NotificationBell from '../notifications/NotificationBell'
+import OfflineStatus from '../offline/OfflineStatus'
+import { clearOfflineData } from '../../offline/persist'
+import { getOutbox } from '../../offline/outbox'
 
 const UserMenu = ({ user, onLogout }) => {
   const navigate = useNavigate()
@@ -49,7 +53,7 @@ const TopBar = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { user, isAuthenticated } = useSelector((state) => state.auth)
-  const page = getPageTitle(pathname, { isAdmin: user?.role?.toLowerCase() !== 'user' })
+  const page = getPageTitle(pathname, { isAdmin: user?.role?.toLowerCase() !== 'user', role: user?.role })
 
   useEffect(() => {
     // Initialize auth state from localStorage on component mount
@@ -57,8 +61,11 @@ const TopBar = () => {
   }, [dispatch])
 
   const handleLogout = async () => {
+    const waiting = getOutbox().filter(item => item.userId === user?.id && !item.error).length
     try {
       await dispatch(logout()).unwrap()
+      await clearOfflineData()
+      if (waiting) toast.info(`${waiting} change${waiting === 1 ? '' : 's'} made offline will be sent after you sign in again`)
       toast.success('Logged out successfully')
       navigate('/')
     } catch (error) {
@@ -79,12 +86,8 @@ const TopBar = () => {
       </h1>
 
       <div className="flex items-center gap-2">
-        <button
-          className="flex h-10 w-10 items-center justify-center rounded-full text-custom-text-secondary transition-colors hover:bg-custom-interactive-hover hover:text-custom-text-primary"
-          aria-label="Notifications"
-        >
-          <Bell className="h-5 w-5" />
-        </button>
+        {isAuthenticated && user && <OfflineStatus />}
+        {isAuthenticated && user && <NotificationBell />}
         {isAuthenticated && user && <UserMenu user={user} onLogout={handleLogout} />}
       </div>
     </header>

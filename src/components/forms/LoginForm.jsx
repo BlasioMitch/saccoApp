@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-function LoginForm({ onSubmit }) {
+function LoginForm({ onSubmit, onForgotPassword, onEmailChange, loading = false }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -22,13 +22,22 @@ function LoginForm({ onSubmit }) {
             className="mt-2 block w-full h-10 px-4 text-sm bg-custom-bg-tertiary dark:bg-custom-bg-tertiary border border-custom-brand-light dark:border-custom-brand-dark rounded-lg text-custom-text-primary dark:text-custom-text-primary placeholder-custom-text-muted dark:placeholder-custom-text-muted focus:outline-none focus:ring-2 focus:ring-custom-brand-primary transition-colors"
             placeholder="Enter your email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) => { setFormData({ ...formData, email: e.target.value }); onEmailChange?.(e.target.value) }}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-custom-text-primary">
-            Password
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-custom-text-primary">
+              Password
+            </label>
+            <button
+              type="button"
+              onClick={() => onForgotPassword?.(formData.email)}
+              className="text-sm text-custom-brand-primary hover:text-custom-brand-dark transition-colors"
+            >
+              Forgot password?
+            </button>
+          </div>
           <input
             type="password"
             required
@@ -40,9 +49,10 @@ function LoginForm({ onSubmit }) {
         </div>
         <button
           type="submit"
-          className="w-full px-4 h-10 text-sm font-medium text-custom-interactive-active-text bg-custom-brand-primary hover:bg-custom-brand-dark focus:bg-custom-brand-dark rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-brand-primary"
+          disabled={loading}
+          className="w-full px-4 h-10 text-sm font-medium text-custom-interactive-active-text bg-custom-brand-primary hover:bg-custom-brand-dark focus:bg-custom-brand-dark rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-brand-primary disabled:opacity-60"
         >
-          Sign In
+          {loading ? 'Signing in…' : 'Sign In'}
         </button>
       </form>
       <p className="text-sm text-center text-custom-text-secondary dark:text-custom-text-secondary">

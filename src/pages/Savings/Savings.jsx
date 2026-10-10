@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { PiggyBank, Receipt, Trophy, BarChart3, Loader2 } from 'lucide-react'
+import { PiggyBank, Receipt, Trophy, BarChart3 } from 'lucide-react'
 import { toast } from 'sonner'
 import { StatGrid } from '../../components/ui/StatCard'
+import { TableRowsSkeleton } from '../../components/ui/Skeleton'
 import { PageShell, Panel } from '../../components/layout/PageShell'
 import SavingsTable, { MONTHS } from '../../components/tables/SavingsTable'
 import { fetchSavingsReport } from '../../reducers/savingsReducer'
@@ -72,9 +73,7 @@ const Savings = () => {
       <StatGrid stats={statCards} />
       <Panel>
         {status === 'loading' && !report ? (
-          <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
-          </div>
+          <TableRowsSkeleton rows={10} columns={8} />
         ) : (
           <SavingsTable
             report={report}
