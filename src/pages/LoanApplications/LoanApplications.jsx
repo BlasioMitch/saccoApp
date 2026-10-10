@@ -26,9 +26,15 @@ import { cn } from '../../lib/utils'
 import OwnerCell from '../../components/ui/OwnerCell'
 
 const TABS = [
-  { key: 'PENDING', label: 'Pending' },
-  { key: 'REJECTED', label: 'Rejected' },
+  { key: 'PENDING', label: 'Pending', empty: 'No applications waiting', hint: 'Loan applications made from the member app appear here.' },
+  { key: 'APPROVED', label: 'Approved', empty: 'No approved applications', hint: 'Applications you approve become loans and are listed here.' },
+  { key: 'REJECTED', label: 'Rejected', empty: 'No rejected applications' },
+  { key: 'ALL', label: 'All', empty: 'No applications yet', hint: 'Loan applications made from the member app appear here.' },
 ]
+
+// Stable empty list: a new [] on every render while loading makes the table reset its paging,
+// which re-renders the page in an endless loop (the page froze when switching tabs)
+const NO_APPLICATIONS = []
 
 const inputClass = 'h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary'
 const labelClass = 'mb-2 block text-sm font-medium text-custom-text-primary'
@@ -64,7 +70,11 @@ const Summary = ({ application }) => (
 
 const ApproveDialog = ({ application, onClose, onDone }) => {
   const [interestRate, setInterestRate] = useState(String(application.interestRate ?? ''))
-  const [startDate, setStartDate] = useState(moment().format(DATE_FORMAT))
+  // Starts from the member's proposed date (today if that has already passed)
+  const [startDate, setStartDate] = useState(() => {
+    const proposed = application.startDate ? moment(application.startDate) : null
+    return proposed && proposed.isSameOrAfter(moment(), 'day') ? proposed.format(DATE_FORMAT) : moment().format(DATE_FORMAT)
+  })
   const [note, setNote] = useState('')
   const [approve, { loading }] = useMutation(APPROVE_LOAN)
 
@@ -184,11 +194,13 @@ const LoanApplications = () => {
   const [approving, setApproving] = useState(null)
   const [rejecting, setRejecting] = useState(null)
 
-  const { data, loading, error, refetch } = useQuery(GET_LOAN_APPLICATIONS, {
-    variables: { status: tab },
+  const { data, previousData, loading, error, refetch } = useQuery(GET_LOAN_APPLICATIONS, {
+    variables: { view: tab },
     fetchPolicy: 'cache-and-network',
   })
-  const applications = data?.getLoanApplications || []
+  // Keep showing the last list while another tab loads
+  const applications = (data ?? previousData)?.getLoanApplications ?? NO_APPLICATIONS
+  const current = TABS.find(option => option.key === tab)
 
   const decided = () => {
     setApproving(null)
@@ -220,6 +232,12 @@ const LoanApplications = () => {
       accessorKey: 'purpose',
       header: 'Purpose',
       cell: ({ getValue }) => <span className="block max-w-xs truncate" title={getValue() || ''}>{getValue() || '–'}</span>,
+    },
+    {
+      accessorKey: 'startDate',
+      meta: { label: 'Proposed start' },
+      header: ({ column }) => <SortableHeader column={column} label="Proposed start" />,
+      cell: ({ getValue }) => getValue() ? moment(getValue()).format('DD MMM YYYY') : '–',
     },
     {
       accessorKey: 'createdAt',
@@ -256,6 +274,18 @@ const LoanApplications = () => {
           ),
         }]
       : [
+          ...(tab === 'REJECTED' ? [] : [{
+            accessorKey: 'status',
+            header: 'Status',
+            cell: ({ getValue }) => <StatusBadge status={getValue()} />,
+          }]),
+          ...(tab === 'APPROVED' ? [{
+            id: 'remaining',
+            meta: { label: 'Remaining', emphasis: 'amount' },
+            header: 'Remaining',
+            accessorFn: (row) => Number(row.summary?.remainingBalance ?? 0),
+            cell: ({ getValue }) => formatUGX(getValue()),
+          }] : []),
           {
             accessorKey: 'decidedAt',
             header: 'Decided',
@@ -263,7 +293,7 @@ const LoanApplications = () => {
           },
           {
             accessorKey: 'decisionNote',
-            header: 'Reason',
+            header: tab === 'REJECTED' ? 'Reason' : 'Note',
             cell: ({ getValue }) => <span className="block max-w-sm truncate" title={getValue() || ''}>{getValue() || '–'}</span>,
           },
         ]),
@@ -292,7 +322,10 @@ const LoanApplications = () => {
                 key={option.key}
                 role="tab"
                 aria-selected={tab === option.key}
-                onClick={() => setTab(option.key)}
+                onClick={() => {
+                  setTab(option.key)
+                  table.setPageIndex(0)
+                }}
                 className={cn(
                   'h-8 rounded-md px-4 text-sm font-medium transition-colors',
                   tab === option.key ? 'bg-custom-interactive-active-bg text-custom-interactive-active-text' : 'text-custom-text-secondary hover:bg-custom-interactive-hover'
@@ -305,7 +338,7 @@ const LoanApplications = () => {
           <ColumnMenu table={table} />
         </TableToolbar>
 
-        {loading && !data ? (
+        {loading && !data && !previousData ? (
           <div className="flex flex-1 items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-custom-brand-primary" />
           </div>
@@ -315,10 +348,7 @@ const LoanApplications = () => {
           <DataTable
             table={table}
             empty={
-              <TableEmpty
-                title={tab === 'PENDING' ? 'No applications waiting' : 'No rejected applications'}
-                description={tab === 'PENDING' ? 'Loan applications made from the member app appear here.' : undefined}
-              />
+              <TableEmpty title={current.empty} description={current.hint} />
             }
           />
         )}

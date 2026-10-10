@@ -491,14 +491,20 @@ export const ME = gql`
 
 // Loan applications (member requests from the app) for the staff Applications page
 export const GET_LOAN_APPLICATIONS = gql`
-  query GetLoanApplications($status: LOANSTATUS) {
-    getLoanApplications(status: $status) {
+  query GetLoanApplications($status: LOANSTATUS, $view: APPLICATIONVIEW) {
+    getLoanApplications(status: $status, view: $view) {
       id
       accountId
       amount
       interestRate
       term
+      startDate
       status
+      summary {
+        id
+        monthlyPayment
+        remainingBalance
+      }
       purpose
       decisionNote
       decidedAt

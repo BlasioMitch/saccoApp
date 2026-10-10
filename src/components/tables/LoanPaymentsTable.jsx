@@ -49,7 +49,7 @@ const LoanPaymentsTable = ({ report, year, month, onYearChange, onMonthChange })
 
   return (
     <MonthlyTimelineTable
-      rows={report?.loans || []}
+      rows={report?.loans}
       totals={totals}
       availableYears={report?.availableYears}
       year={year}

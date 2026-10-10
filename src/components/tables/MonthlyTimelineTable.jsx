@@ -10,6 +10,9 @@ import { Calendar } from 'lucide-react'
 import { TableToolbar, ColumnMenu, DataTable, TableEmpty, TablePagination, SortableHeader } from './TableShell'
 import OwnerCell from '../ui/OwnerCell'
 
+// Stable fallback while a report loads: a fresh [] each render makes the table reset and re-render endlessly
+const NO_ROWS = []
+
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // Timeline cells drop the currency prefix to save width; the toolbar states amounts are in UGX
@@ -25,7 +28,7 @@ const selectClass = 'h-10 rounded-lg border border-custom-bg-tertiary bg-custom-
 // frozen Member column · leading columns · B/F · Jan..Dec (selected month highlighted) · trailing columns,
 // with a pinned totals row and Year / Month filters in the toolbar
 const MonthlyTimelineTable = ({
-  rows = [],
+  rows = NO_ROWS,
   totals,
   availableYears = [],
   year,

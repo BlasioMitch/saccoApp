@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { MoreVertical, Eye, Pencil, Trash2, UserPlus } from 'lucide-react'
 import {
   useReactTable,
@@ -220,7 +220,7 @@ function UsersTable({ users, onEdit, onView }) {
     onGlobalFilterChange: setFiltering,
     onColumnFiltersChange: setColumnFilters,
     filterFns: {
-      nameFilter: (row, id, filterValue) => {
+      nameFilter: (row, _columnId, filterValue) => {
         const first = row.original.first_name || ''
         const last = row.original.last_name || ''
         const other = row.original.other_name || ''

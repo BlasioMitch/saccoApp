@@ -23,7 +23,7 @@ const SavingsTable = ({ report, year, month, onYearChange, onMonthChange }) => {
 
   return (
     <MonthlyTimelineTable
-      rows={report?.members || []}
+      rows={report?.members}
       totals={totals}
       availableYears={report?.availableYears}
       year={year}

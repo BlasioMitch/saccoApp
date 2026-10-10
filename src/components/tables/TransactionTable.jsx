@@ -24,6 +24,9 @@ import { fetchLoans } from '../../reducers/loansReducer';
 import OwnerCell from '../ui/OwnerCell';
 
 // Same hues as before, tuned to stay legible in both themes
+// Stable fallback so the table never sees a new array on each render
+const NO_TRANSACTIONS = [];
+
 const TYPE_STYLES = {
   SAVINGS_DEPOSIT: 'bg-green-500/10 text-green-700 dark:text-green-400',
   ACCOUNT_WITHDRAW: 'bg-red-500/10 text-red-700 dark:text-red-400',
@@ -145,7 +148,7 @@ const TransactionTable = ({ onRowClick, onEdit, onDelete, onView }) => {
   };
 
   const table = useReactTable({
-    data: transactions || [],
+    data: transactions || NO_TRANSACTIONS,
     columns: [...columns, actionColumn],
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

@@ -6,8 +6,7 @@
       },
     ],
     "compilerOptions": {
-      "baseUrl": ".",
-      "moduleResolution": "node",
+      "moduleResolution": "bundler",
       "esModuleInterop": true,
       "module": "esnext",
       "target": "esnext",
