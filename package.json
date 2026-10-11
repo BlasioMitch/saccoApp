@@ -11,7 +11,10 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "server": "json-server -p3001 --watch db.json",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -45,7 +48,12 @@
     "@graphql-codegen/cli": "^7.4.3",
     "@graphql-codegen/client-preset": "^6.2.0",
     "@graphql-codegen/introspection": "^6.1.0",
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/vite": "^4.1.4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^22.15.3",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.2.22",
@@ -55,12 +63,15 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "fake-indexeddb": "^6.2.5",
     "gh-pages": "^6.3.0",
+    "jsdom": "^26.1.0",
     "json-server": "^1.0.0-beta.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "vite": "^6.3.6",
-    "vite-plugin-pwa": "^2.0.0"
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^3.2.7"
   }
 }

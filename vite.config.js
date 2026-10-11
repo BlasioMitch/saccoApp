@@ -33,6 +33,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },  
+  // Unit tests (npm test): browser-like jsdom with IndexedDB faked; E2E lives in e2e/ (Playwright)
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+    include: ['src/**/*.test.{js,jsx}'],
+    css: false,
+  },
   rollUpOptions: {
     output: {
       manualChunks: {
