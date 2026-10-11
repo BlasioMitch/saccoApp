@@ -41,12 +41,13 @@ const NO_APPLICATIONS = []
 const inputClass = 'h-10 w-full rounded-lg border border-custom-bg-tertiary bg-custom-bg-secondary px-4 text-sm text-custom-text-primary focus:outline-none focus:ring-2 focus:ring-custom-brand-primary'
 const labelClass = 'mb-2 block text-sm font-medium text-custom-text-primary'
 
+// Announced as a dialog named by its title (screen readers, keyboard users)
 const Modal = ({ title, onClose, children }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6">
-    <div className="max-h-full w-full max-w-md overflow-y-auto rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6 shadow-2xl">
+    <div role="dialog" aria-modal="true" aria-label={title} className="max-h-full w-full max-w-md overflow-y-auto rounded-lg border border-custom-bg-tertiary bg-custom-bg-primary p-6 shadow-2xl">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold leading-6 text-custom-text-primary">{title}</h2>
-        <button onClick={onClose} className="text-custom-text-secondary hover:text-custom-text-primary" aria-label="Close">
+        <button type="button" onClick={onClose} className="text-custom-text-secondary hover:text-custom-text-primary" aria-label="Close">
           <X className="h-5 w-5" />
         </button>
       </div>
